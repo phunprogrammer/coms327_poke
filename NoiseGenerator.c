@@ -1,19 +1,5 @@
 #include "PerlinNoise.h"
-
-#define HEIGHT 21
-#define WIDTH 80
-#define WAVENUM 5
-
-typedef struct Wave {
-    float seed;
-    float frequency;
-    float amplitude;
-} wave_t;
-
-typedef struct Offset {
-    float x;
-    float y;
-} offset_t;
+#include "NoiseGenerator.h"
 
 float* Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
     float noiseMap[WIDTH][HEIGHT] = { 0 };
@@ -37,4 +23,4 @@ float* Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
     }
 
     return noiseMap;
-}   
+}

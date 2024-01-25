@@ -1,17 +1,16 @@
 #include "NoiseGenerator.h"
 #include <stdio.h>
 
-void GeneratePPM (int width, int length, int height) {
-    remove("noisemap.ppm");
+void GeneratePPM (int length, int width, int height) {
     FILE *fptr;
     fptr = fopen("noisemap.ppm", "w");
     
-    fprintf(fptr, "%d %d %d\n", width, length, height);
+    fprintf(fptr, "P3 %d %d %d\n", length, width, height);
 
     wave_t altitudeWave;
     altitudeWave.amplitude = 1;
     altitudeWave.frequency = 0.05;
-    altitudeWave.seed = 56;
+    altitudeWave.seed = 3200;
 
     wave_t humidityWave;
     humidityWave.amplitude = 1;
@@ -26,9 +25,11 @@ void GeneratePPM (int width, int length, int height) {
 
     noisemap_t noiseMap = Generate(1, waves, offset);
 
-    for (int i = 0; i < LENGTH; i++) {
-        for (int j = 0; j < WIDTH; j++) {
-            fprintf(fptr, "%f %f %f\n", noiseMap.map[i][j], noiseMap.map[i][j], noiseMap.map[i][j]);
+    for (int y = 0; y < WIDTH; y++) {
+        for (int x = 0; x < LENGTH; x++) {
+            int value = (int)((noiseMap.map[y][x] + 0.6) * 212.0);
+
+            fprintf(fptr, "%d %d %d\n", value, value, value);
         }
     }
 
@@ -36,6 +37,6 @@ void GeneratePPM (int width, int length, int height) {
 }
 
 int main () {
-    GeneratePPM(WIDTH, LENGTH, 255);
+    GeneratePPM(LENGTH, WIDTH, 255);
     return 0;
 }

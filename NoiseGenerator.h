@@ -1,8 +1,8 @@
 #ifndef NOISEGENERATOR_H
 #define NOISEGENERATOR_H
 
-#define HEIGHT 21
-#define WIDTH 80
+#define WIDTH 21
+#define LENGTH 80
 #define WAVENUM 1
 
 typedef struct Wave {
@@ -17,7 +17,7 @@ typedef struct Offset {
 } offset_t;
 
 typedef struct NoiseMap {
-    float map[WIDTH][HEIGHT];
+    float map[LENGTH][WIDTH];
 } noisemap_t;
 
 noisemap_t Generate (float scale, wave_t waves[WAVENUM], offset_t offset);

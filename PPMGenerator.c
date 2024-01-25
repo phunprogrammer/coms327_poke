@@ -2,10 +2,10 @@
 #include <stdio.h>
 
 void GeneratePPM (int width, int length, int height) {
+    remove("noisemap.ppm");
     FILE *fptr;
     fptr = fopen("noisemap.ppm", "w");
-
-
+    
     fprintf(fptr, "%d %d %d\n", width, length, height);
 
     wave_t altitudeWave;
@@ -26,7 +26,7 @@ void GeneratePPM (int width, int length, int height) {
 
     noisemap_t noiseMap = Generate(1, waves, offset);
 
-    for (int i = 0; i < WIDTH; i++) {
+    for (int i = 0; i < LENGTH; i++) {
         for (int j = 0; j < WIDTH; j++) {
             fprintf(fptr, "%f %f %f\n", noiseMap.map[i][j], noiseMap.map[i][j], noiseMap.map[i][j]);
         }
@@ -36,6 +36,6 @@ void GeneratePPM (int width, int length, int height) {
 }
 
 int main () {
-    GeneratePPM(HEIGHT, WIDTH, 255);
+    GeneratePPM(WIDTH, LENGTH, 255);
     return 0;
 }

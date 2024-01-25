@@ -4,11 +4,16 @@
 
 noisemap_t Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
     noisemap_t noiseMap;
-
     int i,j,k;
 
-    for (i = 0; i < WIDTH; i++) {
-        for (j = 0; j < HEIGHT; j++) {
+    for (i = 0; i < LENGTH; i++) {
+        for (j = 0; j < WIDTH; j++) {
+            noiseMap.map[i][j] = 0;
+        }
+    }
+
+    for (i = 0; i < LENGTH; i++) {
+        for (j = 0; j < WIDTH; j++) {
             float posX = (float)i * scale + offset.x;
             float posY = (float)j * scale + offset.y;
 

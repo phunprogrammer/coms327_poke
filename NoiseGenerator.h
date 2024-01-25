@@ -1,20 +1,7 @@
+#include "Config.h"
+
 #ifndef NOISEGENERATOR_H
 #define NOISEGENERATOR_H
-
-#define WIDTH 210
-#define LENGTH 800
-#define WAVENUM 2
-
-typedef struct Wave {
-    float seed;
-    float frequency;
-    float amplitude;
-} wave_t;
-
-typedef struct Offset {
-    float x;
-    float y;
-} offset_t;
 
 typedef struct NoiseMap {
     float map[WIDTH][LENGTH];

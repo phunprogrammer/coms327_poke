@@ -1,8 +1,9 @@
 #include "PerlinNoise.h"
 #include "NoiseGenerator.h"
+#include <stdio.h>
 
-float* Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
-    float noiseMap[WIDTH][HEIGHT] = { 0 };
+noisemap_t Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
+    noisemap_t noiseMap;
 
     int i,j,k;
 
@@ -14,11 +15,11 @@ float* Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
             float normalization = 0.0f;
 
             for (k = 0; k < WAVENUM; k++) {
-                noiseMap[i][j] += waves[k].amplitude * noise2(posX * waves[k].frequency + waves[k].seed, posY * waves[k].frequency + waves[k].seed);
+                noiseMap.map[i][j] += waves[k].amplitude * noise2(posX * waves[k].frequency + waves[k].seed, posY * waves[k].frequency + waves[k].seed);
                 normalization += waves[k].amplitude;
             }
 
-            noiseMap[i][j] /= normalization;
+            noiseMap.map[i][j] /= normalization;
         }
     }
 

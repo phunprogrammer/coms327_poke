@@ -1,3 +1,7 @@
+#define FADE(t) ( t * t * t * ( t * ( t * 6 - 15 ) + 10 ) )
+#define FASTFLOOR(x) ( ((int)(x)<(x)) ? ((int)x) : ((int)x-1 ) )
+#define LERP(t, a, b) ((a) + (t)*((b)-(a)))
+
 unsigned char perm[] = {151,160,137,91,90,15,
   131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
   190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
@@ -26,7 +30,12 @@ unsigned char perm[] = {151,160,137,91,90,15,
   138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 };
 
-
+float grad2( int hash, float x, float y ) {
+    int h = hash & 7;      // Convert low 3 bits of hash code
+    float u = h<4 ? x : y;  // into 8 simple gradient directions,
+    float v = h<4 ? y : x;  // and compute the dot product with (x,y).
+    return ((h&1)? -u : u) + ((h&2)? -2.0*v : 2.0*v);
+}
 
 float noise2( float x, float y )
 {

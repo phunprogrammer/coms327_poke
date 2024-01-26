@@ -24,15 +24,18 @@ waves_t GetWaves() {
         printf("Initialize the game first!");
 
     waves_t waves;
+    int i = 0;
 
-    for (int i = 0; i < WAVENUM; i++) {
-        waves.Altitude[i].amplitude = AMPLITUDE[0];
-        waves.Altitude[i].frequency = FREQUENCY[0];
+    for (; i < WAVENUM; i++) {
+        waves.Altitude[i].amplitude = AMPLITUDE[i];
+        waves.Altitude[i].frequency = FREQUENCY[i];
         waves.Altitude[i].seed = 0;
+    }
 
-        waves.Humidity[i].amplitude = AMPLITUDE[1];
-        waves.Humidity[i].frequency = FREQUENCY[1];
-        waves.Humidity[i].seed = 0;
+    for (int j = 0; j < WAVENUM; j++) {
+        waves.Humidity[j].amplitude = AMPLITUDE[i];
+        waves.Humidity[j].frequency = FREQUENCY[i];
+        waves.Humidity[j].seed = 0;
     }
 
     return waves;

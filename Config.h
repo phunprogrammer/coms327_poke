@@ -1,16 +1,16 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define WIDTH 210
-#define LENGTH 800
-#define WAVENUM 5
+#define WIDTH 21
+#define LENGTH 80
+#define WAVENUM 2
+#define BIOMENUM 5
 
 //Waves
-#define AMPLITUDE (float[]){ 1, 1 }
-#define FREQUENCY (float[]){ 0.05, 0.03 }
+#define AMPLITUDE (float[]){ 1.1, 0.9, 1, 1 }
+#define FREQUENCY (float[]){ 0.05, 0.07, 0.03, 0.03 }
 
 //Biomes
-#define BIOMENUM 5
 enum Biome {
     FOREST,
     MOUNTAIN,

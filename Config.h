@@ -3,7 +3,7 @@
 
 #define WIDTH 210
 #define LENGTH 800
-#define WAVENUM 2
+#define WAVENUM 5
 
 //Waves
 #define AMPLITUDE (float[]){ 1, 1 }
@@ -25,6 +25,11 @@ typedef struct Wave {
     float amplitude;
 } wave_t;
 
+typedef struct Waves {
+    wave_t Altitude[WAVENUM];
+    wave_t Humidity[WAVENUM];
+} waves_t;
+
 typedef struct Offset {
     float x;
     float y;
@@ -36,10 +41,12 @@ typedef struct BiomeType {
     float minHumidity;
 } biomeType_t;
 
+extern volatile int initialized;
+
 extern const biomeType_t Biomes[BIOMENUM];
 
 void Initialize();
 
-void InitWaves(wave_t waves[WAVENUM]);
+waves_t GetWaves();
 
 #endif

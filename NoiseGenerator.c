@@ -12,6 +12,9 @@
  * @return noisemap_t 
  */
 noisemap_t Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
+    if (initialized == 0)
+        printf("Initialize the game first!");
+        
     noisemap_t noiseMap;
     int x,y,k;
 

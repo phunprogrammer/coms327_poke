@@ -1,7 +1,7 @@
 #include "Config.h"
 #include <stdio.h>
 
-static int initialized = 0;
+volatile int initialized = 0;
 
 //Biome Assignment
 const biomeType_t Biomes[BIOMENUM] = {
@@ -17,16 +17,23 @@ void Initialize() {
         return;
 
     initialized = 1;
-
 }
 
-void InitWaves(wave_t waves[WAVENUM]) {
+waves_t GetWaves() {
     if (initialized == 0)
         printf("Initialize the game first!");
 
+    waves_t waves;
+
     for (int i = 0; i < WAVENUM; i++) {
-        waves[i].amplitude = AMPLITUDE[i];
-        waves[i].frequency = FREQUENCY[i];
-        waves[i].seed = 0;
+        waves.Altitude[i].amplitude = AMPLITUDE[0];
+        waves.Altitude[i].frequency = FREQUENCY[0];
+        waves.Altitude[i].seed = 0;
+
+        waves.Humidity[i].amplitude = AMPLITUDE[1];
+        waves.Humidity[i].frequency = FREQUENCY[1];
+        waves.Humidity[i].seed = 0;
     }
+
+    return waves;
 }

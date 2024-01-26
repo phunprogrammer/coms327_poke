@@ -3,6 +3,9 @@
 #include <stdio.h>
 
 void GeneratePPM(int length, int width, int height) {
+    if (initialized == 0)
+        printf("Initialize the game first!");
+
     FILE *fptr;
     fptr = fopen("noisemap.ppm", "w");
     
@@ -12,10 +15,9 @@ void GeneratePPM(int length, int width, int height) {
     offset.x = 0;
     offset.y = 0;
 
-    wave_t waves[WAVENUM];
-    InitWaves(waves);
+    waves_t waves = GetWaves();
 
-    noisemap_t noiseMap = Generate(1, waves, offset);
+    noisemap_t noiseMap = Generate(1, waves.Altitude, offset);
 
     float max = -100;
     float min = 100;

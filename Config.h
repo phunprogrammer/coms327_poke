@@ -39,6 +39,7 @@ typedef struct BiomeType {
     enum Biome biomeID;
     float minHeight;
     float minHumidity;
+    char type;
 } biomeType_t;
 
 extern volatile int initialized;

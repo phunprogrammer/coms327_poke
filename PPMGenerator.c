@@ -2,7 +2,7 @@
 #include "Config.h"
 #include <stdio.h>
 
-void GeneratePPM (int length, int width, int height) {
+void GeneratePPM(int length, int width, int height) {
     FILE *fptr;
     fptr = fopen("noisemap.ppm", "w");
     
@@ -37,10 +37,4 @@ void GeneratePPM (int length, int width, int height) {
     printf("Max: %f, min: %f\n", max, min);
 
     fclose(fptr);
-}
-
-int main () {
-    initialize();
-    GeneratePPM(LENGTH, WIDTH, 255);
-    return 0;
 }

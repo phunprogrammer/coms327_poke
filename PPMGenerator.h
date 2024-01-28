@@ -4,8 +4,12 @@
 #ifndef PPMGENERATOR_H
 #define PPMGENERATOR_H
 
-void GeneratePPM (int length, int width, int height);
+void GeneratePPM (int length, int width, int height, waves_t waves);
 
-void ColorTile(FILE *file, enum Biome biome);
+void PrintNext(enum Biome biome);
+
+void PrintHeader();
+
+void CloseFile();
 
 #endif

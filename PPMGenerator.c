@@ -4,18 +4,15 @@
 #include "PPMGenerator.h"
 #include <stdio.h>
 
-void GeneratePPM(int length, int width, int height) {
+static FILE *file;
+
+void GeneratePPM(int length, int width, int height, waves_t waves) {
     if (initialized == 0)
         printf("Initialize the game first!");
 
-    FILE *file;
-    file = fopen("noisemap.ppm", "w");
-    
-    fprintf(file, "P3 %d %d %d\n", length, width, height);
+    PrintHeader();
 
     offset_t offset = { 0, 0 };
-
-    waves_t waves = GetWaves();
 
     noisemap_t altitudeMap = Generate(1, waves.Altitude, offset);
     noisemap_t humidityMap = Generate(1, waves.Humidity, offset);
@@ -44,7 +41,7 @@ void GeneratePPM(int length, int width, int height) {
                 maxHum = humidityMap.map[y][x];
             }
             
-            ColorTile(file, ChooseBiome(altitudeMap.map[y][x], humidityMap.map[y][x]).biomeID);
+            PrintNext(ChooseBiome(altitudeMap.map[y][x], humidityMap.map[y][x]).biomeID);
         }
     }
 
@@ -53,7 +50,7 @@ void GeneratePPM(int length, int width, int height) {
     printf("Max Altitude: %f, Min Altitude: %f\nMax Humidity: %f, Min Humidity: %f\n", maxAlt, minAlt, maxHum, minHum);
 }
 
-void ColorTile(FILE *file, enum Biome biome) {
+void PrintNext(enum Biome biome) {
     switch (biome) {
         case 0:
             fprintf(file, "%d %d %d\n", 24, 115, 0);
@@ -71,4 +68,14 @@ void ColorTile(FILE *file, enum Biome biome) {
             fprintf(file, "%d %d %d\n", 0, 110, 236);
             break;
     }
+}
+
+void PrintHeader() {
+    file = fopen("noisemap.ppm", "w");
+
+    fprintf(file, "P3 %d %d %d\n", LENGTH, WIDTH, 255);
+}
+
+void CloseFile() {
+    fclose(file);
 }

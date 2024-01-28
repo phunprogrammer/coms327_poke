@@ -8,7 +8,7 @@ void GeneratePPM (int length, int width, int height, waves_t waves);
 
 void PrintNext(enum Biome biome);
 
-void PrintHeader();
+void PrintHeader(int length, int width, int height);
 
 void CloseFile();
 

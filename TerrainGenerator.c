@@ -1,19 +1,16 @@
 #include "NoiseGenerator.h"
 #include "Config.h"
 #include "TerrainGenerator.h"
-#include "PPMGenerator.h"
 #include <stdio.h>
 #include <stdlib.h> 
 
 static offset_t offset = { .x = 0, .y = 0 };
 
-void GenerateTerrain(waves_t waves) {
-    offset_t offset = { 0, 0 };
+noisemap_t GenerateTerrain(waves_t waves) {
+    noisemap_t biomeMap = { 0 };
 
     noisemap_t altitudeMap = Generate(1, waves.Altitude, offset);
     noisemap_t humidityMap = Generate(1, waves.Humidity, offset);
-
-    PrintHeader();
 
     for (int y = 0; y < WIDTH; y++) {
         for (int x = 0; x < LENGTH; x++) {
@@ -25,12 +22,12 @@ void GenerateTerrain(waves_t waves) {
                 biome = ChooseBiome(altitudeMap.map[y][x], humidityMap.map[y][x]);
 
             printf("%c", biome.type);
-            PrintNext(biome.biomeID);
+            biomeMap.map[y][x] = (float)biome.biomeID;
         }
         printf("\n");
     }
 
-    CloseFile();
+    return biomeMap;
 }
 
 biomeType_t ChooseBiome(float altitude, float humidity) {
@@ -63,6 +60,6 @@ biomeType_t ChooseBiome(float altitude, float humidity) {
 }
 
 void UpdateOffset(int x, int y) {
-    offset.x = x;
-    offset.y = y;
+    offset.x = x * LENGTH;
+    offset.y = y * WIDTH;
 }

@@ -10,7 +10,7 @@ void GeneratePPM(int length, int width, int height, waves_t waves) {
     if (initialized == 0)
         printf("Initialize the game first!");
 
-    PrintHeader();
+    PrintHeader(length, width, height);
 
     offset_t offset = { 0, 0 };
 
@@ -70,10 +70,10 @@ void PrintNext(enum Biome biome) {
     }
 }
 
-void PrintHeader() {
+void PrintHeader(int length, int width, int height) {
     file = fopen("noisemap.ppm", "w");
 
-    fprintf(file, "P3 %d %d %d\n", LENGTH, WIDTH, 255);
+    fprintf(file, "P3 %d %d %d\n", length, width, height);
 }
 
 void CloseFile() {

@@ -3,6 +3,7 @@
 
 #define WIDTH 21
 #define LENGTH 80
+#define SCREENS 17 //Max 17
 #define WAVENUM 2
 #define BIOMENUM 5
 
@@ -18,6 +19,10 @@ enum Biome {
     GRASSLAND,
     OCEAN
 };
+
+typedef struct NoiseMap {
+    float map[WIDTH][LENGTH];
+} noisemap_t;
 
 typedef struct Wave {
     float seed;

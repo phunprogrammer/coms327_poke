@@ -7,8 +7,8 @@
 #define BIOMENUM 5
 
 //Waves
-#define AMPLITUDE (float[]){ 1.1, 0.9, 1, 1 }
-#define FREQUENCY (float[]){ 0.05, 0.07, 0.03, 0.03 }
+#define AMPLITUDE (float[]){  1.3, 0.5,  1.0,  0.5 }
+#define FREQUENCY (float[]){ 0.05, 0.08, 0.03, 0.06 }
 
 //Biomes
 enum Biome {

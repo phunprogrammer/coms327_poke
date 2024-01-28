@@ -9,6 +9,8 @@ void GenerateTerrain() {
 
     noisemap_t altitudeMap = Generate(1, waves.Altitude, offset);
     noisemap_t humidityMap = Generate(1, waves.Humidity, offset);
+
+    
 }
 
 biomeType_t ChooseBiome(float altitude, float humidity) {

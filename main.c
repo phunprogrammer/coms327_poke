@@ -33,6 +33,15 @@ int main () {
     }
 
     CloseFile();
+    // screen_t tempScreen;
+
+    // for(int i = 0; i < SCREENS; i++) {
+    //     for(int j = 0; j < SCREENS; j++) {
+    //         UpdateOffset(j, i);
+    //         noisemap_t tempMap = GenerateTerrain(waves);
+
+    //     }
+    // }
 
     return 0;
 }

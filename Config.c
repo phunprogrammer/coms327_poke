@@ -9,7 +9,7 @@ const biomeType_t Biomes[BIOMENUM] = {
     [0] = { FOREST, .minHeight = -0.5, .minHumidity = 0.35, .type = '^' },
     [1] = { MOUNTAIN, .minHeight = 0.25, .minHumidity = -0.6, .type = '%' },
     [2] = { CLEARING, .minHeight = -0.5, .minHumidity = -0.4, .type = '.' },
-    [3] = { GRASSLAND, .minHeight = -0.5, .minHumidity = 0, .type = ':' },
+    [3] = { GRASSLAND, .minHeight = -0.5, .minHumidity = 0.05, .type = ':' },
     [4] = { OCEAN, .minHeight = -0.7, .minHumidity = -0.7, .type = '~' }
 };
 

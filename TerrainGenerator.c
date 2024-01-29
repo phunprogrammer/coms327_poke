@@ -3,14 +3,15 @@
 #include "TerrainGenerator.h"
 #include <stdio.h>
 #include <stdlib.h> 
+#include <math.h>
 
-static offset_t offset = { .x = 0, .y = 0 };
+static vector_t offset = { .x = 0, .y = 0 };
 
 noisemap_t GenerateTerrain(waves_t waves) {
     noisemap_t biomeMap = { 0 };
 
-    noisemap_t altitudeMap = Generate(1, waves.Altitude, offset);
-    noisemap_t humidityMap = Generate(1, waves.Humidity, offset);
+    noisemap_t altitudeMap = Generate(PATHSCALE, waves.Altitude, offset);
+    noisemap_t humidityMap = Generate(PATHSCALE, waves.Humidity, offset);
 
     for (int y = 0; y < WIDTH; y++) {
         for (int x = 0; x < LENGTH; x++) {
@@ -21,10 +22,10 @@ noisemap_t GenerateTerrain(waves_t waves) {
             else
                 biome = ChooseBiome(altitudeMap.map[y][x], humidityMap.map[y][x]);
 
-            printf("%c", biome.type);
+            //printf("%c", biome.type);
             biomeMap.map[y][x] = (float)biome.biomeID;
         }
-        printf("\n");
+        //printf("\n");
     }
 
     return biomeMap;
@@ -62,4 +63,41 @@ biomeType_t ChooseBiome(float altitude, float humidity) {
 void UpdateOffset(int x, int y) {
     offset.x = x * LENGTH;
     offset.y = y * WIDTH;
+}
+
+void PathGeneration(waves_t waves, noisemap_t* biomeMap) {
+    // vector_t tempOffset = { .x = (PATHSCALE * LENGTH - LENGTH) / -2 + offset.x, .y = (PATHSCALE * WIDTH - WIDTH) / -2 + offset.y };
+
+    // noisemap_t altitudeMap = Generate(PATHSCALE, waves.Altitude, tempOffset);
+    // noisemap_t humidityMap = Generate(PATHSCALE, waves.Humidity, tempOffset);
+
+    // int yMargin = ceil(WIDTH - WIDTH / PATHSCALE);
+    // int xMargin = ceil(LENGTH - LENGTH / PATHSCALE);
+
+    // path_t bestVerticalPath = { 0, 0 }; 
+    // float optimalNorth = 100;
+    // float optimalSouth = 100;
+    // path_t bestHorizontalPath = { 0, 0 }; 
+    // float optimalWest = 100;
+    // float optimalEast = 100;
+    
+    // for(int x = xMargin + 1; x < (WIDTH - xMargin) + 1; x++) {
+    //     float averageAltitude = 0;
+    //     float averageHumidity = 0;
+
+    //     for(int y = 0; y < yMargin; y++) {
+    //         averageAltitude += altitudeMap.map[y][x];
+    //         averageHumidity += humidityMap.map[y][x];
+    //     }
+
+    //     averageAltitude /= yMargin;
+    //     averageHumidity /= yMargin;
+
+    //     float value = abs(averageAltitude - Biomes[CLEARING].minHeight) + (averageHumidity - Biomes[CLEARING].minHumidity);
+
+    //     if (value < optimalNorth) {
+    //         optimalNorth = value;
+    //         bestVerticalPath = { .start = x };
+    //     }
+    // }
 }

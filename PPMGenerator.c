@@ -12,7 +12,7 @@ void GeneratePPM(int length, int width, int height, waves_t waves) {
 
     PrintHeader(length, width, height);
 
-    offset_t offset = { 0, 0 };
+    vector_t offset = { 0, 0 };
 
     noisemap_t altitudeMap = Generate(1, waves.Altitude, offset);
     noisemap_t humidityMap = Generate(1, waves.Humidity, offset);

@@ -11,7 +11,7 @@
  * @param offset Offset the noise map by a certain x and y
  * @return noisemap_t 
  */
-noisemap_t Generate (float scale, wave_t waves[WAVENUM], offset_t offset) {
+noisemap_t Generate (float scale, wave_t waves[WAVENUM], vector_t offset) {
     if (initialized == 0)
         printf("Initialize the game first!");
         

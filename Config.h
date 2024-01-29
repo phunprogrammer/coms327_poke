@@ -3,9 +3,12 @@
 
 #define WIDTH 21
 #define LENGTH 80
-#define SCREENS 17 //Max 17
+#define SCREENS 10 //Max 17
 #define WAVENUM 2
 #define BIOMENUM 5
+
+//Path
+#define PATHSCALE 1
 
 //Waves
 #define AMPLITUDE (float[]){  1.3, 0.5,  1.0,  0.5 }
@@ -35,10 +38,15 @@ typedef struct Waves {
     wave_t Humidity[WAVENUM];
 } waves_t;
 
-typedef struct Offset {
+typedef struct Vector {
     float x;
     float y;
-} offset_t;
+} vector_t;
+
+typedef struct Path {
+    int start;
+    int end;
+} path_t;
 
 typedef struct BiomeType {
     enum Biome biomeID;
@@ -46,6 +54,13 @@ typedef struct BiomeType {
     float minHumidity;
     char type;
 } biomeType_t;
+
+typedef struct Screen {
+    biomeType_t biomeTile[WIDTH][LENGTH];
+    vector_t screenCoords;
+    path_t horizontalPath;
+    path_t verticalPath;
+} screen_t;
 
 extern volatile int initialized;
 

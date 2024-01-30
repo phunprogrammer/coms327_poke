@@ -35,13 +35,13 @@ waves_t GetWaves() {
     for (; i < WAVENUM; i++) {
         waves.Altitude[i].amplitude = AMPLITUDE[i];
         waves.Altitude[i].frequency = FREQUENCY[i];
-        waves.Altitude[i].seed = seed;
+        waves.Altitude[i].seed = 69;
     }
 
     for (int j = 0; j < WAVENUM; j++) {
         waves.Humidity[j].amplitude = AMPLITUDE[i];
         waves.Humidity[j].frequency = FREQUENCY[i];
-        waves.Humidity[j].seed = seed;
+        waves.Humidity[j].seed = 69;
     }
 
     return waves;

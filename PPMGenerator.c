@@ -70,6 +70,11 @@ void PrintNext(enum Biome biome) {
     }
 }
 
+void PrintNum(float value) {
+    int newValue = (int)((value + 0.7) * 182);
+    fprintf(file, "%d %d %d\n", newValue, newValue, newValue);
+}
+
 void PrintHeader(int length, int width, int height) {
     file = fopen("noisemap.ppm", "w");
 

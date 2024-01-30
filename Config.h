@@ -1,14 +1,15 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define WIDTH 21
-#define LENGTH 80
-#define SCREENS 10 //Max 17
+#define WIDTH 20
+#define LENGTH 20
+#define SCREENS 2 //Max 17
 #define WAVENUM 2
 #define BIOMENUM 5
 
 //Path
-#define PATHSCALE 1
+#define PATHMARGIN 3
+#define QUADRANT 4
 
 //Waves
 #define AMPLITUDE (float[]){  1.3, 0.5,  1.0,  0.5 }
@@ -26,6 +27,10 @@ enum Biome {
 typedef struct NoiseMap {
     float map[WIDTH][LENGTH];
 } noisemap_t;
+
+typedef struct ExpandedMap {
+    float map[WIDTH * 2][LENGTH * 2];
+} expandedmap_t;
 
 typedef struct Wave {
     float seed;

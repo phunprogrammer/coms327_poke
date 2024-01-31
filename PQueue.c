@@ -3,11 +3,14 @@
 
 int pq_init(pqueue_t *queue) {
     queue->size = 0;
+    if (!(queue->array = (pqnode_t *)malloc(PQMAX * sizeof(pqnode_t)))) return 1;
+    
     return 0;
 }
 
 int pq_destroy(pqueue_t *queue) {
     free(queue->array);
+    queue->size = 0;
     return 0;
 }
 

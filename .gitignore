@@ -1,3 +1,7 @@
 *.exe
 *.ppm
 *.json
+*.o
+game
+*.bat
+*.txt

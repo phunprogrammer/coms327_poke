@@ -20,7 +20,7 @@ int pq_enqueue(pqueue_t *queue, void *data, int priority) {
     queue->array[pq_size(queue)] = node;
 
     for(int i = pq_size(queue) - 1; i >= 0; i--) {
-        if(priority <= (queue->array[i]).priority)
+        if(priority < (queue->array[i]).priority)
             break;
 
         pq_swap(queue, i + 1, i);

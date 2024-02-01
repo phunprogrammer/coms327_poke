@@ -1,7 +1,7 @@
 #ifndef PQUEUE_H
 #define PQUEUE_H
 
-#define PQMAX 1000
+#define PQMAX 2000
 
 typedef struct PQueueNode {
     int priority;

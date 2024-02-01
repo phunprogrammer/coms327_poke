@@ -35,7 +35,6 @@ int as_isValid(int x, int y, int start, int width, int length) {
 }
 
 asnode_t* aStar(float** grid, int width, int length, int startX, int startY, int endX, int endY) {
-    printf("%f", grid[0][0]);
     asnode_t* startNode = as_createNode(startX, startY);
     asnode_t* endNode = as_createNode(endX, endY);
 
@@ -74,7 +73,7 @@ asnode_t* aStar(float** grid, int width, int length, int startX, int startY, int
             if(!InArray(nextX, nextY, &open)) {
                 neighborNode->gCost = as_calcDistCost(nextX, nextY, startNode->x, startNode->y);
                 neighborNode->hCost = as_calcDistCost(nextX, nextY, endNode->x, endNode->y);
-                neighborNode->fCost = neighborNode->gCost + neighborNode->hCost;
+                neighborNode->fCost = neighborNode->gCost + neighborNode->hCost + grid[nextY][nextX];
 
                 neighborNode->previous = currentNode;
 

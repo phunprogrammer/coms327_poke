@@ -74,7 +74,7 @@ biomeType_t ChooseBiome(float altitude, float humidity) {
         }
     }
 
-    if (compatibleBiomes == 0)
+    if (numCompatible == 0)
         return Biomes[OCEAN];
     
     int bestBiomeIndex = 0;
@@ -128,6 +128,11 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         }
     }
 
+    screen->biomeMap[0][screen->verticalPath.start].biomeID = Path.biomeID;
+    screen->biomeMap[0][screen->verticalPath.start].type = Path.type;
+    screen->biomeMap[WIDTH - 1][screen->verticalPath.end].biomeID = Path.biomeID;
+    screen->biomeMap[WIDTH - 1][screen->verticalPath.end].type = Path.type;
+
     screen->horizontalPath.start = 0;
     screen->horizontalPath.end = 0;
 
@@ -156,6 +161,11 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         }
     }
 
+    screen->biomeMap[screen->horizontalPath.start][0].biomeID = Path.biomeID;
+    screen->biomeMap[screen->horizontalPath.start][0].type = Path.type;
+    screen->biomeMap[screen->horizontalPath.end][LENGTH - 1].biomeID = Path.biomeID;
+    screen->biomeMap[screen->horizontalPath.end][LENGTH - 1].type = Path.type;
+
 
     float** biomeGrid = (float**)malloc(WIDTH * sizeof(float*));
 
@@ -163,17 +173,11 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         biomeGrid[y] = (float*)malloc(LENGTH * sizeof(float));
 
         for (int x = 0; x < LENGTH; x++) {
-            biomeGrid[y][x] = OptimalScore(screen->biomeMap[y][x].minHeight, screen->biomeMap[y][x].minHumidity) * 10;
+            biomeGrid[y][x] = OptimalScore(Biomes[screen->biomeMap[y][x].biomeID].minHeight, Biomes[screen->biomeMap[y][x].biomeID].minHumidity) * 15;
         }
     }
 
     asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, 1, screen->horizontalPath.start, LENGTH - 2, screen->horizontalPath.end);
-
-    for (int i = 0; i < WIDTH; ++i) {
-        free(biomeGrid[i]);
-    }
-    
-    free(biomeGrid);
 
     while(horizontalPath != NULL) {
         int x = horizontalPath->x;
@@ -184,15 +188,44 @@ void GeneratePath(waves_t waves, screen_t* screen) {
 
         horizontalPath = horizontalPath->previous;
     }
+
+    
+    for (int y = 0; y < WIDTH; y++) {
+        biomeGrid[y] = (float*)malloc(LENGTH * sizeof(float));
+
+        for (int x = 0; x < LENGTH; x++) {
+            if (screen->biomeMap[y][x].biomeID == PATH)
+                biomeGrid[y][x] = OptimalScore(Path.minHeight, Path.minHumidity) * 15;
+            else
+                biomeGrid[y][x] = OptimalScore(Biomes[screen->biomeMap[y][x].biomeID].minHeight, Biomes[screen->biomeMap[y][x].biomeID].minHumidity) * 15;
+        }
+    }
+
+    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalPath.start, 1, screen->verticalPath.end, WIDTH - 2);
+
+    for (int i = 0; i < WIDTH; ++i) {
+        free(biomeGrid[i]);
+    }
+    
+    free(biomeGrid);
+
+    while(verticalPath != NULL) {
+        int x = verticalPath->x;
+        int y = verticalPath->y;
+
+        screen->biomeMap[y][x].biomeID = Path.biomeID;
+        screen->biomeMap[y][x].type = Path.type;
+
+        verticalPath = verticalPath->previous;
+    }
 }
 
 float OptimalScore (float altitude, float humidity) {
-    return fabs((altitude - (Biomes[CLEARING].minHeight + Biomes[GRASSLAND].minHeight) / 2) + (humidity - (Biomes[CLEARING].minHumidity + Biomes[GRASSLAND].minHumidity) / 2));
+    return fabs((altitude - Path.minHeight) + (humidity - Path.minHumidity));
 }
 
 expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
     expandedmap_t expandedMap;
-    expandedMap.map[WIDTH * 2][LENGTH * 2];
 
     vector_t pathOffsets[QUADRANT] = {
         [0] = { .x = LENGTH / -2 + offset.x, .y = WIDTH / -2 + offset.y },

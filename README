@@ -1,0 +1,5 @@
+# COMS 327 - Assignment01
+This is the terrain generation assignment. In this generation, the terrain is generated using a noise map and paths are generated using an A* algorthm. Currently, buildings have not been implemented yet (I understand this will doc me points). Also note, the path algorithm favors the edge and in some cases look like the paths combined.
+
+## HOW TO RUN:
+To run use `make` in the terminal then run the `game` file generated from it

@@ -9,7 +9,7 @@
 #define NEIGHBORARR (vector_t[]) { { .x = 0, .y = -1 }, { .x = 1, .y = 0 }, { .x = 0, .y = 1 }, { .x = -1, .y = 0} }
 
 float as_calcDistCost(int currX, int currY, int endX, int endY) {
-    return abs(currX - endX) + abs(currY - endY);
+    return sqrt(pow(abs(currX - endX), 2) + pow(abs(currY - endY), 2));
 }
 
 asnode_t* as_createNode(int x, int y) {

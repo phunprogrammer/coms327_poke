@@ -1,8 +1,8 @@
 IDIR =./include
 CC=gcc
-CFLAGS=-I$(IDIR) -Wall
+CFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g
 
-ODIR=./bin
+ODIR=./obj
 SDIR=./src
 
 LIBS=-lm
@@ -23,4 +23,5 @@ game: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -fr $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -f ./game

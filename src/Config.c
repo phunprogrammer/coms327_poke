@@ -8,15 +8,14 @@
 volatile int initialized = 0;
 
 //Biome Assignment
-const biomeType_t Biomes[BIOMENUM] = {
-    [0] = { FOREST, .minHeight = -0.5, .minHumidity = 0.35, .type = '^' },
-    [1] = { MOUNTAIN, .minHeight = 0.25, .minHumidity = -0.6, .type = '%' },
-    [2] = { CLEARING, .minHeight = -0.5, .minHumidity = -0.35, .type = '.' },
-    [3] = { GRASSLAND, .minHeight = -0.5, .minHumidity = 0.05, .type = ':' },
-    [4] = { OCEAN, .minHeight = -0.65, .minHumidity = -0.65, .type = '~' }
+const tileType_t Tiles[TILENUM] = {
+    [FOREST] = { FOREST, .minHeight = -0.5, .minHumidity = 0.35, .type = '^', .weight = 30 },
+    [MOUNTAIN] = { MOUNTAIN, .minHeight = 0.25, .minHumidity = -0.6, .type = '%', .weight = 60 },
+    [CLEARING] = { CLEARING, .minHeight = -0.5, .minHumidity = -0.4, .type = '.', .weight = 10 },
+    [GRASSLAND] = { GRASSLAND, .minHeight = -0.5, .minHumidity = 0.05, .type = ':', .weight = 15 },
+    [OCEAN] = { OCEAN, .minHeight = -1, .minHumidity = -1, .type = '~', .weight = 60 },
+    [PATH] = { PATH, .minHeight = -0.5, .minHumidity = -0.2, .type = '#', .weight = 0 }
 };
-
-const biomeType_t Path = { PATH, .minHeight = -0.5, .minHumidity = -0.3, .type = '@' };
 
 void Initialize() {
     if (initialized == 1)
@@ -31,7 +30,7 @@ waves_t GetWaves() {
     waves_t waves;
 
     int i = 0;
-    int seed = rand() /*/ 10000*/;
+    int seed = rand() / 10000;
 
     for (; i < WAVENUM; i++) {
         waves.Altitude[i].amplitude = AMPLITUDE[i];

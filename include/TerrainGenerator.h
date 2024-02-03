@@ -4,12 +4,15 @@
 #define TERRAINGENERATOR_H
 
 screen_t ScreenGenerator(waves_t waves);
-biomeType_t** GenerateTerrain(waves_t waves, screen_t* screen);
-void FreeBiomeArray(biomeType_t** array, int width, int length);
-biomeType_t ChooseBiome(float altitude, float humidity);
+tileType_t** GenerateTerrain(waves_t waves, screen_t* screen);
+void FreeBiomeArray(tileType_t** array, int width);
+tileType_t ChooseBiome(float altitude, float humidity);
 void UpdateOffset(int x, int y);
 void GeneratePath(waves_t waves, screen_t* screen);
+void SwitchTile (tileType_t* tileA, tileType_t tileB);
+int endPointSelector(path_t* path, int width, int length, expandedmap_t altitudeMap, expandedmap_t humidityMap);
 float OptimalScore (float altitude, float humidity);
+float OptimalPathScore (float altitude, float humidity);
 expandedmap_t MapExpander (wave_t wave[WAVENUM]);
 
 #endif

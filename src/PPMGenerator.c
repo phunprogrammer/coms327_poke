@@ -50,7 +50,7 @@ void GeneratePPM(int length, int width, int height, waves_t waves) {
     printf("Max Altitude: %f, Min Altitude: %f\nMax Humidity: %f, Min Humidity: %f\n", maxAlt, minAlt, maxHum, minHum);
 }
 
-void PrintNext(enum Biome biome) {
+void PrintNext(enum Tile biome) {
     switch (biome) {
         case 0:
             fprintf(file, "%d %d %d\n", 24, 115, 0);
@@ -69,6 +69,9 @@ void PrintNext(enum Biome biome) {
             break;
         case 5:
             fprintf(file, "%d %d %d\n", 255, 0, 0);
+            break;
+        default:
+            fprintf(file, "%d %d %d\n", 0, 0, 0);
             break;
     }
 }

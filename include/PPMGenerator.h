@@ -6,7 +6,7 @@
 
 void GeneratePPM (int length, int width, int height, waves_t waves);
 
-void PrintNext(enum Biome biome);
+void PrintNext(enum Tile biome);
 
 void PrintHeader(int length, int width, int height);
 

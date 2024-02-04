@@ -14,6 +14,7 @@ screen_t ScreenGenerator(waves_t waves) {
 
     GenerateTerrain(waves, &screen);
     GeneratePath(waves, &screen);
+    GenerateBuildings(&screen);
     //printf("(%d, %d) = Start: %d, End: %d\n", screen.screenCoords.x, screen.screenCoords.y, screen.horizontalPath.start, screen.horizontalPath.end);
 
     return screen;
@@ -33,7 +34,7 @@ tileType_t** GenerateTerrain(waves_t waves, screen_t* screen) {
             tileType_t biome = ChooseBiome(altitudeMap.map[y][x], humidityMap.map[y][x]);
 
             if ((x == 0 || y == 0 || y == WIDTH - 1 || x == LENGTH - 1) && biome.biomeID != FOREST) {
-                biome = Tiles[MOUNTAIN];
+                SwitchTile(&biome, Tiles[MOUNTAIN]);
             }
 
             biome.minHeight = altitudeMap.map[y][x];
@@ -92,18 +93,18 @@ void GeneratePath(waves_t waves, screen_t* screen) {
     expandedmap_t expandedAltitudeMap = MapExpander(waves.Altitude);
     expandedmap_t expandedHumidityMap = MapExpander(waves.Humidity);
 
-    endPointSelector(&(screen->verticalPath), WIDTH, LENGTH, expandedAltitudeMap, expandedHumidityMap);
+    endPointSelector(&(screen->verticalEndpoints), WIDTH, LENGTH, expandedAltitudeMap, expandedHumidityMap);
 
     for (int i = 0; i < PATHOFFSET; i++) {
-        SwitchTile(&(screen->biomeMap[i][screen->verticalPath.start]), Tiles[PATH]);
-        SwitchTile(&(screen->biomeMap[(WIDTH - 1) - i][screen->verticalPath.end]), Tiles[PATH]);
+        SwitchTile(&(screen->biomeMap[i][screen->verticalEndpoints.start]), Tiles[PATH]);
+        SwitchTile(&(screen->biomeMap[(WIDTH - 1) - i][screen->verticalEndpoints.end]), Tiles[PATH]);
     }
 
-    endPointSelector(&(screen->horizontalPath), LENGTH, WIDTH, expandedAltitudeMap, expandedHumidityMap);
+    endPointSelector(&(screen->horizontalEndpoints), LENGTH, WIDTH, expandedAltitudeMap, expandedHumidityMap);
 
     for (int i = 0; i < PATHOFFSET; i++) {
-        SwitchTile(&(screen->biomeMap[screen->horizontalPath.start][i]), Tiles[PATH]);
-        SwitchTile(&(screen->biomeMap[screen->horizontalPath.end][(LENGTH - 1)- i]), Tiles[PATH]);
+        SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.start][i]), Tiles[PATH]);
+        SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.end][(LENGTH - 1)- i]), Tiles[PATH]);
     }
 
 
@@ -117,7 +118,8 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         }
     }
 
-    asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalPath.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalPath.end);
+    asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, PATHOFFSET - 1, screen->horizontalEndpoints.start);
+    screen->horizontalPath = horizontalPath;
 
     while(horizontalPath != NULL) {
         int x = horizontalPath->x;
@@ -137,12 +139,12 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         }
     }
 
-    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalPath.start, PATHOFFSET, screen->verticalPath.end, (WIDTH - 1) - PATHOFFSET);
+    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, screen->verticalEndpoints.start, PATHOFFSET - 1);
+    screen->verticalPath = verticalPath;
 
     for (int i = 0; i < WIDTH; ++i) {
         free(biomeGrid[i]);
     }
-    
     free(biomeGrid);
 
     while(verticalPath != NULL) {
@@ -227,4 +229,160 @@ expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
     }
 
     return expandedMap;
+}
+
+int GenerateBuildings(screen_t* screen) {
+    asnode_t* verticalPath = (asnode_t *)(screen->verticalPath);
+    asnode_t* horizontalPath = (asnode_t *)(screen->horizontalPath);
+
+    srand(screen->biomeMap[0][0].minHeight);
+
+    int horizontalBias = rand() % LENGTH;
+    int verticalBias = rand() % WIDTH;
+
+    pqueue_t buildingQueue;
+    pq_init(&buildingQueue);
+
+    while(horizontalPath != NULL) {
+        int x = horizontalPath->x;
+        int y = horizontalPath->y;
+
+        for(int i = -1; i <= 1; i += 2) {
+            int value = 0;
+
+            if (isValidBuilding(screen, x, y, &value, i, 0)) {
+                building_t* building = (building_t *)malloc(sizeof(building_t));
+                building->path = horizontalPath;
+                building->inverse = i;
+                building->vertical = 0;
+                pq_enqueue(&buildingQueue, building, value + abs(horizontalBias - x) + rand() % 10);
+            }
+        }
+
+        horizontalPath = horizontalPath->previous;
+    }
+
+    while(verticalPath != NULL) {
+        int x = verticalPath->x;
+        int y = verticalPath->y;
+
+        for(int i = -1; i < 0; i += 2) {
+            int value = 0;
+
+            if (isValidBuilding(screen, x, y, &value, i, 1)) {
+                building_t* building = (building_t *)malloc(sizeof(building_t));
+                building->path = verticalPath;
+                building->inverse = i;
+                building->vertical = 1;
+                pq_enqueue(&buildingQueue, building, value + abs(verticalBias - y) + rand() % 10);
+            }
+        }
+
+        verticalPath = verticalPath->previous;
+    }
+
+    void* node;
+    pq_dequeue(&buildingQueue, &node);
+    building_t* pokemart = (building_t*)node;
+    ConstructBuilding(screen, pokemart, Tiles[POKEM]);
+
+    int constructed = 1;
+    while(constructed == 1){
+        pq_dequeue(&buildingQueue, &node);
+        building_t* pokecenter = (building_t*)node;
+        constructed = ConstructBuilding(screen, pokecenter, Tiles[POKEC]);
+    }
+
+    pq_destroy(&buildingQueue);
+
+    return 0;
+}
+
+int isValidBuilding(screen_t* screen, int currX, int currY, int* value, int inverse, int vertical) {
+    vector_t buildingOffset[QUADRANT] = {
+        [0] = { .x = 0, .y = 1 },
+        [1] =  { .x = 0, .y = 2 },
+        [2] = { .x = 1, .y = 2 },
+        [3] = { .x = 1, .y = 1 }
+    };
+
+    for (int j = 0; j < QUADRANT; j++) {
+        int newX = 0;
+        int newY = 0;
+
+        if (!vertical) {
+            newX = currX + buildingOffset[j].x;
+            newY = currY + buildingOffset[j].y * inverse;
+        }
+        else {
+            newX = currX + buildingOffset[j].y * inverse;
+            newY = currY + buildingOffset[j].x;
+        }
+
+        if((newX <= 0 && newY <= 0 && newX >= LENGTH - 1 && newY >= WIDTH - 1) || screen->biomeMap[newY][newX].biomeID == PATH)
+            return 0;
+
+        *value += screen->biomeMap[newY][newX].weight;
+    }
+
+    if(!vertical && screen->biomeMap[currY][currX + 1].biomeID != PATH)
+        return 0;
+
+    if(vertical && screen->biomeMap[currY + 1][currX].biomeID != PATH)
+        return 0;
+
+    *value /= QUADRANT;
+
+    return 1;
+}
+
+int ConstructBuilding(screen_t* screen, building_t* building, tileType_t tile) {
+    vector_t buildingOffset[QUADRANT] = {
+        [0] = { .x = 0, .y = 1 },
+        [1] =  { .x = 0, .y = 2 },
+        [2] = { .x = 1, .y = 2 },
+        [3] = { .x = 1, .y = 1 }
+    };
+
+    vector_t placed[QUADRANT];
+
+    int currX = (*(asnode_t*)(building->path)).x;
+    int currY = (*(asnode_t*)(building->path)).y;
+    int inverse = building->inverse;
+    int vertical = building->vertical;
+
+    for (int j = 0; j < QUADRANT; j++) {
+        int newX = 0;
+        int newY = 0;
+
+        if (!vertical) {
+            newX = currX + buildingOffset[j].x;
+            newY = currY + buildingOffset[j].y * inverse;
+        }
+        else {
+            newX = currX + buildingOffset[j].y * inverse;
+            newY = currY + buildingOffset[j].x;
+        }
+
+        if (screen->biomeMap[newY][newX].biomeID == POKEM)
+            return 1;
+
+        
+        placed[j].x = newX;
+        placed[j].y = newY;
+    }
+
+    for (int j = 0; j < QUADRANT; j++) {
+        SwitchTile(&(screen->biomeMap[(int)(placed[j].y)][(int)(placed[j].x)]), tile);
+    }
+
+    return 0;
+}
+
+int FirstFourDigits(float num) {
+    float abs = fabs(num);
+
+    int firstFourDigits = (int)(abs * pow(10, 3 - floor(log10(abs))));
+
+    return firstFourDigits;
 }

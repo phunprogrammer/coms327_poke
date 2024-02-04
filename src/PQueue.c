@@ -52,6 +52,18 @@ int pq_dequeue(pqueue_t *queue, void **data) {
     return 0;
 }
 
+int pq_dequeue_node(pqueue_t *queue, int index) {
+    if(pq_size(queue) == 0 || index >= pq_size(queue)) return 1;
+
+    queue->size--;
+
+    for(int i = index; i < pq_size(queue); i++) {
+        pq_swap(queue, i, i + 1);
+    }
+
+    return 0;
+}
+
 int pq_peek(pqueue_t *queue, void **data) {
     if(pq_size(queue) == 0) return 1;
 

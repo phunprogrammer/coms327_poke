@@ -3,10 +3,10 @@
 
 #define WIDTH 21
 #define LENGTH 80
-#define SCREENS 5 //Max 17
+#define SCREENS 1
 #define WAVENUM 2
 #define BIOMENUM 5
-#define TILENUM 6
+#define TILENUM 8
 
 //Path
 #define PATHMARGIN WIDTH / 5
@@ -18,15 +18,15 @@
 #define FREQUENCY (float[]){ 0.1, 0.05, 0.06, 0.08 }
 
 //Biomes
-enum Tile {
+enum __attribute__ ((__packed__)) Tile {
     FOREST,
     MOUNTAIN,
     CLEARING,
     GRASSLAND,
     OCEAN,
     PATH,
-    POKEC,
-    POKEM
+    POKEM,
+    POKEC
 };
 
 typedef struct NoiseMap {
@@ -69,9 +69,17 @@ typedef struct tileType {
 typedef struct Screen {
     tileType_t** biomeMap;
     vector_t screenCoords;
-    path_t horizontalPath;
-    path_t verticalPath;
+    path_t horizontalEndpoints;
+    path_t verticalEndpoints;
+    void* horizontalPath;
+    void* verticalPath;
 } screen_t;
+
+typedef struct Building {
+    void* path;
+    int vertical;
+    int inverse;
+} building_t;
 
 extern volatile int initialized;
 

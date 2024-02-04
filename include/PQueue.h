@@ -1,7 +1,7 @@
 #ifndef PQUEUE_H
 #define PQUEUE_H
 
-#define PQMAX 2000
+#define PQMAX 5000
 
 typedef struct PQueueNode {
     int priority;
@@ -18,6 +18,7 @@ int pq_destroy(pqueue_t *queue);
 int pq_enqueue(pqueue_t *queue, void *data, int priority);
 int pq_swap(pqueue_t *queue, int a, int b);
 int pq_dequeue(pqueue_t *queue, void **data);
+int pq_dequeue_node(pqueue_t *queue, int index);
 int pq_peek(pqueue_t *queue, void **data);
 int pq_size(pqueue_t *queue);
 int pq_isEmpty(pqueue_t *queue);

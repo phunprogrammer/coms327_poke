@@ -9,11 +9,13 @@ volatile int initialized = 0;
 //Biome Assignment
 const tileType_t Tiles[TILENUM] = {
     [FOREST] = { FOREST, .minHeight = -0.5, .minHumidity = 0.35, .type = '^', .weight = 50 },
-    [MOUNTAIN] = { MOUNTAIN, .minHeight = 0.25, .minHumidity = -0.6, .type = '%', .weight = 75 },
+    [MOUNTAIN] = { MOUNTAIN, .minHeight = 0.25, .minHumidity = -0.6, .type = '%', .weight = 90 },
     [CLEARING] = { CLEARING, .minHeight = -0.5, .minHumidity = -0.35, .type = '.', .weight = 15 },
-    [GRASSLAND] = { GRASSLAND, .minHeight = -0.5, .minHumidity = 0.05, .type = ':', .weight = 30 },
+    [GRASSLAND] = { GRASSLAND, .minHeight = -0.5, .minHumidity = 0.05, .type = ':', .weight = 25 },
     [OCEAN] = { OCEAN, .minHeight = -0.8, .minHumidity = -0.8, .type = '~', .weight = 100 },
-    [PATH] = { PATH, .minHeight = -0.4, .minHumidity = -0, .type = '#', .weight = 0 }
+    [PATH] = { PATH, .minHeight = 0, .minHumidity = 0, .type = '#', .weight = -5 },
+    [POKEM] = { POKEM, .minHeight = 0, .minHumidity = 0, .type = 'M', .weight = 100 },
+    [POKEC] = { POKEC, .minHeight = 0, .minHumidity = 0, .type = 'C', .weight = 100 }
 };
 
 void Initialize() {
@@ -30,6 +32,7 @@ waves_t GetWaves() {
 
     int i = 0;
     int seed = rand();
+    
     printf("%d\n", seed);
 
     for (; i < WAVENUM; i++) {

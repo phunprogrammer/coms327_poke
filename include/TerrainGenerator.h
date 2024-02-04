@@ -12,5 +12,9 @@ void GeneratePath(waves_t waves, screen_t* screen);
 void SwitchTile (tileType_t* tileA, tileType_t tileB);
 int endPointSelector(path_t* path, int width, int length, expandedmap_t altitudeMap, expandedmap_t humidityMap);
 expandedmap_t MapExpander (wave_t wave[WAVENUM]);
+int GenerateBuildings(screen_t* screen);
+int isValidBuilding(screen_t* screen, int currX, int currY, int* value, int inverse, int vertical);
+int ConstructBuilding(screen_t* screen, building_t* building, tileType_t tile);
+int FirstFourDigits(float num);
 
 #endif

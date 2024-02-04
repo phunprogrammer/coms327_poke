@@ -8,8 +8,8 @@
 #define NEIGHBORS 4
 #define NEIGHBORARR (vector_t[]) { { .x = 0, .y = -1 }, { .x = 1, .y = 0 }, { .x = 0, .y = 1 }, { .x = -1, .y = 0} }
 
-float as_calcDistCost(int currX, int currY, int endX, int endY) {
-    return sqrt(pow(abs(currX - endX), 2) + pow(abs(currY - endY), 2));
+float as_calcDistCost(float currX, float currY, float endX, float endY) {
+    return (float)sqrt(pow(fabs(currX - endX), 2) + pow(fabs(currY - endY), 2));
 }
 
 asnode_t* as_createNode(int x, int y) {
@@ -67,14 +67,18 @@ asnode_t* aStar(float** grid, int width, int length, int startX, int startY, int
 
             asnode_t* neighborNode = as_createNode(nextX, nextY);
 
-            if(!as_isValid(nextX, nextY, 1, width - 1, length - 1) || InArray(nextX, nextY, &closed))
+            void* tempNode = 0;
+
+            if(!as_isValid(nextX, nextY, 2, width - 2, length - 2) || InArray(nextX, nextY, &closed, &tempNode))
                 continue;
 
-            if(!InArray(nextX, nextY, &open)) {
-                neighborNode->gCost = as_calcDistCost(nextX, nextY, startNode->x, startNode->y);
-                neighborNode->hCost = as_calcDistCost(nextX, nextY, endNode->x, endNode->y);
-                neighborNode->fCost = neighborNode->gCost + neighborNode->hCost + grid[nextY][nextX];
+            int inArray = InArray(nextX, nextY, &open, &tempNode);
+            int costToNeighbor = currentNode->gCost + as_calcDistCost(currentNode->x, currentNode->y, nextX, nextY);
 
+            if((inArray && costToNeighbor < ((asnode_t *)tempNode)->gCost) || !inArray) {
+                neighborNode->gCost = costToNeighbor;
+                neighborNode->hCost = as_calcDistCost(nextX, nextY, endNode->x, endNode->y);
+                neighborNode->fCost = neighborNode->gCost + neighborNode->hCost + grid[nextY][nextX];;
                 neighborNode->previous = currentNode;
 
                 pq_enqueue(&open, neighborNode, neighborNode->fCost);
@@ -85,10 +89,12 @@ asnode_t* aStar(float** grid, int width, int length, int startX, int startY, int
     return NULL;
 }
 
-int InArray(int x, int y, pqueue_t* queue) {
+int InArray(int x, int y, pqueue_t* queue, void** data) {
     for(int i = 0; i < pq_size(queue); i++) {
-        if((*(asnode_t *)(queue->array[i].data)).x == x && (*(asnode_t *)(queue->array[i].data)).y == y)
+        if((*(asnode_t *)(queue->array[i].data)).x == x && (*(asnode_t *)(queue->array[i].data)).y == y) {
+            *data = (asnode_t *)(queue->array[i].data);
             return 1;
+        }
     }
 
     return 0;

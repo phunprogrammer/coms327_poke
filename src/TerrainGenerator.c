@@ -32,7 +32,7 @@ tileType_t** GenerateTerrain(waves_t waves, screen_t* screen) {
         for (int x = 0; x < LENGTH; x++) {
             tileType_t biome = ChooseBiome(altitudeMap.map[y][x], humidityMap.map[y][x]);
 
-            if (x == 0 || y == 0 || y == WIDTH - 1 || x == LENGTH - 1) {
+            if ((x == 0 || y == 0 || y == WIDTH - 1 || x == LENGTH - 1) && biome.biomeID != FOREST) {
                 biome = Tiles[MOUNTAIN];
             }
 
@@ -94,13 +94,17 @@ void GeneratePath(waves_t waves, screen_t* screen) {
 
     endPointSelector(&(screen->verticalPath), WIDTH, LENGTH, expandedAltitudeMap, expandedHumidityMap);
 
-    SwitchTile(&(screen->biomeMap[0][screen->verticalPath.start]), Tiles[PATH]);
-    SwitchTile(&(screen->biomeMap[WIDTH - 1][screen->verticalPath.end]), Tiles[PATH]);
+    for (int i = 0; i < PATHOFFSET; i++) {
+        SwitchTile(&(screen->biomeMap[i][screen->verticalPath.start]), Tiles[PATH]);
+        SwitchTile(&(screen->biomeMap[(WIDTH - 1) - i][screen->verticalPath.end]), Tiles[PATH]);
+    }
 
     endPointSelector(&(screen->horizontalPath), LENGTH, WIDTH, expandedAltitudeMap, expandedHumidityMap);
 
-    SwitchTile(&(screen->biomeMap[screen->horizontalPath.start][0]), Tiles[PATH]);
-    SwitchTile(&(screen->biomeMap[screen->horizontalPath.end][LENGTH - 1]), Tiles[PATH]);
+    for (int i = 0; i < PATHOFFSET; i++) {
+        SwitchTile(&(screen->biomeMap[screen->horizontalPath.start][i]), Tiles[PATH]);
+        SwitchTile(&(screen->biomeMap[screen->horizontalPath.end][(LENGTH - 1)- i]), Tiles[PATH]);
+    }
 
 
     float** biomeGrid = (float**)malloc(WIDTH * sizeof(float*));
@@ -113,7 +117,7 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         }
     }
 
-    asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, 1, screen->horizontalPath.start, LENGTH - 2, screen->horizontalPath.end);
+    asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalPath.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalPath.end);
 
     while(horizontalPath != NULL) {
         int x = horizontalPath->x;
@@ -133,7 +137,7 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         }
     }
 
-    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalPath.start, 1, screen->verticalPath.end, WIDTH - 2);
+    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalPath.start, PATHOFFSET, screen->verticalPath.end, (WIDTH - 1) - PATHOFFSET);
 
     for (int i = 0; i < WIDTH; ++i) {
         free(biomeGrid[i]);
@@ -164,10 +168,9 @@ int endPointSelector(path_t* path, int width, int length, expandedmap_t altitude
     path->end = 0;
 
     for(int i = 0; i < 2; i++) {
-        float bestAbsAvg = 1000;
-        for(int x = length / 2 + 1; x < length + length / 2 - 1; x++) {
-            float averageAltitude = 0;
-            float averageHumidity = 0;
+        float bestAbsAvg = length * 100;
+        for(int x = length / 2 + PATHOFFSET; x < length + length / 2 - PATHOFFSET; x++) {
+            int average = 0;
             for(int y = width / 2 - PATHMARGIN + (width * i); y < width / 2 + PATHMARGIN + (width * i); y++) {
                 int j = y;
                 int k = x;
@@ -177,14 +180,12 @@ int endPointSelector(path_t* path, int width, int length, expandedmap_t altitude
                     k = y;
                 }
 
-                averageAltitude += altitudeMap.map[j][k];
-                averageHumidity += humidityMap.map[j][k];
+                average += ChooseBiome(altitudeMap.map[j][k], humidityMap.map[j][k]).weight;
             }
 
-            averageAltitude /= PATHMARGIN * 2;
-            averageHumidity /= PATHMARGIN * 2;
+            average /= PATHMARGIN * 2;
 
-            float absAvg = OptimalScore(averageAltitude, averageHumidity);
+            float absAvg = average * length + (abs(length - x) / 4);
 
             if(absAvg < bestAbsAvg) {
                 bestAbsAvg = absAvg;
@@ -196,10 +197,6 @@ int endPointSelector(path_t* path, int width, int length, expandedmap_t altitude
     }
 
     return 0;
-}
-
-float OptimalScore (float altitude, float humidity) {
-    return ChooseBiome(altitude, humidity).weight + fabs((altitude - Tiles[PATH].minHeight) + (humidity - Tiles[PATH].minHumidity)) * 20;
 }
 
 expandedmap_t MapExpander (wave_t wave[WAVENUM]) {

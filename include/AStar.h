@@ -9,10 +9,10 @@ typedef struct AStarNode {
     struct AStarNode *previous;
 } asnode_t;
 
-float as_calcDistCost(int currX, int currY, int endX, int endY);
+float as_calcDistCost(float currX, float currY, float endX, float endY);
 asnode_t* as_createNode(int x, int y);
 int as_isValid(int x, int y, int start, int width, int length);
 asnode_t* aStar(float** grid, int width, int length, int startX, int startY, int goalX, int goalY);
-int InArray(int x, int y, pqueue_t* queue);
+int InArray(int x, int y, pqueue_t* queue, void** data);
 
 #endif

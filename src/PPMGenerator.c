@@ -68,7 +68,7 @@ void PrintNext(enum Tile biome) {
             fprintf(file, "%d %d %d\n", 0, 110, 236);
             break;
         case 5:
-            fprintf(file, "%d %d %d\n", 255, 0, 0);
+            fprintf(file, "%d %d %d\n", 209, 148, 56);
             break;
         default:
             fprintf(file, "%d %d %d\n", 0, 0, 0);

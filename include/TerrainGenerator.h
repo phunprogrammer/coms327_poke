@@ -11,8 +11,6 @@ void UpdateOffset(int x, int y);
 void GeneratePath(waves_t waves, screen_t* screen);
 void SwitchTile (tileType_t* tileA, tileType_t tileB);
 int endPointSelector(path_t* path, int width, int length, expandedmap_t altitudeMap, expandedmap_t humidityMap);
-float OptimalScore (float altitude, float humidity);
-float OptimalPathScore (float altitude, float humidity);
 expandedmap_t MapExpander (wave_t wave[WAVENUM]);
 
 #endif

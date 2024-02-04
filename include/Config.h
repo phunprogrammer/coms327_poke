@@ -9,12 +9,13 @@
 #define TILENUM 6
 
 //Path
-#define PATHMARGIN 3
+#define PATHMARGIN WIDTH / 5
 #define QUADRANT 4
+#define PATHOFFSET 2
 
 //Waves
-#define AMPLITUDE (float[]){  1.3, 1,  1.0,  0.5 }
-#define FREQUENCY (float[]){ 0.05, 0.08, 0.03, 0.06 }
+#define AMPLITUDE (float[]){  1.0, 1.5,  1.0,  0.8 }
+#define FREQUENCY (float[]){ 0.1, 0.05, 0.06, 0.08 }
 
 //Biomes
 enum Tile {

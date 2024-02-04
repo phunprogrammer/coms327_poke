@@ -10,13 +10,13 @@ int main () {
     Initialize();
     waves_t waves = GetWaves();
 
-    //screen_t screen = ScreenGenerator(waves);
-    // for(int y = 0; y < WIDTH; y++) {
-    //     for(int x = 0; x < LENGTH; x++) {
-    //         printf("%c", screen.biomeMap[y][x].type);
-    //     }
-    //     printf("\n");
-    // }
+    screen_t screen = ScreenGenerator(waves);
+    for(int y = 0; y < WIDTH; y++) {
+        for(int x = 0; x < LENGTH; x++) {
+            printf("%c", screen.biomeMap[y][x].type);
+        }
+        printf("\n");
+    }
 
     enum Tile PPMBiomeMap[WIDTH * SCREENS][LENGTH * SCREENS] = { 0 };
 

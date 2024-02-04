@@ -8,42 +8,24 @@
 
 int main () {
     Initialize();
+    
     waves_t waves = GetWaves();
 
+    if(GENERATEPPM)
+        GeneratePPM(waves);
+
+    UpdateOffset(MIDDLE, MIDDLE);
     screen_t screen = ScreenGenerator(waves);
-    for(int y = 0; y < WIDTH; y++) {
-        for(int x = 0; x < LENGTH; x++) {
-            printf("%c", screen.biomeMap[y][x].type);
-        }
-        printf("\n");
-    }
+    char input;
 
-    PrintHeader(LENGTH * SCREENS, WIDTH * SCREENS, 255);
-
-    for(int i = 0; i < SCREENS; i++) {
-        enum Tile PPMBiomeMap[WIDTH][LENGTH * SCREENS] = { 0 };
-        
-        for(int j = 0; j < SCREENS; j++) {
-            UpdateOffset(j, i);
-            screen_t screen = ScreenGenerator(waves);
-
-            for(int y = 0; y < WIDTH; y++) {
-                for(int x = LENGTH * j; x < LENGTH * (j + 1); x++) {
-                    PPMBiomeMap[y][x] = screen.biomeMap[y][x % LENGTH].biomeID;
-                }
+    do {
+        for(int y = 0; y < WIDTH; y++) {
+            for(int x = 0; x < LENGTH; x++) {
+                printf("%c", screen.biomeMap[y][x].type);
             }
-            
-            FreeBiomeArray(screen.biomeMap, WIDTH);
-        }
-
-        for(int k = 0; k < WIDTH; k++) {
-            for(int l = 0; l < LENGTH * SCREENS; l++) {
-                PrintNext(PPMBiomeMap[k][l]);
-            }
-        }
-    }
-
-    CloseFile();
+            printf("\n");
+        } 
+    } while ((input = getc(stdin)) != 'q');
     
     return 0;
 }

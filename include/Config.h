@@ -3,12 +3,14 @@
 
 #define WIDTH 21
 #define LENGTH 80
-#define SCREENS 10
+#define SCREENS 11
 #define WAVENUM 2
 #define BIOMENUM 5
 #define TILENUM 8
 #define MIDDLE 200
 #define GENERATEPPM 1
+#define MAXSIZE 400
+#define MINSIZE 0
 
 //Path
 #define PATHMARGIN WIDTH / 5

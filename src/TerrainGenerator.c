@@ -14,7 +14,22 @@ screen_t ScreenGenerator(waves_t waves) {
 
     GenerateTerrain(waves, &screen);
     GeneratePath(waves, &screen);
-    GenerateBuildings(&screen);
+
+    int chance = 100;
+    int dist = offset.x / LENGTH + offset.y / WIDTH;
+
+    if (dist < 400)
+        chance = 0.11 * dist + 5;
+        //chance = pow(0.99, dist * -1) + 5;
+    else if (dist > 400)
+        chance = -0.11 * (float)(dist - 800) + 5;
+        //chance = pow(0.99, dist - 800) + 5;
+
+    srand(FirstFourDigits(screen.biomeMap[0][0].minHeight));
+
+    if((rand() % 100) < chance)
+        GenerateBuildings(&screen);
+
     //printf("(%d, %d) = Start: %d, End: %d\n", screen.screenCoords.x, screen.screenCoords.y, screen.horizontalPath.start, screen.horizontalPath.end);
 
     return screen;
@@ -33,7 +48,7 @@ tileType_t** GenerateTerrain(waves_t waves, screen_t* screen) {
         for (int x = 0; x < LENGTH; x++) {
             tileType_t biome = ChooseBiome(altitudeMap.map[y][x], humidityMap.map[y][x]);
 
-            if ((x == 0 || y == 0 || y == WIDTH - 1 || x == LENGTH - 1) && biome.biomeID != FOREST) {
+            if ((x == 0 || y == 0 || y == WIDTH - 1 || x == LENGTH - 1) && biome.biomeID != FOREST && biome.biomeID != OCEAN) {
                 SwitchTile(&biome, Tiles[MOUNTAIN]);
             }
 

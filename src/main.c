@@ -41,8 +41,15 @@ int main () {
                 scanf("%d %d", &x, &y);
                 UpdateOffset((currX = (int)fmax(fmin(MIDDLE + x, MAXSIZE), MINSIZE)), (currY = (int)fmax(fmin(MIDDLE + y, MAXSIZE), MINSIZE)));
                 break;
-            
+            case 0:
+                break;
+            case '\n':
+                continue;
+            default:
+                printf("ERROR: Not a valid command\n");
+                continue;
         }
+        
         screen = ScreenGenerator(waves);
 
         for(int y = 0; y < WIDTH; y++) {

@@ -15,8 +15,8 @@ int main () {
     if(GENERATEPPM)
         GeneratePPM(waves);
 
-    int currX = MIDDLE;
-    int currY = MIDDLE;
+    int currX = MIDDLEX;
+    int currY = MIDDLEY;
 
     UpdateOffset(currX, currY);
     screen_t screen;
@@ -39,7 +39,7 @@ int main () {
             case 'f':
                 int x, y;
                 scanf("%d %d", &x, &y);
-                UpdateOffset((currX = (int)fmax(fmin(MIDDLE + x, MAXSIZE), MINSIZE)), (currY = (int)fmax(fmin(MIDDLE + y, MAXSIZE), MINSIZE)));
+                UpdateOffset((currX = (int)fmax(fmin(MIDDLEX + x, MAXSIZE), MINSIZE)), (currY = (int)fmax(fmin(MIDDLEY + y, MAXSIZE), MINSIZE)));
                 break;
             case 0:
                 break;
@@ -58,7 +58,7 @@ int main () {
             }
             printf("\n");
         } 
-        printf("(%d, %d)\n", currX - MIDDLE, currY - MIDDLE);
+        printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
 
     } while ((input = getc(stdin)) != 'q');
     

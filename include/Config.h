@@ -3,12 +3,13 @@
 
 #define WIDTH 21
 #define LENGTH 80
-#define SCREENS 51
+#define SCREENS 21
 #define WAVENUM 2
 #define BIOMENUM 5
 #define TILENUM 8
-#define MIDDLE 200
-#define GENERATEPPM 1
+#define MIDDLEX 200
+#define MIDDLEY 200
+#define GENERATEPPM 0
 #define MAXSIZE 400
 #define MINSIZE 0
 

@@ -14,18 +14,21 @@ void GeneratePPM(waves_t waves) {
 
     screen_t screen;
     PrintHeader(LENGTH * SCREENS, WIDTH * SCREENS, 255);
-    int start = MIDDLE - SCREENS / 2;
-    int end = MIDDLE + SCREENS / 2 + SCREENS % 2;
+    
+    int startX = MIDDLEX - SCREENS / 2;
+    int endX = MIDDLEX + SCREENS / 2 + SCREENS % 2;
+    int startY = MIDDLEY - SCREENS / 2;
+    int endY = MIDDLEY + SCREENS / 2 + SCREENS % 2;
 
-    for(int i = start; i < end; i++) {
+    for(int i = startY; i < endY; i++) {
         enum Tile* PPMMap = (enum Tile *)(malloc(sizeof(enum Tile) * WIDTH * LENGTH * SCREENS));
         
-        for(int j = start; j < end; j++) {
+        for(int j = startX; j < endX; j++) {
             UpdateOffset(j, i);
             screen = ScreenGenerator(waves);
 
             for(int y = 0; y < WIDTH; y++) {
-                for(int x = LENGTH * (j - (MIDDLE - SCREENS / 2)); x < LENGTH * ((j - (MIDDLE - SCREENS / 2)) + 1); x++) {
+                for(int x = LENGTH * (j - (MIDDLEX - SCREENS / 2)); x < LENGTH * ((j - (MIDDLEX - SCREENS / 2)) + 1); x++) {
                     PPMMap[y * LENGTH * SCREENS + x] = screen.biomeMap[y][x % LENGTH].biomeID;
                 }
             }

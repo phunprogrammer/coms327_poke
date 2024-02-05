@@ -33,11 +33,11 @@ screen_t ScreenGenerator(waves_t waves) {
     if (offset.x == MAXSIZE * LENGTH)
         SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.end][LENGTH - 1]), Tiles[MOUNTAIN]);
     if (offset.y == MAXSIZE * WIDTH)
-        SwitchTile(&(screen.biomeMap[0][screen.verticalEndpoints.start]), Tiles[MOUNTAIN]);
+        SwitchTile(&(screen.biomeMap[WIDTH - 1][screen.verticalEndpoints.end]), Tiles[MOUNTAIN]);
     if (offset.x == 0)
         SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.start][0]), Tiles[MOUNTAIN]);
     if (offset.y == 0)
-        SwitchTile(&(screen.biomeMap[WIDTH - 1][screen.verticalEndpoints.end]), Tiles[MOUNTAIN]);
+        SwitchTile(&(screen.biomeMap[0][screen.verticalEndpoints.start]), Tiles[MOUNTAIN]);
     
     return screen;
 }

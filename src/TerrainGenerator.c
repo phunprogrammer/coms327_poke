@@ -30,8 +30,15 @@ screen_t ScreenGenerator(waves_t waves) {
     if((rand() % 100) < chance)
         GenerateBuildings(&screen);
 
-    //printf("(%d, %d) = Start: %d, End: %d\n", screen.screenCoords.x, screen.screenCoords.y, screen.horizontalPath.start, screen.horizontalPath.end);
-
+    if (offset.x == MAXSIZE * LENGTH)
+        SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.end][LENGTH - 1]), Tiles[MOUNTAIN]);
+    if (offset.y == MAXSIZE * WIDTH)
+        SwitchTile(&(screen.biomeMap[0][screen.verticalEndpoints.start]), Tiles[MOUNTAIN]);
+    if (offset.x == 0)
+        SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.start][0]), Tiles[MOUNTAIN]);
+    if (offset.y == 0)
+        SwitchTile(&(screen.biomeMap[WIDTH - 1][screen.verticalEndpoints.end]), Tiles[MOUNTAIN]);
+    
     return screen;
 }
 

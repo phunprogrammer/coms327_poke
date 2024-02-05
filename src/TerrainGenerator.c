@@ -19,11 +19,11 @@ screen_t ScreenGenerator(waves_t waves) {
     int dist = offset.x / LENGTH + offset.y / WIDTH;
 
     if (dist < 400)
-        chance = 0.11 * dist + 5;
-        //chance = pow(0.99, dist * -1) + 5;
+        //chance = 0.11 * dist + 5;
+        chance = pow(0.99, dist * -1) + 5;
     else if (dist > 400)
-        chance = -0.11 * (float)(dist - 800) + 5;
-        //chance = pow(0.99, dist - 800) + 5;
+        //chance = -0.11 * (float)(dist - 800) + 5;
+        chance = pow(0.99, dist - 800) + 5;
 
     srand(FirstFourDigits(screen.biomeMap[0][0].minHeight));
 

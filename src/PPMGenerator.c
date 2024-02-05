@@ -3,17 +3,22 @@
 #include "TerrainGenerator.h"
 #include "PPMGenerator.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 static FILE *file;
 
 void GeneratePPM(waves_t waves) {
+    time_t startTime, endTime;
+    startTime = clock();
+
     screen_t screen;
     PrintHeader(LENGTH * SCREENS, WIDTH * SCREENS, 255);
     int start = MIDDLE - SCREENS / 2;
     int end = MIDDLE + SCREENS / 2 + SCREENS % 2;
 
     for(int i = start; i < end; i++) {
-        enum Tile PPMBiomeMap[WIDTH][LENGTH * SCREENS] = { 0 };
+        enum Tile* PPMMap = (enum Tile *)(malloc(sizeof(enum Tile) * WIDTH * LENGTH * SCREENS));
         
         for(int j = start; j < end; j++) {
             UpdateOffset(j, i);
@@ -21,7 +26,7 @@ void GeneratePPM(waves_t waves) {
 
             for(int y = 0; y < WIDTH; y++) {
                 for(int x = LENGTH * (j - (MIDDLE - SCREENS / 2)); x < LENGTH * ((j - (MIDDLE - SCREENS / 2)) + 1); x++) {
-                    PPMBiomeMap[y][x] = screen.biomeMap[y][x % LENGTH].biomeID;
+                    PPMMap[y * LENGTH * SCREENS + x] = screen.biomeMap[y][x % LENGTH].biomeID;
                 }
             }
             
@@ -30,12 +35,18 @@ void GeneratePPM(waves_t waves) {
 
         for(int k = 0; k < WIDTH; k++) {
             for(int l = 0; l < LENGTH * SCREENS; l++) {
-                PrintNext(PPMBiomeMap[k][l]);
+                PrintNext(PPMMap[k * LENGTH * SCREENS + l]);
             }
         }
+
+        free(PPMMap);
     }
 
     CloseFile();
+
+    endTime = clock();
+
+    printf("Time to Gen: %.2f\n", (double)(endTime - startTime) / (double)CLOCKS_PER_SEC);
 }
 
 void PrintNext(enum Tile biome) {

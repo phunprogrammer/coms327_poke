@@ -14,6 +14,16 @@ int pq_destroy(pqueue_t *queue) {
     return 0;
 }
 
+int pq_destroy_dynamic(pqueue_t* queue) {
+    for(int i = 0; i < pq_size(queue); i++) {
+        free(queue->array[i].data);
+    }
+
+    pq_destroy(queue);
+
+    return 0;
+}
+
 int pq_enqueue(pqueue_t *queue, void *data, int priority) {
     pqnode_t node = { .data = data, .priority = priority };
 

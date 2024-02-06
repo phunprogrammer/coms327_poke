@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <math.h>
+#include <time.h>
 
 static vector_t offset = { .x = 0, .y = 0 };
 
@@ -19,10 +20,8 @@ screen_t ScreenGenerator(waves_t waves) {
     int dist = offset.x / LENGTH + offset.y / WIDTH;
 
     if (dist < 400)
-        //chance = 0.11 * dist + 5;
         chance = pow(0.99, dist * -1) + 5;
     else if (dist > 400)
-        //chance = -0.11 * (float)(dist - 800) + 5;
         chance = pow(0.99, dist - 800) + 5;
 
     srand(FirstFourDigits(screen.biomeMap[0][0].minHeight));
@@ -34,11 +33,11 @@ screen_t ScreenGenerator(waves_t waves) {
         SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.end][LENGTH - 1]), Tiles[MOUNTAIN]);
     if (offset.y == MAXSIZE * WIDTH)
         SwitchTile(&(screen.biomeMap[WIDTH - 1][screen.verticalEndpoints.end]), Tiles[MOUNTAIN]);
-    if (offset.x == 0)
+    if (offset.x == MINSIZE * LENGTH)
         SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.start][0]), Tiles[MOUNTAIN]);
-    if (offset.y == 0)
+    if (offset.y == MINSIZE * WIDTH)
         SwitchTile(&(screen.biomeMap[0][screen.verticalEndpoints.start]), Tiles[MOUNTAIN]);
-    
+
     return screen;
 }
 
@@ -129,54 +128,76 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.end][(LENGTH - 1)- i]), Tiles[PATH]);
     }
 
-
-    float** biomeGrid = (float**)malloc(WIDTH * sizeof(float*));
+    int** biomeGrid = (int**)malloc(WIDTH * sizeof(int*));
 
     for (int y = 0; y < WIDTH; y++) {
-        biomeGrid[y] = (float*)malloc(LENGTH * sizeof(float));
+        biomeGrid[y] = (int*)malloc(LENGTH * sizeof(int));
 
         for (int x = 0; x < LENGTH; x++) {
             biomeGrid[y][x] = screen->biomeMap[y][x].weight;
         }
     }
 
-    asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, PATHOFFSET - 1, screen->horizontalEndpoints.start);
-    screen->horizontalPath = horizontalPath;
+    pqueue_t open;
+    pqueue_t closed;
 
-    while(horizontalPath != NULL) {
+    asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, PATHOFFSET - 1, screen->horizontalEndpoints.start, &open, &closed);
+    
+    screen->horizontalPath = (path_t*)malloc(LENGTH * sizeof(path_t));
+    path_t* tempPath = screen->horizontalPath;
+
+    while(1) {
         int x = horizontalPath->x;
         int y = horizontalPath->y;
 
+        tempPath->coord.x = x;
+        tempPath->coord.y = y;
+        
+        biomeGrid[y][x] = Tiles[PATH].weight;
         SwitchTile(&(screen->biomeMap[y][x]), Tiles[PATH]);
-
+        
         horizontalPath = horizontalPath->previous;
+
+        if (horizontalPath == NULL)
+            break;  
+                
+        tempPath->previous = (path_t*)malloc(LENGTH * sizeof(path_t));
+        tempPath = tempPath->previous;
     }
 
-    
-    for (int y = 0; y < WIDTH; y++) {
-        biomeGrid[y] = (float*)malloc(LENGTH * sizeof(float));
+    pq_destroy_dynamic(&open);
+    pq_destroy_dynamic(&closed);
 
-        for (int x = 0; x < LENGTH; x++) {
-            biomeGrid[y][x] = screen->biomeMap[y][x].weight;
-        }
-    }
-
-    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, screen->verticalEndpoints.start, PATHOFFSET - 1);
-    screen->verticalPath = verticalPath;
+    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, screen->verticalEndpoints.start, PATHOFFSET - 1, &open, &closed);
 
     for (int i = 0; i < WIDTH; ++i) {
         free(biomeGrid[i]);
     }
     free(biomeGrid);
 
+    screen->verticalPath = (path_t*)malloc(LENGTH * sizeof(path_t));
+    tempPath = screen->verticalPath;
+
     while(verticalPath != NULL) {
         int x = verticalPath->x;
         int y = verticalPath->y;
 
+        tempPath->coord.x = x;
+        tempPath->coord.y = y;
+
         SwitchTile(&(screen->biomeMap[y][x]), Tiles[PATH]);
 
         verticalPath = verticalPath->previous;
+
+        if (verticalPath == NULL)
+            break;  
+                
+        tempPath->previous = (path_t*)malloc(LENGTH * sizeof(path_t));
+        tempPath = tempPath->previous;
     }
+
+    pq_destroy_dynamic(&open);
+    pq_destroy_dynamic(&closed);
 }
 
 void SwitchTile (tileType_t* tileA, tileType_t tileB) {
@@ -187,7 +208,7 @@ void SwitchTile (tileType_t* tileA, tileType_t tileB) {
     tileA->minHumidity = tempHumidity;
 }
 
-int endPointSelector(path_t* path, int width, int length, expandedmap_t altitudeMap, expandedmap_t humidityMap) {
+int endPointSelector(pathgates_t* path, int width, int length, expandedmap_t altitudeMap, expandedmap_t humidityMap) {
     path->start = 0;
     path->end = 0;
 
@@ -254,8 +275,8 @@ expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
 }
 
 int GenerateBuildings(screen_t* screen) {
-    asnode_t* verticalPath = (asnode_t *)(screen->verticalPath);
-    asnode_t* horizontalPath = (asnode_t *)(screen->horizontalPath);
+    path_t* verticalPath = screen->verticalPath;
+    path_t* horizontalPath = screen->horizontalPath;
 
     srand(screen->biomeMap[0][0].minHeight);
 
@@ -266,8 +287,8 @@ int GenerateBuildings(screen_t* screen) {
     pq_init(&buildingQueue);
 
     while(horizontalPath != NULL) {
-        int x = horizontalPath->x;
-        int y = horizontalPath->y;
+        int x = horizontalPath->coord.x;
+        int y = horizontalPath->coord.y;
 
         for(int i = -1; i <= 1; i += 2) {
             int value = 0;
@@ -285,8 +306,8 @@ int GenerateBuildings(screen_t* screen) {
     }
 
     while(verticalPath != NULL) {
-        int x = verticalPath->x;
-        int y = verticalPath->y;
+        int x = verticalPath->coord.x;
+        int y = verticalPath->coord.y;
 
         for(int i = -1; i < 0; i += 2) {
             int value = 0;
@@ -309,13 +330,14 @@ int GenerateBuildings(screen_t* screen) {
     ConstructBuilding(screen, pokemart, Tiles[POKEM]);
 
     int constructed = 1;
-    while(constructed == 1){
+
+    while(constructed == 1 || pq_size(&buildingQueue) == 0){
         pq_dequeue(&buildingQueue, &node);
         building_t* pokecenter = (building_t*)node;
         constructed = ConstructBuilding(screen, pokecenter, Tiles[POKEC]);
     }
 
-    pq_destroy(&buildingQueue);
+    pq_destroy_dynamic(&buildingQueue);
 
     return 0;
 }
@@ -368,8 +390,8 @@ int ConstructBuilding(screen_t* screen, building_t* building, tileType_t tile) {
 
     vector_t placed[QUADRANT];
 
-    int currX = (*(asnode_t*)(building->path)).x;
-    int currY = (*(asnode_t*)(building->path)).y;
+    int currX = building->path->coord.x;
+    int currY = building->path->coord.y;
     int inverse = building->inverse;
     int vertical = building->vertical;
 

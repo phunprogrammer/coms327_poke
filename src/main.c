@@ -25,7 +25,7 @@ int main () {
     do {
         switch (input) {
             case 'n':
-                UpdateOffset(currX, (currY = fmax(--currY, 0)));
+                UpdateOffset(currX, (currY = fmax(--currY, MINSIZE)));
                 break;
             case 'e':
                 UpdateOffset((currX = fmin(++currX, MAXSIZE)), currY);
@@ -34,7 +34,7 @@ int main () {
                 UpdateOffset(currX, (currY = fmin(++currY, MAXSIZE)));
                 break;
             case 'w':
-                UpdateOffset((currX = fmax(--currX, 0)), currY);
+                UpdateOffset((currX = fmax(--currX, MINSIZE)), currY);
                 break;
             case 'f':
                 int x, y;

@@ -3,18 +3,18 @@
 
 #define WIDTH 21
 #define LENGTH 80
-#define SCREENS 21
+#define SCREENS 11
 #define WAVENUM 2
 #define BIOMENUM 5
 #define TILENUM 8
 #define MIDDLEX 200
 #define MIDDLEY 200
-#define GENERATEPPM 0
+#define GENERATEPPM 1
 #define MAXSIZE 400
 #define MINSIZE 0
 
 //Path
-#define PATHMARGIN WIDTH / 5
+#define PATHMARGIN 2
 #define QUADRANT 4
 #define PATHOFFSET 2
 
@@ -58,9 +58,14 @@ typedef struct Vector {
     float y;
 } vector_t;
 
-typedef struct Path {
+typedef struct PathGates {
     int start;
     int end;
+} pathgates_t;
+
+typedef struct Path {
+    vector_t coord;
+    struct Path* previous;
 } path_t;
 
 typedef struct tileType {
@@ -74,14 +79,14 @@ typedef struct tileType {
 typedef struct Screen {
     tileType_t** biomeMap;
     vector_t screenCoords;
-    path_t horizontalEndpoints;
-    path_t verticalEndpoints;
-    void* horizontalPath;
-    void* verticalPath;
+    pathgates_t horizontalEndpoints;
+    pathgates_t verticalEndpoints;
+    path_t* horizontalPath;
+    path_t* verticalPath;
 } screen_t;
 
 typedef struct Building {
-    void* path;
+    path_t* path;
     int vertical;
     int inverse;
 } building_t;

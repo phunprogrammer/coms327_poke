@@ -24,6 +24,9 @@ void GeneratePPM(waves_t waves) {
         enum Tile* PPMMap = (enum Tile *)(malloc(sizeof(enum Tile) * WIDTH * LENGTH * SCREENS));
         
         for(int j = startX; j < endX; j++) {
+            if (i == 199 && j == 199) {
+                printf("hi");
+            }
             UpdateOffset(j, i);
             screen = ScreenGenerator(waves);
 

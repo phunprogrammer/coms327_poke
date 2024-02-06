@@ -146,7 +146,7 @@ void GeneratePath(waves_t waves, screen_t* screen) {
     screen->horizontalPath = (path_t*)malloc(LENGTH * sizeof(path_t));
     path_t* tempPath = screen->horizontalPath;
 
-    while(1) {
+    while(horizontalPath != NULL) {
         int x = horizontalPath->x;
         int y = horizontalPath->y;
 
@@ -213,7 +213,7 @@ int endPointSelector(pathgates_t* path, int width, int length, expandedmap_t alt
     path->end = 0;
 
     for(int i = 0; i < 2; i++) {
-        float bestAbsAvg = length * 100;
+        float bestAbsAvg = length * Tiles[OCEAN].weight * 2;
         for(int x = length / 2 + PATHOFFSET; x < length + length / 2 - PATHOFFSET; x++) {
             int average = 0;
             for(int y = width / 2 - PATHMARGIN + (width * i); y < width / 2 + PATHMARGIN + (width * i); y++) {

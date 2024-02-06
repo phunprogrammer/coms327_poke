@@ -14,7 +14,7 @@
 #define MINSIZE 0
 
 //Path
-#define PATHMARGIN 2
+#define PATHMARGIN 3
 #define QUADRANT 4
 #define PATHOFFSET 2
 

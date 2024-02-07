@@ -43,6 +43,8 @@ void GeneratePPM(waves_t waves) {
         }
 
         free(PPMMap);
+        
+        printf("%.2f percent done\n", ((float)((i + 1) - startY) / SCREENS) * 100.0);
     }
 
     CloseFile();

@@ -79,11 +79,13 @@ path_t* aStar(int** grid, int width, int length, int startX, int startY, int end
                 gCost[*neighborNode] = costToNeighbor;
                 fCost[*neighborNode] = costToNeighbor + as_calcDistCost(nextX, nextY, endX, endY) * (float)Tiles[CLEARING].weight * BIOMEFACTOR;
 
-                if(!visited)
+                if(!visited) {
                     pq_enqueue(open, neighborNode, fCost[*neighborNode]);
+                    continue;
+                }
             }
-            else
-                free(neighborNode);
+            
+            free(neighborNode);
         }
     }
 

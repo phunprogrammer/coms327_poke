@@ -3,7 +3,7 @@
 
 #define WIDTH 21
 #define LENGTH 80
-#define SCREENS 21
+#define SCREENS 11
 #define WAVENUM 2
 #define BIOMENUM 5
 #define TILENUM 8

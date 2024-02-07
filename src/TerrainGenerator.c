@@ -17,12 +17,10 @@ screen_t ScreenGenerator(waves_t waves) {
     GeneratePath(waves, &screen);
 
     int chance = 100;
-    int dist = offset.x / LENGTH + offset.y / WIDTH;
+    int dist = abs((int)(offset.x / LENGTH) - MAXSIZE / 2) + abs((int)(offset.y / WIDTH) - MAXSIZE / 2);
 
-    if (dist < 400)
-        chance = pow(0.99, dist * -1) + 5;
-    else if (dist > 400)
-        chance = pow(0.99, dist - 800) + 5;
+    if (dist > 0)
+        chance = pow(0.975, dist - 155) + 5;
 
     srand(FirstFourDigits(screen.biomeMap[0][0].minHeight));
 

@@ -1,5 +1,5 @@
-# COMS 327 - Poke (name not final)
-This is a pokemon inspired game for my coms327 class.
+# COMS 327 - Assignment 02
+
 
 ## HOW TO RUN:
 To run use `make` in the terminal then run the `game` executable generated from it

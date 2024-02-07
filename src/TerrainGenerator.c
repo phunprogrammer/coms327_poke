@@ -41,6 +41,28 @@ screen_t ScreenGenerator(waves_t waves) {
     return screen;
 }
 
+int DestroyScreen(screen_t* screen) {
+    FreeBiomeArray(screen->biomeMap, WIDTH);
+
+    path_t* horizontalPath = screen->horizontalPath;
+
+    while (horizontalPath != NULL) {
+        path_t* tempPath = horizontalPath;
+        horizontalPath = horizontalPath->previous;
+        free(tempPath);
+    }
+
+    path_t* verticalPath = screen->verticalPath;
+
+    while (verticalPath != NULL) {
+        path_t* tempPath = verticalPath;
+        verticalPath = verticalPath->previous;
+        free(tempPath);
+    }
+
+    return 0;
+}
+
 tileType_t** GenerateTerrain(waves_t waves, screen_t* screen) {
     screen->biomeMap = (tileType_t**)malloc(WIDTH * sizeof(tileType_t*));
 
@@ -139,65 +161,36 @@ void GeneratePath(waves_t waves, screen_t* screen) {
     }
 
     pqueue_t open;
-    pqueue_t closed;
 
-    asnode_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, PATHOFFSET - 1, screen->horizontalEndpoints.start, &open, &closed);
-    
-    screen->horizontalPath = (path_t*)malloc(LENGTH * sizeof(path_t));
-    path_t* tempPath = screen->horizontalPath;
+    path_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, &open);
+    screen->horizontalPath = horizontalPath;
 
     while(horizontalPath != NULL) {
-        int x = horizontalPath->x;
-        int y = horizontalPath->y;
-
-        tempPath->coord.x = x;
-        tempPath->coord.y = y;
+        int x = horizontalPath->coord.x;
+        int y = horizontalPath->coord.y;
         
         biomeGrid[y][x] = Tiles[PATH].weight;
         SwitchTile(&(screen->biomeMap[y][x]), Tiles[PATH]);
         
         horizontalPath = horizontalPath->previous;
-
-        if (horizontalPath == NULL)
-            break;  
-                
-        tempPath->previous = (path_t*)malloc(LENGTH * sizeof(path_t));
-        tempPath = tempPath->previous;
     }
 
-    pq_destroy_dynamic(&open);
-    pq_destroy_dynamic(&closed);
-
-    asnode_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, screen->verticalEndpoints.start, PATHOFFSET - 1, &open, &closed);
+    path_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, &open);
+    screen->verticalPath = verticalPath;
 
     for (int i = 0; i < WIDTH; ++i) {
         free(biomeGrid[i]);
     }
     free(biomeGrid);
 
-    screen->verticalPath = (path_t*)malloc(LENGTH * sizeof(path_t));
-    tempPath = screen->verticalPath;
-
     while(verticalPath != NULL) {
-        int x = verticalPath->x;
-        int y = verticalPath->y;
-
-        tempPath->coord.x = x;
-        tempPath->coord.y = y;
+        int x = verticalPath->coord.x;
+        int y = verticalPath->coord.y;
 
         SwitchTile(&(screen->biomeMap[y][x]), Tiles[PATH]);
 
         verticalPath = verticalPath->previous;
-
-        if (verticalPath == NULL)
-            break;  
-                
-        tempPath->previous = (path_t*)malloc(LENGTH * sizeof(path_t));
-        tempPath = tempPath->previous;
     }
-
-    pq_destroy_dynamic(&open);
-    pq_destroy_dynamic(&closed);
 }
 
 void SwitchTile (tileType_t* tileA, tileType_t tileB) {
@@ -327,7 +320,8 @@ int GenerateBuildings(screen_t* screen) {
     void* node;
     pq_dequeue(&buildingQueue, &node);
     building_t* pokemart = (building_t*)node;
-    ConstructBuilding(screen, pokemart, Tiles[POKEM]);
+    ConstructBuilding(screen, pokemart, Tiles[POKEM]); 
+    free(pokemart);
 
     int constructed = 1;
 
@@ -335,6 +329,7 @@ int GenerateBuildings(screen_t* screen) {
         pq_dequeue(&buildingQueue, &node);
         building_t* pokecenter = (building_t*)node;
         constructed = ConstructBuilding(screen, pokecenter, Tiles[POKEC]);
+        free(pokecenter);
     }
 
     pq_destroy_dynamic(&buildingQueue);
@@ -363,7 +358,7 @@ int isValidBuilding(screen_t* screen, int currX, int currY, int* value, int inve
             newY = currY + buildingOffset[j].x;
         }
 
-        if((newX <= 0 && newY <= 0 && newX >= LENGTH - 1 && newY >= WIDTH - 1) || screen->biomeMap[newY][newX].biomeID == PATH)
+        if((newX <= 0 && newY && 0 && newX >= LENGTH - 1 && newY >= WIDTH - 1) || screen->biomeMap[newY][newX].biomeID == PATH)
             return 0;
 
         *value += screen->biomeMap[newY][newX].weight;

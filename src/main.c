@@ -60,6 +60,8 @@ int main () {
         } 
         printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
 
+        DestroyScreen(&screen);
+
     } while ((input = getc(stdin)) != 'q');
     
     return 0;

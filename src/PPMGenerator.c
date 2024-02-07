@@ -24,9 +24,6 @@ void GeneratePPM(waves_t waves) {
         enum Tile* PPMMap = (enum Tile *)(malloc(sizeof(enum Tile) * WIDTH * LENGTH * SCREENS));
         
         for(int j = startX; j < endX; j++) {
-            if (i == 199 && j == 199) {
-                printf("hi");
-            }
             UpdateOffset(j, i);
             screen = ScreenGenerator(waves);
 
@@ -36,7 +33,7 @@ void GeneratePPM(waves_t waves) {
                 }
             }
             
-            FreeBiomeArray(screen.biomeMap, WIDTH);
+            DestroyScreen(&screen);
         }
 
         for(int k = 0; k < WIDTH; k++) {
@@ -49,6 +46,7 @@ void GeneratePPM(waves_t waves) {
     }
 
     CloseFile();
+    system("pnmtopng map.ppm > map.png");
 
     endTime = clock();
 

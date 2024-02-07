@@ -32,7 +32,6 @@ waves_t GetWaves() {
 
     int i = 0;
     int seed = rand();
-    seed = 27456050;
     
     printf("%d\n", seed);
 

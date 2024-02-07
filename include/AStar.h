@@ -1,5 +1,7 @@
 #include "PQueue.h"
 
+#include "Config.h"
+
 #ifndef ASTAR_H
 #define ASTAR_H
 
@@ -12,7 +14,8 @@ typedef struct AStarNode {
 float as_calcDistCost(int currX, int currY, int endX, int endY);
 asnode_t* as_createNode(int x, int y);
 int as_isValid(int x, int y, int start, int width, int length);
-asnode_t* aStar(int** grid, int width, int length, int startX, int startY, int endX, int endY, int previousX, int previousY, pqueue_t* open, pqueue_t* closed);
-int InArray(int x, int y, pqueue_t* queue, int* index);
+path_t* aStar(int** grid, int width, int length, int startX, int startY, int endX, int endY, pqueue_t* open);
+int InArray(int node, pqueue_t* queue);
+path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], int current, int start);
 
 #endif

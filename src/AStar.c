@@ -4,31 +4,50 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define NEIGHBORS 4
 #define BIOMEFACTOR 0.08
+#define NEIGHBORS 4
 #define NEIGHBORARR (vector_t[]) { { .x = 0, .y = -1 }, { .x = -1, .y = 0 }, { .x = 1, .y = 0 }, { .x = 0, .y = 1 }, { .x = -1, .y = -1 }, { .x = 1, .y = -1 }, { .x = -1, .y = 1 }, { .x = 1, .y = 1 } }
 
+/**
+ * @brief Calculates the distance cost between two points
+ * 
+ * @param currX pointA x
+ * @param currY pointA y
+ * @param endX pointB x
+ * @param endY pointB y
+ * @return float 
+ */
 float as_calcDistCost(int currX, int currY, int endX, int endY) {
     return sqrt(pow(abs(currX - endX), 2) + pow(abs(currY - endY), 2));
 }
 
-asnode_t* as_createNode(int x, int y) {
-    asnode_t* newNode;
-
-    if (!(newNode = (asnode_t*)malloc(sizeof(asnode_t)))) return NULL;
-
-    newNode->x = x;
-    newNode->y = y;
-
-    newNode->previous = NULL;
-    
-    return newNode;
-}
-
+/**
+ * @brief Detects if the point given is a valid point based on given length and width
+ * 
+ * @param x 
+ * @param y 
+ * @param start 
+ * @param width 
+ * @param length 
+ * @return int 0 or 1
+ */
 int as_isValid(int x, int y, int start, int width, int length) {
     return (x >= start && x < length && y >= start && y < width);
 }
 
+/**
+ * @brief A* path finding algorithm finds the optimal path based on the given map grid
+ * 
+ * @param grid A grid of weights
+ * @param width Width of the grid
+ * @param length length of the grid
+ * @param startX Starting position's X value
+ * @param startY Starting position's Y value
+ * @param endX Ending position's X value
+ * @param endY Ending position's Y value
+ * @param open An open queue that stores opened grids
+ * @return path_t* A pointer from the end of the path to the beginning
+ */
 path_t* aStar(int** grid, int width, int length, int startX, int startY, int endX, int endY, pqueue_t* open) {
     int startKey = startY * LENGTH + startX;
     int endKey = endY * LENGTH + endX;
@@ -92,6 +111,14 @@ path_t* aStar(int** grid, int width, int length, int startX, int startY, int end
     return NULL;
 }   
 
+/**
+ * @brief Reconstructs the path from the cameFrom array and the current position
+ * 
+ * @param cameFrom Latest traveled path array
+ * @param current Starting point of the path
+ * @param start Stopping point of the path
+ * @return path_t* 
+ */
 path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], int current, int start) {
         path_t* path = (path_t *)malloc(sizeof(path_t));
         path->coord.x = current % LENGTH;
@@ -111,16 +138,4 @@ path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], int current, int start) {
         }
 
         return path;
-}
-
-int InArray(int node, pqueue_t* queue) {
-    for(int i = 0; i < pq_size(queue); i++) {
-        int currentNode = *((int*)(queue->array[i].data));
-
-        if(currentNode == node) {
-            return 1;
-        }
-    }
-
-    return 0;
 }

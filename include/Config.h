@@ -1,15 +1,15 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+//PPM
+#define SCREENS 11
+#define GENERATEPPM 0
+
+//Screen
 #define WIDTH 21
 #define LENGTH 80
-#define SCREENS 11
-#define WAVENUM 2
-#define BIOMENUM 5
-#define TILENUM 8
 #define MIDDLEX 200
 #define MIDDLEY 200
-#define GENERATEPPM 0
 #define MAXSIZE 400
 #define MINSIZE 0
 
@@ -19,10 +19,13 @@
 #define PATHOFFSET 2
 
 //Waves
+#define WAVENUM 2
 #define AMPLITUDE (float[]){  1.0, 1.5,  1.0,  0.8 }
 #define FREQUENCY (float[]){ 0.1, 0.05, 0.06, 0.08 }
 
 //Biomes
+#define BIOMENUM 5
+#define TILENUM 8
 enum __attribute__ ((__packed__)) Tile {
     FOREST,
     MOUNTAIN,

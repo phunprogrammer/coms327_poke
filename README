@@ -1,5 +1,5 @@
 # COMS 327 - Assignment 02
-
+This is assignment 02 of the Pokemon game for COMS 327. In this iteration, you can traverse between screens using `n`,`e`,`s`,`w` in cmd line and it will travel accordingly. Biomes and paths will remain connected between screens to keep fluidity. Use `f` then any two integers and it will travel to that square (will limit at max distance). On the borders of the world the paths will be blocked off. Lastly, buildings decay logarithmically the further you travel from the center until bottoming out at 5%.
 
 ## HOW TO RUN:
 To run use `make` in the terminal then run the `game` executable generated from it

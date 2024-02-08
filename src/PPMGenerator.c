@@ -70,7 +70,7 @@ void PrintNext(enum Tile biome) {
             fprintf(file, "%c%c%c", 50, 170, 29);
             break;
         case OCEAN:
-            fprintf(file, "%c%c%c", 0, 110, 236);
+            fprintf(file, "%c%c%c", 43, 135, 240);
             break;
         case PATH:
             fprintf(file, "%c%c%c", 209, 148, 56);

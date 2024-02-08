@@ -74,7 +74,7 @@ path_t* aStar(int** grid, int width, int length, int startX, int startY, int end
         closed[currentKey] = 1;
 
         if(currentKey == endKey) {
-            pq_destroy_dynamic(open);
+            pq_destroy(open);
             return ConstructPath(cameFrom, currentKey, startKey);
         }
 
@@ -82,29 +82,27 @@ path_t* aStar(int** grid, int width, int length, int startX, int startY, int end
             int nextX = currentKey % LENGTH + NEIGHBORARR[i].x;
             int nextY = currentKey / LENGTH + NEIGHBORARR[i].y;
 
-            int* neighborNode = (int *)malloc(sizeof(int));
-            *neighborNode = nextY * LENGTH + nextX;
+            int neighborNode = nextY * LENGTH + nextX;
 
-            if(!as_isValid(nextX, nextY, 2, width - 2, length - 2) || closed[*neighborNode] == 1) {
-                free(neighborNode);
+            if(!as_isValid(nextX, nextY, 2, width - 2, length - 2) || closed[neighborNode] == 1) {
                 continue;
             }
             
-            int visited = gCost[*neighborNode] != 0;
+            int visited = gCost[neighborNode] != 0;
             int costToNeighbor = gCost[currentKey] + as_calcDistCost(cameFrom[currentKey] % LENGTH, cameFrom[currentKey] / LENGTH, nextX, nextY) / 2 + (float)grid[nextY][nextX] * BIOMEFACTOR;
 
-            if(costToNeighbor < gCost[*neighborNode] || !visited) {
-                cameFrom[*neighborNode] = currentKey;
-                gCost[*neighborNode] = costToNeighbor;
-                fCost[*neighborNode] = costToNeighbor + as_calcDistCost(nextX, nextY, endX, endY) * (float)Tiles[CLEARING].weight * BIOMEFACTOR;
+            if(costToNeighbor < gCost[neighborNode] || !visited) {
+                cameFrom[neighborNode] = currentKey;
+                gCost[neighborNode] = costToNeighbor;
+                fCost[neighborNode] = costToNeighbor + as_calcDistCost(nextX, nextY, endX, endY) * (float)Tiles[CLEARING].weight * BIOMEFACTOR;
 
                 if(!visited) {
-                    pq_enqueue(open, neighborNode, fCost[*neighborNode]);
+                    int* neighborPtr = (int *)malloc(sizeof(int));
+                    *neighborPtr = neighborNode;
+                    pq_enqueue(open, neighborPtr, fCost[neighborNode]);
                     continue;
                 }
             }
-            
-            free(neighborNode);
         }
     }
 

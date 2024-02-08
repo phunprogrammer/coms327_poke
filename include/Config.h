@@ -1,3 +1,9 @@
+/**
+ * @brief Configuration file for the whole game
+ * @author phun
+ * @date 2/8/24
+ */
+
 #ifndef CONFIG_H
 #define CONFIG_H
 

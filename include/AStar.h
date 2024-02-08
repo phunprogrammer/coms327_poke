@@ -1,3 +1,9 @@
+/**
+ * @brief A* algorthm that will find the best path between 2 points based on a weight map
+ * @author phun
+ * @date 2/8/24
+ */
+
 #include "PQueue.h"
 #include "Config.h"
 

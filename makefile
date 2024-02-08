@@ -28,3 +28,5 @@ clean:
 	rm -fr $(ODIR)/*.o *~ core $(INCDIR)/*~ 
 	rmdir $(ODIR)
 	rm -f ./game
+	rm -f ./map.png
+	rm -f ./map.ppm

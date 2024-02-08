@@ -8,37 +8,35 @@
 #include <math.h>
 #include <time.h>
 
+/**
+ * @brief Current offset of the world
+ * 
+ */
 static vector_t offset = { .x = 0, .y = 0 };
 
+/**
+ * @brief Generates a screen with all components in it
+ * 
+ * @param waves Waves generated from getWaves();
+ * @return screen_t 
+ */
 screen_t ScreenGenerator(waves_t waves) {
     screen_t screen = { .screenCoords = offset };
 
     GenerateTerrain(waves, &screen);
     GeneratePath(waves, &screen);
-
-    int chance = 100;
-    int dist = abs((int)(offset.x / LENGTH) - MAXSIZE / 2) + abs((int)(offset.y / WIDTH) - MAXSIZE / 2);
-
-    if (dist > 0)
-        chance = pow(0.975, dist - 155) + 5;
-
-    srand(FirstFourDigits(screen.biomeMap[0][0].minHeight));
-
-    if((rand() % 100) < chance)
-        GenerateBuildings(&screen);
-
-    if (offset.x == MAXSIZE * LENGTH)
-        SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.end][LENGTH - 1]), Tiles[MOUNTAIN]);
-    if (offset.y == MAXSIZE * WIDTH)
-        SwitchTile(&(screen.biomeMap[WIDTH - 1][screen.verticalEndpoints.end]), Tiles[MOUNTAIN]);
-    if (offset.x == MINSIZE * LENGTH)
-        SwitchTile(&(screen.biomeMap[screen.horizontalEndpoints.start][0]), Tiles[MOUNTAIN]);
-    if (offset.y == MINSIZE * WIDTH)
-        SwitchTile(&(screen.biomeMap[0][screen.verticalEndpoints.start]), Tiles[MOUNTAIN]);
+    RandomizeBuildings(&screen);
+    BorderDetector(&screen);
 
     return screen;
 }
 
+/**
+ * @brief Destroys screen and all malloced components
+ * 
+ * @param screen 
+ * @return int 
+ */
 int DestroyScreen(screen_t* screen) {
     FreeBiomeArray(screen->biomeMap, WIDTH);
 
@@ -61,14 +59,40 @@ int DestroyScreen(screen_t* screen) {
     return 0;
 }
 
+/**
+ * @brief Detects if the square is a border and blocks off the gates
+ * 
+ * @param screen 
+ * @return int 
+ */
+int BorderDetector(screen_t* screen) {
+    if (offset.x == MAXSIZE * LENGTH)
+        SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.end][LENGTH - 1]), Tiles[MOUNTAIN]);
+    if (offset.y == MAXSIZE * WIDTH)
+        SwitchTile(&(screen->biomeMap[WIDTH - 1][screen->verticalEndpoints.end]), Tiles[MOUNTAIN]);
+    if (offset.x == MINSIZE * LENGTH)
+        SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.start][0]), Tiles[MOUNTAIN]);
+    if (offset.y == MINSIZE * WIDTH)
+        SwitchTile(&(screen->biomeMap[0][screen->verticalEndpoints.start]), Tiles[MOUNTAIN]);
+
+    return 0;
+}
+
+/**
+ * @brief Generates terrain based off of the waves given
+ * 
+ * @param waves 
+ * @param screen 
+ * @return tileType_t** 
+ */
 tileType_t** GenerateTerrain(waves_t waves, screen_t* screen) {
     screen->biomeMap = (tileType_t**)malloc(WIDTH * sizeof(tileType_t*));
 
     for (int i = 0; i < WIDTH; ++i)
         screen->biomeMap[i] = (tileType_t*)malloc(LENGTH * sizeof(tileType_t));
 
-    noisemap_t altitudeMap = Generate(1, waves.Altitude, offset);
-    noisemap_t humidityMap = Generate(1, waves.Humidity, offset);
+    noisemap_t altitudeMap = GenerateNoise(1, waves.Altitude, offset);
+    noisemap_t humidityMap = GenerateNoise(1, waves.Humidity, offset);
 
     for (int y = 0; y < WIDTH; y++) {
         for (int x = 0; x < LENGTH; x++) {
@@ -88,6 +112,12 @@ tileType_t** GenerateTerrain(waves_t waves, screen_t* screen) {
     return screen->biomeMap;
 }
 
+/**
+ * @brief Frees the biome array in screen
+ * 
+ * @param array 
+ * @param width 
+ */
 void FreeBiomeArray(tileType_t** array, int width) {
     for (int i = 0; i < width; ++i) {
         free(array[i]);
@@ -96,6 +126,13 @@ void FreeBiomeArray(tileType_t** array, int width) {
     free(array);
 }
 
+/**
+ * @brief Chooses the correct biome based off of altitude and humidity given
+ * 
+ * @param altitude 
+ * @param humidity 
+ * @return tileType_t 
+ */
 tileType_t ChooseBiome(float altitude, float humidity) {
     tileType_t compatibleBiomes[BIOMENUM];
     int numCompatible = 0;
@@ -125,11 +162,23 @@ tileType_t ChooseBiome(float altitude, float humidity) {
     return compatibleBiomes[bestBiomeIndex];
 }
 
+/**
+ * @brief Updates the offset of the terrain generator
+ * 
+ * @param x 
+ * @param y 
+ */
 void UpdateOffset(int x, int y) {
     offset.x = x * LENGTH;
     offset.y = y * WIDTH;
 }
 
+/**
+ * @brief Generates the paths on the screen
+ * 
+ * @param waves 
+ * @param screen 
+ */
 void GeneratePath(waves_t waves, screen_t* screen) {
     expandedmap_t expandedAltitudeMap = MapExpander(waves.Altitude);
     expandedmap_t expandedHumidityMap = MapExpander(waves.Humidity);
@@ -191,6 +240,12 @@ void GeneratePath(waves_t waves, screen_t* screen) {
     }
 }
 
+/**
+ * @brief Switches tileA ptr on the screen with tileB
+ * 
+ * @param tileA 
+ * @param tileB 
+ */
 void SwitchTile (tileType_t* tileA, tileType_t tileB) {
     float tempAltitude = tileA->minHeight;
     float tempHumidity = tileA->minHumidity;
@@ -199,6 +254,16 @@ void SwitchTile (tileType_t* tileA, tileType_t tileB) {
     tileA->minHumidity = tempHumidity;
 }
 
+/**
+ * @brief Selects endpoints based on the average of between screens for paths
+ * 
+ * @param path pathgates of the screen
+ * @param width 
+ * @param length 
+ * @param altitudeMap 
+ * @param humidityMap 
+ * @return int 
+ */
 int endPointSelector(pathgates_t* path, int width, int length, expandedmap_t altitudeMap, expandedmap_t humidityMap) {
     path->start = 0;
     path->end = 0;
@@ -235,6 +300,12 @@ int endPointSelector(pathgates_t* path, int width, int length, expandedmap_t alt
     return 0;
 }
 
+/**
+ * @brief Expands the given map by 4x based off of the offset. Used for endpoint selector
+ * 
+ * @param wave 
+ * @return expandedmap_t 
+ */
 expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
     expandedmap_t expandedMap;
 
@@ -253,7 +324,7 @@ expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
     };
 
     for(int i = 0; i < QUADRANT; i++) {
-        noisemap_t temp = Generate(1, wave, pathOffsets[i]);
+        noisemap_t temp = GenerateNoise(1, wave, pathOffsets[i]);
 
         for(int y = 0; y < WIDTH; y++) {
             for(int x = 0; x < LENGTH; x++) {
@@ -265,6 +336,33 @@ expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
     return expandedMap;
 }
 
+/**
+ * @brief Randomizes if the screen should generate a building.
+ * 
+ * @param screen 
+ * @return int 
+ */
+int RandomizeBuildings(screen_t* screen) {
+    int chance = 100;
+    int dist = abs((int)(offset.x / LENGTH) - MAXSIZE / 2) + abs((int)(offset.y / WIDTH) - MAXSIZE / 2);
+
+    if (dist > 0)
+        chance = pow(0.975, dist - 155) + 5;
+
+    srand(FirstFourDigits(screen->biomeMap[0][0].minHeight));
+
+    if((rand() % 100) < chance)
+        GenerateBuildings(screen);
+
+    return 0;
+}
+
+/**
+ * @brief Generates buildings for the given screen
+ * 
+ * @param screen 
+ * @return int 
+ */
 int GenerateBuildings(screen_t* screen) {
     path_t* verticalPath = screen->verticalPath;
     path_t* horizontalPath = screen->horizontalPath;
@@ -330,11 +428,22 @@ int GenerateBuildings(screen_t* screen) {
         free(pokecenter);
     }
 
-    pq_destroy_dynamic(&buildingQueue);
+    pq_destroy(&buildingQueue);
 
     return 0;
 }
 
+/**
+ * @brief Detects if the given position is a valid position for a building
+ * 
+ * @param screen 
+ * @param currX x position of the path
+ * @param currY y position of the path
+ * @param value random bias onn the path to make it not favor the first available position
+ * @param inverse determines if it is on the left or right side of the path
+ * @param vertical determins if it is a vertical path of a horizontal path
+ * @return int 
+ */
 int isValidBuilding(screen_t* screen, int currX, int currY, int* value, int inverse, int vertical) {
     vector_t buildingOffset[QUADRANT] = {
         [0] = { .x = 0, .y = 1 },
@@ -373,6 +482,14 @@ int isValidBuilding(screen_t* screen, int currX, int currY, int* value, int inve
     return 1;
 }
 
+/**
+ * @brief Constructs the building with the building struct
+ * 
+ * @param screen 
+ * @param building 
+ * @param tile 
+ * @return int 
+ */
 int ConstructBuilding(screen_t* screen, building_t* building, tileType_t tile) {
     vector_t buildingOffset[QUADRANT] = {
         [0] = { .x = 0, .y = 1 },
@@ -416,6 +533,12 @@ int ConstructBuilding(screen_t* screen, building_t* building, tileType_t tile) {
     return 0;
 }
 
+/**
+ * @brief Returns the first four digits of a float value as an 4 digit int
+ * 
+ * @param num 
+ * @return int 
+ */
 int FirstFourDigits(float num) {
     float abs = fabs(num);
 

@@ -6,7 +6,10 @@
 
 volatile int initialized = 0;
 
-//Biome Assignment
+/**
+ * @brief Tile Assignment
+ * 
+ */
 const tileType_t Tiles[TILENUM] = {
     [FOREST] = { FOREST, .minHeight = -0.5, .minHumidity = 0.35, .type = '^', .weight = 50 },
     [MOUNTAIN] = { MOUNTAIN, .minHeight = 0.25, .minHumidity = -0.6, .type = '%', .weight = 90 },
@@ -18,6 +21,10 @@ const tileType_t Tiles[TILENUM] = {
     [POKEC] = { POKEC, .minHeight = 0, .minHumidity = 0, .type = 'C', .weight = 100 }
 };
 
+/**
+ * @brief Inialization. CALL BEFORE ANYTHING
+ * 
+ */
 void Initialize() {
     if (initialized == 1)
         return;
@@ -27,6 +34,11 @@ void Initialize() {
     srand(time(NULL));     
 }
 
+/**
+ * @brief Get the Waves (altitude waves and humidity) for the noise map
+ * 
+ * @return waves_t 
+ */
 waves_t GetWaves() {
     waves_t waves;
 

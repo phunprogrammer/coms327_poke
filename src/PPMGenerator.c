@@ -8,6 +8,11 @@
 
 static FILE *file;
 
+/**
+ * @brief Generates a PPM map for given waves. Settings can be changed in config
+ * 
+ * @param waves 
+ */
 void GeneratePPM(waves_t waves) {
     time_t startTime, endTime;
     startTime = clock();
@@ -55,6 +60,11 @@ void GeneratePPM(waves_t waves) {
     printf("Time to Gen: %.2f\n", (double)(endTime - startTime) / (double)CLOCKS_PER_SEC);
 }
 
+/**
+ * @brief Prints different color based on tile
+ * 
+ * @param biome 
+ */
 void PrintNext(enum Tile biome) {
     switch (biome) {
         case FOREST:
@@ -87,17 +97,33 @@ void PrintNext(enum Tile biome) {
     }
 }
 
+/**
+ * @brief Print based on a float number
+ * 
+ * @param value 
+ */
 void PrintNum(float value) {
     int newValue = (int)((value + 0.7) * 182);
     fprintf(file, "%d %d %d\n", newValue, newValue, newValue);
 }
 
+/**
+ * @brief Prints the head of the PPM file. CALL BEFORE GENERATING PPM
+ * 
+ * @param length 
+ * @param width 
+ * @param height 
+ */
 void PrintHeader(int length, int width, int height) {
     file = fopen("map.ppm", "wb");
 
     fprintf(file, "P6 %d %d %d\n", length, width, height);
 }
 
+/**
+ * @brief Closes PPM file. CALL AFTER GENERATING PPM
+ * 
+ */
 void CloseFile() {
     fclose(file);
 }

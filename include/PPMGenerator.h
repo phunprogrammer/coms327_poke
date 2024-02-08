@@ -1,3 +1,9 @@
+/**
+ * @brief Generates a PPM file with the world. Changes to this generation can be made in config.h
+ * @author phun
+ * @date 2/8/24
+ */
+
 #include "Config.h"
 #include <stdio.h>
 

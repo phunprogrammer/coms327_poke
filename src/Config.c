@@ -18,7 +18,8 @@ const tileType_t Tiles[TILENUM] = {
     [OCEAN] = { OCEAN, .minHeight = -0.8, .minHumidity = -0.8, .type = '~', .weight = 100 },
     [PATH] = { PATH, .minHeight = 0, .minHumidity = 0, .type = '#', .weight = -5 },
     [POKEM] = { POKEM, .minHeight = 0, .minHumidity = 0, .type = 'M', .weight = 100 },
-    [POKEC] = { POKEC, .minHeight = 0, .minHumidity = 0, .type = 'C', .weight = 100 }
+    [POKEC] = { POKEC, .minHeight = 0, .minHumidity = 0, .type = 'C', .weight = 100 },
+    [PC] = { PC, .minHeight = 0, .minHumidity = 0, .type = '@', .weight = 100 }
 };
 
 /**
@@ -44,6 +45,7 @@ waves_t GetWaves() {
 
     int i = 0;
     int seed = rand();
+    seed = 1477246270;
     
     printf("%d\n", seed);
 

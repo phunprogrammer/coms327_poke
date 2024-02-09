@@ -3,6 +3,7 @@
 #include "TerrainGenerator.h"
 #include "Config.h"
 #include "PQueue.h"
+#include "EntityGenerator.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,6 +52,7 @@ int main () {
         }
         
         screen = ScreenGenerator(waves);
+        RandomizePC(&screen);
 
         for(int y = 0; y < WIDTH; y++) {
             for(int x = 0; x < LENGTH; x++) {

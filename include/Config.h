@@ -18,6 +18,7 @@
 #define MIDDLEY 200
 #define MAXSIZE 400
 #define MINSIZE 0
+#define MAXENTITIES 10
 
 //Path
 #define PATHMARGIN 3
@@ -31,7 +32,7 @@
 
 //Biomes
 #define BIOMENUM 5
-#define TILENUM 8
+#define TILENUM 9
 enum __attribute__ ((__packed__)) Tile {
     FOREST,
     MOUNTAIN,
@@ -40,7 +41,8 @@ enum __attribute__ ((__packed__)) Tile {
     OCEAN,
     PATH,
     POKEM,
-    POKEC
+    POKEC,
+    PC
 };
 
 typedef struct NoiseMap {
@@ -77,13 +79,19 @@ typedef struct Path {
     struct Path* previous;
 } path_t;
 
-typedef struct tileType {
+typedef struct TileType {
     enum Tile biomeID;
     float minHeight;
     float minHumidity;
     int weight;
     char type;
 } tileType_t;
+
+typedef struct EntityType {
+    tileType_t tile;
+    enum Tile originalTile;
+    int weightFactor[BIOMENUM];
+} entityType_t;
 
 typedef struct Screen {
     tileType_t** biomeMap;
@@ -92,6 +100,8 @@ typedef struct Screen {
     pathgates_t verticalEndpoints;
     path_t* horizontalPath;
     path_t* verticalPath;
+    entityType_t entities[MAXENTITIES];
+    int entitiesSize;
 } screen_t;
 
 typedef struct Building {

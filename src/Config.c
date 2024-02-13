@@ -19,7 +19,13 @@ const tileType_t Tiles[TILENUM] = {
     [PATH] = { PATH, .minHeight = 0, .minHumidity = 0, .type = '#', .weight = -5 },
     [POKEM] = { POKEM, .minHeight = 0, .minHumidity = 0, .type = 'M', .weight = 100 },
     [POKEC] = { POKEC, .minHeight = 0, .minHumidity = 0, .type = 'C', .weight = 100 },
-    [PC] = { PC, .minHeight = 0, .minHumidity = 0, .type = '@', .weight = 100 }
+    [PC] = { PC, .minHeight = 0, .minHumidity = 0, .type = '@', .weight = 100 },
+    [HIKER] = { HIKER, .minHeight = 0, .minHumidity = 0, .type = 'H', .weight = 100 }
+};
+
+const entityType_t Entities[TILENUM] = {
+    [PC] = { .tile = Tiles[PC], .weightFactor = {  0, 0, 10, 20, 0, 10, 10, 10 } },
+    [HIKER] = { .tile = Tiles[HIKER], .weightFactor = { 15, 15, 10, 15, 0, 10, 50, 50 } }
 };
 
 /**
@@ -32,7 +38,9 @@ void Initialize() {
 
     initialized = 1;
 
-    srand(time(NULL));     
+    srand(time(NULL));    
+
+    //Init_Entities(); 
 }
 
 /**
@@ -63,3 +71,15 @@ waves_t GetWaves() {
 
     return waves;
 }
+
+// int Init_Entities() {
+//     for(int i = 0; i < ENTITYNUM; i++) {
+//         Entities[i].tile = Tiles[BIOMENUM + STRUCNUM + i];
+
+//         for(int j = 0; j < BIOMENUM + STRUCNUM; j++) {
+//             Entities[i].weightFactor[j] = PCWEIGHT[j];
+//         }
+//     }
+
+//     return 0;
+// }

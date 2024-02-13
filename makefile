@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I$(IDIR) -Wall -Wextra -Werror
+CFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g
 
 IDIR =./include
 ODIR=./obj

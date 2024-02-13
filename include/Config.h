@@ -32,7 +32,9 @@
 
 //Biomes
 #define BIOMENUM 5
-#define TILENUM 9
+#define STRUCNUM 3
+#define ENTITYNUM 2
+#define TILENUM BIOMENUM + STRUCNUM + ENTITYNUM
 enum __attribute__ ((__packed__)) Tile {
     FOREST,
     MOUNTAIN,
@@ -42,7 +44,8 @@ enum __attribute__ ((__packed__)) Tile {
     PATH,
     POKEM,
     POKEC,
-    PC
+    PC,
+    HIKER
 };
 
 typedef struct NoiseMap {
@@ -90,7 +93,8 @@ typedef struct TileType {
 typedef struct EntityType {
     tileType_t tile;
     enum Tile originalTile;
-    int weightFactor[BIOMENUM];
+    vector_t coord;
+    int weightFactor[BIOMENUM + STRUCNUM];
 } entityType_t;
 
 typedef struct Screen {
@@ -100,8 +104,9 @@ typedef struct Screen {
     pathgates_t verticalEndpoints;
     path_t* horizontalPath;
     path_t* verticalPath;
-    entityType_t entities[MAXENTITIES];
-    int entitiesSize;
+    entityType_t pc;
+    entityType_t npcs[MAXENTITIES];
+    int npcSize;
 } screen_t;
 
 typedef struct Building {
@@ -114,8 +119,12 @@ extern volatile int initialized;
 
 extern const tileType_t Tiles[TILENUM];
 
+extern const entityType_t Entities[TILENUM];
+
 void Initialize();
 
 waves_t GetWaves();
+
+int Init_Entities();
 
 #endif

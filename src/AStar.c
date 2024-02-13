@@ -2,9 +2,9 @@
 #include "AStar.h"
 #include "Config.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
-#define BIOMEFACTOR 0.08
 #define NEIGHBORS 4
 #define NEIGHBORARR (vector_t[]) { { .x = 0, .y = -1 }, { .x = -1, .y = 0 }, { .x = 1, .y = 0 }, { .x = 0, .y = 1 }, { .x = -1, .y = -1 }, { .x = 1, .y = -1 }, { .x = -1, .y = 1 }, { .x = 1, .y = 1 } }
 
@@ -31,8 +31,11 @@ float as_calcDistCost(int currX, int currY, int endX, int endY) {
  * @param length 
  * @return int 0 or 1
  */
-int as_isValid(int x, int y, int start, int width, int length) {
-    return (x >= start && x < length && y >= start && y < width);
+int as_isValid(int x, int y, int width, int length) {
+    int widthOffset = (WIDTH - width) / 2;
+    int lengthOffest = (LENGTH - length) / 2;
+
+    return (x >= lengthOffest && x < length + lengthOffest && y >= widthOffset && y < width + widthOffset);
 }
 
 /**
@@ -48,7 +51,7 @@ int as_isValid(int x, int y, int start, int width, int length) {
  * @param open An open queue that stores opened grids
  * @return path_t* A pointer from the end of the path to the beginning
  */
-path_t* aStar(int** grid, int width, int length, int startX, int startY, int endX, int endY, pqueue_t* open) {
+path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int startY, int endX, int endY, float biomeFactor, pqueue_t* open) {
     int startKey = startY * LENGTH + startX;
     int endKey = endY * LENGTH + endX;
 
@@ -62,7 +65,7 @@ path_t* aStar(int** grid, int width, int length, int startX, int startY, int end
     gCost[startKey] = 1;
 
     float fCost[WIDTH * LENGTH] = { 0 };
-    fCost[startKey] = as_calcDistCost(startX, startY, endX, endY) * (float)Tiles[CLEARING].weight * BIOMEFACTOR;
+    fCost[startKey] = as_calcDistCost(startX, startY, endX, endY) * (float)Tiles[CLEARING].weight * biomeFactor;
 
     pq_enqueue(open, &startKey, fCost[startKey]);
 
@@ -84,17 +87,17 @@ path_t* aStar(int** grid, int width, int length, int startX, int startY, int end
 
             int neighborNode = nextY * LENGTH + nextX;
 
-            if(!as_isValid(nextX, nextY, 2, width - 2, length - 2) || closed[neighborNode] == 1) {
+            if(!as_isValid(nextX, nextY, width, length) || grid[nextY][nextX] == 0 || closed[neighborNode] == 1) {
                 continue;
             }
             
             int visited = gCost[neighborNode] != 0;
-            int costToNeighbor = gCost[currentKey] + as_calcDistCost(cameFrom[currentKey] % LENGTH, cameFrom[currentKey] / LENGTH, nextX, nextY) / 2 + (float)grid[nextY][nextX] * BIOMEFACTOR;
+            int costToNeighbor = gCost[currentKey] + as_calcDistCost(cameFrom[currentKey] % LENGTH, cameFrom[currentKey] / LENGTH, nextX, nextY) / 2 + (float)grid[nextY][nextX] * biomeFactor;
 
             if(costToNeighbor < gCost[neighborNode] || !visited) {
                 cameFrom[neighborNode] = currentKey;
                 gCost[neighborNode] = costToNeighbor;
-                fCost[neighborNode] = costToNeighbor + as_calcDistCost(nextX, nextY, endX, endY) * (float)Tiles[CLEARING].weight * BIOMEFACTOR;
+                fCost[neighborNode] = costToNeighbor + as_calcDistCost(nextX, nextY, endX, endY) * (float)Tiles[CLEARING].weight * biomeFactor;
 
                 if(!visited) {
                     int* neighborPtr = (int *)malloc(sizeof(int));
@@ -106,6 +109,8 @@ path_t* aStar(int** grid, int width, int length, int startX, int startY, int end
         }
     }
 
+    PrintWeightMap(fCost);
+    pq_destroy(open);
     return NULL;
 }   
 
@@ -136,4 +141,19 @@ path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], int current, int start) {
         }
 
         return path;
+}
+
+int PrintWeightMap(float map[WIDTH * LENGTH]) {
+    for(int i = 0; i < WIDTH; i++) {
+        for(int j = 0; j < LENGTH; j++) {
+            int current = (int)map[i * LENGTH + j];
+            if(current == 0) 
+                printf("    ");
+            else
+                printf("%03d ", current % 100);
+        }
+        printf("\n");
+    }
+
+    return 0;
 }

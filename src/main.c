@@ -53,6 +53,7 @@ int main () {
         
         screen = ScreenGenerator(waves);
         RandomizePC(&screen);
+        SpawnNPC(&screen, HIKER);
 
         for(int y = 0; y < WIDTH; y++) {
             for(int x = 0; x < LENGTH; x++) {
@@ -61,6 +62,8 @@ int main () {
             printf("\n");
         } 
         printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
+
+        GenWeightMap(&screen, &(screen.npcs[0]));
 
         DestroyScreen(&screen);
 

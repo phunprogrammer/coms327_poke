@@ -197,11 +197,9 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.end][(LENGTH - 1)- i]), Tiles[PATH]);
     }
 
-    int** biomeGrid = (int**)malloc(WIDTH * sizeof(int*));
+    int biomeGrid[WIDTH][LENGTH];
 
     for (int y = 0; y < WIDTH; y++) {
-        biomeGrid[y] = (int*)malloc(LENGTH * sizeof(int));
-
         for (int x = 0; x < LENGTH; x++) {
             biomeGrid[y][x] = screen->biomeMap[y][x].weight;
         }
@@ -209,7 +207,7 @@ void GeneratePath(waves_t waves, screen_t* screen) {
 
     pqueue_t open;
 
-    path_t* horizontalPath = aStar(biomeGrid, WIDTH, LENGTH, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, &open);
+    path_t* horizontalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, 0.08, &open);
     screen->horizontalPath = horizontalPath;
 
     while(horizontalPath != NULL) {
@@ -222,13 +220,8 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         horizontalPath = horizontalPath->previous;
     }
 
-    path_t* verticalPath = aStar(biomeGrid, WIDTH, LENGTH, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, &open);
+    path_t* verticalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, 0.08, &open);
     screen->verticalPath = verticalPath;
-
-    for (int i = 0; i < WIDTH; ++i) {
-        free(biomeGrid[i]);
-    }
-    free(biomeGrid);
 
     while(verticalPath != NULL) {
         int x = verticalPath->coord.x;

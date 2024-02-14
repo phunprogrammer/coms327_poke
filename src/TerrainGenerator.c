@@ -207,7 +207,7 @@ void GeneratePath(waves_t waves, screen_t* screen) {
 
     pqueue_t open;
 
-    path_t* horizontalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, 0.08, &open);
+    path_t* horizontalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, PATHOFFSET, screen->horizontalEndpoints.start, (LENGTH - 1) - PATHOFFSET, screen->horizontalEndpoints.end, 0.08, 4, &open);
     screen->horizontalPath = horizontalPath;
 
     while(horizontalPath != NULL) {
@@ -220,7 +220,7 @@ void GeneratePath(waves_t waves, screen_t* screen) {
         horizontalPath = horizontalPath->previous;
     }
 
-    path_t* verticalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, 0.08, &open);
+    path_t* verticalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, screen->verticalEndpoints.start, PATHOFFSET, screen->verticalEndpoints.end, (WIDTH - 1) - PATHOFFSET, 0.08, 4, &open);
     screen->verticalPath = verticalPath;
 
     while(verticalPath != NULL) {

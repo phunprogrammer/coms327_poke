@@ -12,7 +12,6 @@ int RandomizePC(screen_t* screen) {
     path_t* vertical = screen->verticalPath;
 
     int randPathLoc = rand() % (LENGTH + WIDTH) * 2 ;
-    printf("%d\n", randPathLoc);
 
     int i = 0;
 
@@ -71,19 +70,22 @@ int SetEntity(screen_t* screen, entityType_t* entity, int x, int y, enum Tile en
     return 0;
 }
 
-int GenWeightMap(screen_t* screen, entityType_t* entity) {
+int GenWeightMap(screen_t* screen, entityType_t entity) {
+    int endX = 0;
+    int endY = 0;
+    float biomeFactor = 1.0;
+    int neighbors = 8;
+
     int biomeGrid[WIDTH][LENGTH];
 
     for (int y = 0; y < WIDTH; y++) {
         for (int x = 0; x < LENGTH; x++) {
-            biomeGrid[y][x] = entity->weightFactor[screen->biomeMap[y][x].biomeID];
+            biomeGrid[y][x] = entity.weightFactor[screen->biomeMap[y][x].biomeID];
         }
     }
 
-    biomeGrid[(int)screen->pc.coord.y][(int)screen->pc.coord.x] = 0;
-
     pqueue_t open;
-    aStar(biomeGrid, WIDTH - 2, LENGTH - 2, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, 1.0, &open);
+    aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, endX, endY, biomeFactor, neighbors, &open);
 
     return 0;
 }

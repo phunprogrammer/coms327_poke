@@ -12,8 +12,8 @@
 
 float as_calcDistCost(int currX, int currY, int endX, int endY);
 int as_isValid(int x, int y, int width, int length);
-path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int startY, int endX, int endY, float biomeFactor, pqueue_t* open);
+path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int startY, int endX, int endY, float biomeFactor, int neighbors, pqueue_t* open);
 path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], int current, int start);
-int PrintWeightMap(float map[WIDTH * LENGTH]);
+int PrintWeightMap(float map[WIDTH * LENGTH], int startX, int startY);
 
 #endif

@@ -33,7 +33,7 @@
 //Biomes
 #define BIOMENUM 5
 #define STRUCNUM 3
-#define ENTITYNUM 2
+#define ENTITYNUM 3
 #define TILENUM BIOMENUM + STRUCNUM + ENTITYNUM
 enum __attribute__ ((__packed__)) Tile {
     FOREST,
@@ -45,7 +45,8 @@ enum __attribute__ ((__packed__)) Tile {
     POKEM,
     POKEC,
     PC,
-    HIKER
+    HIKER,
+    RIVAL
 };
 
 typedef struct NoiseMap {

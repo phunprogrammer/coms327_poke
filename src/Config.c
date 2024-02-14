@@ -20,12 +20,15 @@ const tileType_t Tiles[TILENUM] = {
     [POKEM] = { POKEM, .minHeight = 0, .minHumidity = 0, .type = 'M', .weight = 100 },
     [POKEC] = { POKEC, .minHeight = 0, .minHumidity = 0, .type = 'C', .weight = 100 },
     [PC] = { PC, .minHeight = 0, .minHumidity = 0, .type = '@', .weight = 100 },
-    [HIKER] = { HIKER, .minHeight = 0, .minHumidity = 0, .type = 'H', .weight = 100 }
+    [HIKER] = { HIKER, .minHeight = 0, .minHumidity = 0, .type = 'H', .weight = 100 },
+    [RIVAL] = { RIVAL, .minHeight = 0, .minHumidity = 0, .type = 'R', .weight = 100 }
 };
 
+#define HIKERWEIGHT (int){ 15, 15, 10, 15, 0, 10, 50, 50 }
 const entityType_t Entities[TILENUM] = {
     [PC] = { .tile = Tiles[PC], .weightFactor = {  0, 0, 10, 20, 0, 10, 10, 10 } },
-    [HIKER] = { .tile = Tiles[HIKER], .weightFactor = { 15, 15, 10, 15, 0, 10, 50, 50 } }
+    [HIKER] = { .tile = Tiles[HIKER], .weightFactor = { 15, 15, 10, 15, 0, 10, 50, 50 } },
+    [RIVAL] = { .tile = Tiles[RIVAL], .weightFactor = {  0, 0, 10, 20, 0, 10, 50, 50 } }
 };
 
 /**
@@ -53,9 +56,8 @@ waves_t GetWaves() {
 
     int i = 0;
     int seed = rand();
-    seed = 1477246270;
     
-    printf("%d\n", seed);
+    printf("seed: %d\n", seed);
 
     for (; i < WAVENUM; i++) {
         waves.Altitude[i].amplitude = AMPLITUDE[i];

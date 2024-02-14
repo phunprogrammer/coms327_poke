@@ -1,5 +1,5 @@
-# COMS 327 - Assignment 02
-This is assignment 02 of the Pokemon game for COMS 327. In this iteration, you can traverse between screens using `n`,`e`,`s`,`w` in cmd line and it will travel accordingly. Biomes and paths will remain connected between screens to keep fluidity. Use `f` then any two integers and it will travel to that square (will limit at max distance). On the borders of the world the paths will be blocked off. Lastly, buildings decay logarithmically the further you travel from the center until bottoming out at 5%.
+# COMS 327 - Assignment 03
+This is assignment 03 of the Pokemon game for COMS 327. In this iteration, when running the game, the map will still generate and be traversalable but along with that a PC will spawn on the map denoted as `@`. The PC will generate randomly but will bias towards paths. After the map is generated, two cost maps will generate with it that shows the costs for the HIKER and the RIVAL NPCs to get the PC. This implements travel in eight directions and the costs are provided by the Professor.
 
 ## HOW TO RUN:
 To run use `make` in the terminal then run the `game` executable generated from it

@@ -19,6 +19,7 @@
 #define MAXSIZE 400
 #define MINSIZE 0
 #define MAXENTITIES 10
+#define DEVMODE 1
 
 //Path
 #define PATHMARGIN 3

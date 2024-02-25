@@ -2,4 +2,4 @@
 This is assignment 03 of the Pokemon game for COMS 327. In this iteration, when running the game, the map will still generate and be traversalable but along with that a PC will spawn on the map denoted as `@`. The PC will generate randomly but will bias towards paths. After the map is generated, two cost maps will generate with it that shows the costs for the HIKER and the RIVAL NPCs to get the PC. This implements travel in eight directions and the costs are provided by the Professor.
 
 ## HOW TO RUN:
-To run use `make` in the terminal then run the `game` executable generated from it
+To run use `make` in the terminal then run the `game` executable generated from it. Use `make clean` to delete generated files.

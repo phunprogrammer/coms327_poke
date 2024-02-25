@@ -50,11 +50,12 @@ int as_isValid(int x, int y, int width, int length) {
  * @param open An open queue that stores opened grids
  * @return path_t* A pointer from the end of the path to the beginning
  */
-path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int startY, int endX, int endY, float biomeFactor, int neighbors, pqueue_t* open) {
+path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int startY, int endX, int endY, float biomeFactor, int neighbors) {
     int startKey = startY * LENGTH + startX;
     int endKey = endY * LENGTH + endX;
 
-    pq_init(open);
+    pqueue_t open;
+    pq_init(&open);
 
     int closed[WIDTH * LENGTH] = { 0 };
 
@@ -66,17 +67,17 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
     float fCost[WIDTH * LENGTH] = { 0 };
     fCost[startKey] = as_calcDistCost(startX, startY, endX, endY) * (float)Tiles[CLEARING].weight * biomeFactor;
 
-    pq_enqueue(open, &startKey, fCost[startKey]);
+    pq_enqueue(&open, &startKey, fCost[startKey]);
 
-    while(!pq_isEmpty(open)) {
+    while(!pq_isEmpty(&open)) {
         void *node;
 
-        pq_dequeue(open, &node);
+        pq_dequeue(&open, &node);
         int currentKey = *(int *)node;
         closed[currentKey] = 1;
 
         if(currentKey == endKey) {
-            pq_destroy(open);
+            pq_destroy(&open);
             return ConstructPath(cameFrom, currentKey, startKey);
         }
 
@@ -91,7 +92,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
             }
             
             int visited = gCost[neighborNode] != 0;
-            int costToNeighbor = gCost[currentKey] + as_calcDistCost(cameFrom[currentKey] % LENGTH, cameFrom[currentKey] / LENGTH, nextX, nextY) / 2 * !(int)biomeFactor + (float)grid[nextY][nextX] * biomeFactor;
+            int costToNeighbor = gCost[currentKey] + as_calcDistCost(cameFrom[currentKey] % LENGTH, cameFrom[currentKey] / LENGTH, nextX, nextY) / 2 + (float)grid[nextY][nextX] * biomeFactor;
 
             if(costToNeighbor < gCost[neighborNode] || !visited) {
                 cameFrom[neighborNode] = currentKey;
@@ -101,7 +102,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
                 if(!visited) {
                     int* neighborPtr = (int *)malloc(sizeof(int));
                     *neighborPtr = neighborNode;
-                    pq_enqueue(open, neighborPtr, fCost[neighborNode]);
+                    pq_enqueue(&open, neighborPtr, fCost[neighborNode]);
                     continue;
                 }
             }
@@ -109,7 +110,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
     }
 
     PrintWeightMap(gCost, startX, startY);
-    pq_destroy(open);
+    pq_destroy(&open);
     return NULL;
 }   
 

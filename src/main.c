@@ -8,21 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main () {
-    Initialize();
-    
-    waves_t waves = GetWaves();
-
-    if(GENERATEPPM)
-        GeneratePPM(waves);
-
-    int currX = MIDDLEX;
-    int currY = MIDDLEY;
-
-    UpdateOffset(currX, currY);
-    screen_t screen;
+void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     char input = 0;
-
     do {
         switch (input) {
             case 'n':
@@ -51,23 +38,40 @@ int main () {
                 continue;
         }
         
-        screen = ScreenGenerator(waves);
-        RandomizePC(&screen);
+        *screen = ScreenGenerator(waves);
+        RandomizePC(screen);
+        SpawnNPC(screen, HIKER);
 
         for(int y = 0; y < WIDTH; y++) {
             for(int x = 0; x < LENGTH; x++) {
-                printf("%c", screen.biomeMap[y][x].type);
+                printf("%c", screen->biomeMap[y][x].type);
             }
             printf("\n");
         } 
         printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
+        printf("%d\n", !1);
 
-        GenWeightMap(&screen, Entities[HIKER]);
-        GenWeightMap(&screen, Entities[RIVAL]);
-
-        DestroyScreen(&screen);
+        DestroyScreen(screen);
 
     } while ((input = getc(stdin)) != 'q');
+}
+
+int main () {
+    Initialize();
+    
+    waves_t waves = GetWaves();
+
+    if(GENERATEPPM)
+        GeneratePPM(waves);
+
+    int currX = MIDDLEX;
+    int currY = MIDDLEY;
+
+    UpdateOffset(currX, currY);
+    screen_t screen;
+
+    if(DEVMODE == 1)
+        DevLoop(&screen, waves, currX, currY);
     
     return 0;
 }

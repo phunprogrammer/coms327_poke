@@ -56,6 +56,7 @@ waves_t GetWaves() {
 
     int i = 0;
     int seed = rand();
+    seed = 549798832;
     
     printf("seed: %d\n", seed);
 

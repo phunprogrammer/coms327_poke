@@ -84,8 +84,7 @@ int GenWeightMap(screen_t* screen, entityType_t entity) {
         }
     }
 
-    pqueue_t open;
-    aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, endX, endY, biomeFactor, neighbors, &open);
+    aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, endX, endY, biomeFactor, neighbors);
 
     return 0;
 }

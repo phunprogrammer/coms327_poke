@@ -1,4 +1,3 @@
-#include "Config.h"
 #include "EntityGenerator.h"
 #include "TerrainGenerator.h"
 #include "aStar.h"

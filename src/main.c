@@ -64,6 +64,10 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     *screen = ScreenGenerator(waves);
     RandomizePC(screen);
     SpawnNPC(screen, HIKER);
+    SpawnNPC(screen, RIVAL);
+
+    pqueue_t moveQueue;
+    pq_init(&moveQueue);
 
     while (1) {
         for(int y = 0; y < WIDTH; y++) {
@@ -72,8 +76,9 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
             }
             printf("\n");
         } 
+
         printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
-        
+
         FD_ZERO(&detectInput);
         FD_SET(0, &detectInput);
         timeout.tv_sec = 3;
@@ -89,10 +94,20 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
                     return;
                     
                 PCController(screen, input[0]);
-
                 break;
             default:
                 break;
+        }
+
+        
+        pq_destroy_static(&moveQueue);
+        pq_init(&moveQueue);
+        GetAllNPCMoves(screen, &moveQueue);
+        
+        for(int i = pq_size(&moveQueue) - 1; i >= 0; i--) {
+            entityType_t* entity = (entityType_t*)moveQueue.array[i].data;
+            printf("%d: (%f, %f), %d\n", entity->tile.biomeID, entity->entityPath->coord.x, entity->entityPath->coord.y, moveQueue.array[i].priority);
+            entity->entityPath = entity->entityPath->previous;
         }
     }
 }

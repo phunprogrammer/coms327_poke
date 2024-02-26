@@ -2,7 +2,11 @@
 #include "EntityMover.h"
 #include "EntityGenerator.h"
 #include "TerrainGenerator.h"
+#include "PQueue.h"
+#include "AStar.h"
+#include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 int MovePC(screen_t* screen, vector_t move) {
     if(move.x < 0 || move.x >= LENGTH || move.y < 0 || move.y >= WIDTH)
@@ -21,28 +25,31 @@ int MovePC(screen_t* screen, vector_t move) {
     return 1;
 }
 
-// int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
-//     float biomeFactor = 1.0;
-//     int neighbors = 8;
+int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
+    float biomeFactor = 1.0;
+    int neighbors = 8;
 
-//     int biomeGrid[WIDTH][LENGTH];
+    int biomeGrid[WIDTH][LENGTH];
 
-//     for (int i = 0; i < screen->npcSize; i++) {
-//         for (int y = 0; y < WIDTH; y++) {
-//             for (int x = 0; x < LENGTH; x++) {
-//                 biomeGrid[y][x] = npcs[i].weightFactor[screen->biomeMap[y][x].biomeID];
-//             }
-//         }
+    for (int i = 0; i < screen->npcSize; i++) {
+        for (int y = 0; y < WIDTH; y++) {
+            for (int x = 0; x < LENGTH; x++) {
+                biomeGrid[y][x] = screen->npcs[i].weightFactor[screen->biomeMap[y][x].biomeID];
+            }
+        }
 
-//         path_t* entityPath = aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, npcs[i].coord.x, npcs[i].coord.y, biomeFactor, neighbors);
+        biomeGrid[(int)screen->npcs[i].coord.y][(int)screen->npcs[i].coord.x] = screen->npcs[i].weightFactor[(int)screen->npcs[i].originalTile];
+        path_t* entityPath = aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, screen->npcs[i].coord.x, screen->npcs[i].coord.y, biomeFactor, neighbors);
+        screen->npcs[i].entityPath = entityPath;
 
-//         while(entityPath != NULL) {
-//             pq_enqueue(moveq, entityPath.)
+        while(entityPath->previous != NULL) {
+            pq_enqueue(moveq, &(screen->npcs[i]), entityPath->gCost);
+            entityPath = entityPath->previous;
+        }
+    }
 
-//             entityPath = entityPath->previous;
-//         }
-//     }
-// }
+    return 1;
+}
 
 int PCController(screen_t* screen, char input) {
     vector_t move;

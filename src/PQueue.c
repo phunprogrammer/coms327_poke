@@ -31,6 +31,18 @@ int pq_destroy(pqueue_t* queue) {
 }
 
 /**
+ * @brief Destroys priority queue but doesnt free data
+ * 
+ * @param queue 
+ * @return int 
+ */
+int pq_destroy_static(pqueue_t* queue) {
+    free(queue->array);
+    queue->size = 0;
+    return 0;
+}
+
+/**
  * @brief Queues data into the priority queue
  * 
  * @param queue 

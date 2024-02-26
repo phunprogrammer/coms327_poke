@@ -21,6 +21,7 @@ typedef struct PQueue {
 
 int pq_init(pqueue_t *queue);
 int pq_destroy(pqueue_t *queue);
+int pq_destroy_static(pqueue_t *queue);
 int pq_enqueue(pqueue_t *queue, void *data, int priority);
 int pq_swap(pqueue_t *queue, int a, int b);
 int pq_dequeue(pqueue_t *queue, void **data);

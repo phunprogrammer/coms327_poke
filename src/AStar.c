@@ -78,7 +78,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
 
         if(currentKey == endKey) {
             pq_destroy(&open);
-            return ConstructPath(cameFrom, currentKey, startKey);
+            return ConstructPath(cameFrom, gCost, currentKey, startKey);
         }
 
         for(int i = 0; i < neighbors; i++) {
@@ -122,7 +122,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
  * @param start Stopping point of the path
  * @return path_t* 
  */
-path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], int current, int start) {
+path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH], int current, int start) {
         path_t* path = (path_t *)malloc(sizeof(path_t));
         path->coord.x = current % LENGTH;
         path->coord.y = current / LENGTH;
@@ -135,6 +135,7 @@ path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], int current, int start) {
             tempPath->previous = (path_t *)malloc(sizeof(path_t));
             tempPath->previous->coord.x = current % LENGTH;
             tempPath->previous->coord.y = current / LENGTH;
+            tempPath->gCost = (int)gCost[current];
             tempPath->previous->previous = NULL;
             
             tempPath = tempPath->previous;

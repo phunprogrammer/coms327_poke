@@ -81,6 +81,7 @@ typedef struct PathGates {
 
 typedef struct Path {
     vector_t coord;
+    int gCost;
     struct Path* previous;
 } path_t;
 
@@ -97,6 +98,7 @@ typedef struct EntityType {
     enum Tile originalTile;
     vector_t coord;
     int weightFactor[BIOMENUM + STRUCNUM];
+    path_t* entityPath;
 } entityType_t;
 
 typedef struct Screen {

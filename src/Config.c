@@ -26,9 +26,9 @@ const tileType_t Tiles[TILENUM] = {
 
 #define HIKERWEIGHT (int){ 15, 15, 10, 15, 0, 10, 50, 50 }
 const entityType_t Entities[TILENUM] = {
-    [PC] = { .tile = Tiles[PC], .weightFactor = {  0, 0, 10, 20, 0, 10, 10, 10 } },
-    [HIKER] = { .tile = Tiles[HIKER], .weightFactor = { 15, 15, 10, 15, 0, 10, 50, 50 } },
-    [RIVAL] = { .tile = Tiles[RIVAL], .weightFactor = {  0, 0, 10, 20, 0, 10, 50, 50 } }
+    [PC] =    { .tile = Tiles[PC],    .weightFactor = {  0,  0, 10, 20, 0, 10, 10, 10, 100, 100, 100 } },
+    [HIKER] = { .tile = Tiles[HIKER], .weightFactor = { 15, 15, 10, 15, 0, 10,  0,  0, 100, 100, 100 } },
+    [RIVAL] = { .tile = Tiles[RIVAL], .weightFactor = {  0,  0, 10, 20, 0, 10,  0,  0, 100, 100, 100 } }
 };
 
 /**
@@ -56,7 +56,7 @@ waves_t GetWaves() {
 
     int i = 0;
     int seed = rand();
-    seed = 549798832;
+    //seed = 549798832;
     
     printf("seed: %d\n", seed);
 
@@ -74,15 +74,3 @@ waves_t GetWaves() {
 
     return waves;
 }
-
-// int Init_Entities() {
-//     for(int i = 0; i < ENTITYNUM; i++) {
-//         Entities[i].tile = Tiles[BIOMENUM + STRUCNUM + i];
-
-//         for(int j = 0; j < BIOMENUM + STRUCNUM; j++) {
-//             Entities[i].weightFactor[j] = PCWEIGHT[j];
-//         }
-//     }
-
-//     return 0;
-// }

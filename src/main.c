@@ -63,13 +63,15 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
 
     *screen = ScreenGenerator(waves);
     RandomizePC(screen);
-    SpawnNPC(screen, HIKER);
-    SpawnNPC(screen, RIVAL);
 
     pqueue_t moveQueue;
     pq_init(&moveQueue);
 
-    while (1) {
+    GetAllNPCMoves(screen, &moveQueue);
+
+    int currentPriority = 0;
+
+    while (1) {        
         for(int y = 0; y < WIDTH; y++) {
             for(int x = 0; x < LENGTH; x++) {
                 printf("%c", screen->biomeMap[y][x].type);
@@ -84,31 +86,42 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
         timeout.tv_sec = 3;
         timeout.tv_usec = 0;
 
-        switch (select(1, &detectInput, NULL, NULL, &timeout)) {
-            case 1:
-                char buffer[1024];
-                fgets(buffer, sizeof(buffer), stdin);
-                sprintf(input, "%s", buffer);
+        currentPriority = moveQueue.array[pq_size(&moveQueue) - 1].priority;
 
-                if (input[0] == 'q')
-                    return;
-                    
-                PCController(screen, input[0]);
-                break;
-            default:
-                break;
+        if(select(1, &detectInput, NULL, NULL, &timeout) == 1) {
+            char buffer[1024];
+            fgets(buffer, sizeof(buffer), stdin);
+            sprintf(input, "%s", buffer);
+
+            if (input[0] == 'q')
+                return;
+                
+            if (PCController(screen, input[0])) {
+                GetAllNPCMoves(screen, &moveQueue);
+                currentPriority = Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
+            }
         }
 
-        
-        pq_destroy_static(&moveQueue);
-        pq_init(&moveQueue);
-        GetAllNPCMoves(screen, &moveQueue);
-        
-        for(int i = pq_size(&moveQueue) - 1; i >= 0; i--) {
-            entityType_t* entity = (entityType_t*)moveQueue.array[i].data;
-            printf("%d: (%f, %f), %d\n", entity->tile.biomeID, entity->entityPath->coord.x, entity->entityPath->coord.y, moveQueue.array[i].priority);
-            entity->entityPath = entity->entityPath->previous;
-        }
+        if (pq_size(&moveQueue) == 0)
+            continue;
+
+        void* nextMove;
+
+        do {
+            pq_dequeue(&moveQueue, &nextMove);
+
+            entityType_t* npc = (entityType_t*)nextMove;
+            vector_t npcMove = { .x = npc->entityPath->coord.x, .y = npc->entityPath->coord.y };
+
+            printf("%d: (%d, %d), %d\n", npc->tile.biomeID, (int)npc->entityPath->coord.x, (int)npc->entityPath->coord.y, moveQueue.array[pq_size(&moveQueue)].priority);
+
+            if(MoveEntity(screen, npc, npcMove) == 0) {
+                GetAllNPCMoves(screen, &moveQueue);
+                break;
+            }
+
+            npc->entityPath = npc->entityPath->previous;
+        } while (pq_size(&moveQueue) > 0 && moveQueue.array[pq_size(&moveQueue) - 1].priority <= currentPriority);
     }
 }
 

@@ -50,19 +50,21 @@ int SpawnNPC(screen_t* screen, enum Tile entity) {
     do {
         randX = rand() % (LENGTH - 2) + 1;
         randY = rand() % (WIDTH - 2) + 1;
-    } while(Entities[entity].weightFactor[screen->biomeMap[randY][randX].biomeID] == 0);
+    } while(Entities[entity].weightFactor[screen->biomeMap[randY][randX].biomeID] == 0 || 
+                screen->biomeMap[randY][randX].biomeID > BIOMENUM);
 
     SetEntity(screen, &(screen->npcs[screen->npcSize++]), randX, randY, entity);
-
     return 0;
 }
 
 int SetEntity(screen_t* screen, entityType_t* entity, int x, int y, enum Tile entityID) {
     vector_t coord = { .x = x, .y = y };
 
+    path_t* tempPath = entity->entityPath;
     *entity = Entities[entityID];
     entity->coord = coord;
-    entity->originalTile = screen->biomeMap[y][x].biomeID;
+    entity->originalTile = screen->biomeMap[y][x];
+    entity->entityPath = tempPath;
 
     SwitchTile(&(screen->biomeMap[y][x]), Tiles[entityID]);
 

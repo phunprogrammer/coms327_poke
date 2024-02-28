@@ -8,24 +8,27 @@
 #include <math.h>
 #include <stdio.h>
 
-int MovePC(screen_t* screen, vector_t move) {
+int MoveEntity(screen_t* screen, entityType_t* entity, vector_t move) {
     if(move.x < 0 || move.x >= LENGTH || move.y < 0 || move.y >= WIDTH)
         return 0;
 
-    if(fabs(screen->pc.coord.x - move.x) > 1 || fabs(screen->pc.coord.y - move.y) > 1)
+    if(fabs(entity->coord.x - move.x) > 1 || fabs(entity->coord.y - move.y) > 1)
         return 0;
 
-    if(Entities[PC].weightFactor[screen->biomeMap[(int)move.y][(int)move.x].biomeID] == 0 ||
-        Entities[PC].weightFactor[screen->biomeMap[(int)move.y][(int)move.x].biomeID] > 100)
+    if(Entities[entity->tile.biomeID].weightFactor[screen->biomeMap[(int)move.y][(int)move.x].biomeID] == 0 ||
+        screen->biomeMap[(int)move.y][(int)move.x].biomeID >= (TILENUM - ENTITYNUM))
         return 0;
 
-    SwitchTile(&(screen->biomeMap[(int)screen->pc.coord.y][(int)(int)screen->pc.coord.x]), Tiles[screen->pc.originalTile]);
-    SetEntity(screen, &(screen->pc), move.x, move.y, PC);
+    SwitchTile(&(screen->biomeMap[(int)entity->coord.y][(int)(int)entity->coord.x]), Tiles[entity->originalTile.biomeID]);
+    SetEntity(screen, entity, move.x, move.y, entity->tile.biomeID);
 
     return 1;
 }
 
 int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
+    pq_destroy_static(moveq);
+    pq_init(moveq);
+
     float biomeFactor = 1.0;
     int neighbors = 8;
 
@@ -38,7 +41,7 @@ int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
             }
         }
 
-        biomeGrid[(int)screen->npcs[i].coord.y][(int)screen->npcs[i].coord.x] = screen->npcs[i].weightFactor[(int)screen->npcs[i].originalTile];
+        biomeGrid[(int)screen->npcs[i].coord.y][(int)screen->npcs[i].coord.x] = screen->npcs[i].weightFactor[(int)screen->npcs[i].originalTile.biomeID];
         path_t* entityPath = aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, screen->npcs[i].coord.x, screen->npcs[i].coord.y, biomeFactor, neighbors);
         screen->npcs[i].entityPath = entityPath;
 
@@ -46,6 +49,11 @@ int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
             pq_enqueue(moveq, &(screen->npcs[i]), entityPath->gCost);
             entityPath = entityPath->previous;
         }
+        
+        void* data;
+        pq_dequeue(moveq, &data);
+        entityType_t* npc = (entityType_t*)data;
+        npc->entityPath = npc->entityPath->previous;
     }
 
     return 1;
@@ -75,6 +83,6 @@ int PCController(screen_t* screen, char input) {
             return 0;
     }
 
-    MovePC(screen, move);
+    MoveEntity(screen, &(screen->pc), move);
     return 1;
 }

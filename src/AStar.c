@@ -92,7 +92,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
             }
             
             int visited = gCost[neighborNode] != 0;
-            int costToNeighbor = gCost[currentKey] + as_calcDistCost(cameFrom[currentKey] % LENGTH, cameFrom[currentKey] / LENGTH, nextX, nextY) / 2 + (float)grid[nextY][nextX] * biomeFactor;
+            int costToNeighbor = gCost[currentKey] + as_calcDistCost(cameFrom[currentKey] % LENGTH, cameFrom[currentKey] / LENGTH, nextX, nextY) / 2 * (neighbors != 8) + (float)grid[nextY][nextX] * biomeFactor;
 
             if(costToNeighbor < gCost[neighborNode] || !visited) {
                 cameFrom[neighborNode] = currentKey;

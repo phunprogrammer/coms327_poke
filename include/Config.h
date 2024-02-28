@@ -18,7 +18,7 @@
 #define MIDDLEY 200
 #define MAXSIZE 400
 #define MINSIZE 0
-#define MAXENTITIES 10
+#define MAXENTITIES 20
 #define DEVMODE 0
 
 //Path
@@ -95,9 +95,9 @@ typedef struct TileType {
 
 typedef struct EntityType {
     tileType_t tile;
-    enum Tile originalTile;
+    tileType_t originalTile;
     vector_t coord;
-    int weightFactor[BIOMENUM + STRUCNUM];
+    int weightFactor[TILENUM];
     path_t* entityPath;
 } entityType_t;
 

@@ -8,6 +8,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <malloc.h>
 
 void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     char input = 0;
@@ -56,13 +58,15 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     } while ((input = getc(stdin)) != 'q');
 }
 
-void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
+void GameLoop(screen_t* screen, waves_t waves, int currX, int currY, int argc, char *argv[]) {
     fd_set detectInput;
     struct timeval timeout;
     char input[1024];
 
     *screen = ScreenGenerator(waves);
+    InitSize(screen, argc, argv);
     RandomizePC(screen);
+    SpawnAllNPC(screen);
 
     pqueue_t moveQueue;
     pq_init(&moveQueue);
@@ -78,7 +82,6 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
             }
             printf("\n");
         } 
-
         printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
 
         FD_ZERO(&detectInput);
@@ -115,7 +118,7 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
 
             printf("%d: (%d, %d), %d\n", npc->tile.biomeID, (int)npc->entityPath->coord.x, (int)npc->entityPath->coord.y, moveQueue.array[pq_size(&moveQueue)].priority);
 
-            if(MoveEntity(screen, npc, npcMove) == 0) {
+            if(MoveEntity(screen, npc, npcMove) == 0 || npc->entityPath->previous == NULL) {
                 GetAllNPCMoves(screen, &moveQueue);
                 break;
             }
@@ -125,7 +128,7 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     }
 }
 
-int main () {
+int main (int argc, char *argv[]) {
     Initialize();
     
     waves_t waves = GetWaves();
@@ -142,7 +145,7 @@ int main () {
     if(DEVMODE == 1)
         DevLoop(&screen, waves, currX, currY);
 
-    GameLoop(&screen, waves, currX, currY);
+    GameLoop(&screen, waves, currX, currY, argc, argv);
     
     return 0;
 }

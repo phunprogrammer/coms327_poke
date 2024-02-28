@@ -18,7 +18,7 @@
 #define MIDDLEY 200
 #define MAXSIZE 400
 #define MINSIZE 0
-#define MAXENTITIES 20
+#define DEFAULTENTITIES 10
 #define DEVMODE 0
 
 //Path
@@ -34,7 +34,7 @@
 //Biomes
 #define BIOMENUM 5
 #define STRUCNUM 3
-#define ENTITYNUM 3
+#define ENTITYNUM 7
 #define TILENUM BIOMENUM + STRUCNUM + ENTITYNUM
 enum __attribute__ ((__packed__)) Tile {
     FOREST,
@@ -47,7 +47,11 @@ enum __attribute__ ((__packed__)) Tile {
     POKEC,
     PC,
     HIKER,
-    RIVAL
+    RIVAL,
+    PACER,
+    WANDERER,
+    SENTRY,
+    EXPLORER
 };
 
 typedef struct NoiseMap {
@@ -109,7 +113,7 @@ typedef struct Screen {
     path_t* horizontalPath;
     path_t* verticalPath;
     entityType_t pc;
-    entityType_t npcs[MAXENTITIES];
+    entityType_t* npcs;
     int npcSize;
 } screen_t;
 
@@ -120,6 +124,8 @@ typedef struct Building {
 } building_t;
 
 extern volatile int initialized;
+
+extern volatile int numNPC;
 
 extern const tileType_t Tiles[TILENUM];
 

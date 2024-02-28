@@ -6,6 +6,8 @@
 
 volatile int initialized = 0;
 
+volatile int numNPC = DEFAULTENTITIES;
+
 /**
  * @brief Tile Assignment
  * 
@@ -20,15 +22,24 @@ const tileType_t Tiles[TILENUM] = {
     [POKEM] = { POKEM, .minHeight = 0, .minHumidity = 0, .type = 'M', .weight = 100 },
     [POKEC] = { POKEC, .minHeight = 0, .minHumidity = 0, .type = 'C', .weight = 100 },
     [PC] = { PC, .minHeight = 0, .minHumidity = 0, .type = '@', .weight = 100 },
-    [HIKER] = { HIKER, .minHeight = 0, .minHumidity = 0, .type = 'H', .weight = 100 },
-    [RIVAL] = { RIVAL, .minHeight = 0, .minHumidity = 0, .type = 'R', .weight = 100 }
+    [HIKER] = { HIKER, .minHeight = 0, .minHumidity = 0, .type = 'h', .weight = 100 },
+    [RIVAL] = { RIVAL, .minHeight = 0, .minHumidity = 0, .type = 'r', .weight = 100 },
+    [PACER] = { PACER, .minHeight = 0, .minHumidity = 0, .type = 'p', .weight = 100 },
+    [WANDERER] = { WANDERER, .minHeight = 0, .minHumidity = 0, .type = 'w', .weight = 100 },
+    [SENTRY] = { SENTRY, .minHeight = 0, .minHumidity = 0, .type = 's', .weight = 100 },
+    [EXPLORER] = { EXPLORER, .minHeight = 0, .minHumidity = 0, .type = 'e', .weight = 100 }
 };
 
-#define HIKERWEIGHT (int){ 15, 15, 10, 15, 0, 10, 50, 50 }
+#define GENERICWEIGHTS {  0, 0, 10, 20, 0, 10, 0, 0, 100, 100, 100, 100, 100, 100, 100 }
+
 const entityType_t Entities[TILENUM] = {
-    [PC] =    { .tile = Tiles[PC],    .weightFactor = {  0,  0, 10, 20, 0, 10, 10, 10, 100, 100, 100 } },
-    [HIKER] = { .tile = Tiles[HIKER], .weightFactor = { 15, 15, 10, 15, 0, 10,  0,  0, 100, 100, 100 } },
-    [RIVAL] = { .tile = Tiles[RIVAL], .weightFactor = {  0,  0, 10, 20, 0, 10,  0,  0, 100, 100, 100 } }
+    [PC] =    { .tile = Tiles[PC],    .weightFactor = {  0,  0, 10, 20, 0, 10, 10, 10, 100, 100, 100, 100, 100, 100, 100 } },
+    [HIKER] = { .tile = Tiles[HIKER], .weightFactor = { 15, 15, 10, 15, 0, 10,  0,  0, 100, 100, 100, 100, 100, 100, 100 } },
+    [RIVAL] = { .tile = Tiles[RIVAL], .weightFactor = {  0,  0, 10, 20, 0, 10,  0,  0, 100, 100, 100, 100, 100, 100, 100 } },
+    [PACER] = { .tile = Tiles[PACER], .weightFactor = GENERICWEIGHTS },
+    [WANDERER] = { .tile = Tiles[WANDERER], .weightFactor = GENERICWEIGHTS },
+    [SENTRY] = { .tile = Tiles[SENTRY], .weightFactor = GENERICWEIGHTS },
+    [EXPLORER] = { .tile = Tiles[EXPLORER], .weightFactor = GENERICWEIGHTS }
 };
 
 /**
@@ -42,8 +53,6 @@ void Initialize() {
     initialized = 1;
 
     srand(time(NULL));    
-
-    //Init_Entities(); 
 }
 
 /**

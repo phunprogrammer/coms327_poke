@@ -4,6 +4,22 @@
 #include "PQueue.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <malloc.h>
+
+int InitSize(screen_t* screen, int argc, char *argv[]) {
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--numtrainers") == 0 && i + 1 < argc) {
+            numNPC = atoi(argv[i + 1]);
+            break;
+        }
+    }
+    if (!(screen->npcs = (entityType_t *)malloc(numNPC * sizeof(entityType_t)))) return 0;
+
+    printf("Size: %ld\n", malloc_usable_size(screen->npcs));
+
+    return 1;
+}
 
 int RandomizePC(screen_t* screen) {
     srand(FirstFourDigits(screen->biomeMap[0][0].minHeight));
@@ -88,4 +104,23 @@ int GenWeightMap(screen_t* screen, entityType_t entity) {
     aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, endX, endY, biomeFactor, neighbors);
 
     return 0;
+}
+
+int SpawnAllNPC(screen_t* screen) {
+    if(numNPC <= 0)
+        return 0;
+
+    if(numNPC == 1) {
+        SpawnNPC(screen, TILENUM - ENTITYNUM + (rand() % 2 + 1));
+        return 1;
+    }
+
+    SpawnNPC(screen, RIVAL);
+    SpawnNPC(screen, HIKER);
+
+    for(int i = 2; i < numNPC; i++) {
+
+    }
+
+    return 1;
 }

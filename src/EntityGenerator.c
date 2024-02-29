@@ -16,8 +16,6 @@ int InitSize(screen_t* screen, int argc, char *argv[]) {
     }
     if (!(screen->npcs = (entityType_t *)malloc(numNPC * sizeof(entityType_t)))) return 0;
 
-    printf("Size: %ld\n", malloc_usable_size(screen->npcs));
-
     return 1;
 }
 
@@ -69,7 +67,11 @@ int SpawnNPC(screen_t* screen, enum Tile entity) {
     } while(Entities[entity].weightFactor[screen->biomeMap[randY][randX].biomeID] == 0 || 
                 screen->biomeMap[randY][randX].biomeID > BIOMENUM);
 
+    if(entity == PACER)
+        screen->npcs[screen->npcSize].direction = rand() % 4;
+
     SetEntity(screen, &(screen->npcs[screen->npcSize++]), randX, randY, entity);
+
     return 0;
 }
 
@@ -77,10 +79,12 @@ int SetEntity(screen_t* screen, entityType_t* entity, int x, int y, enum Tile en
     vector_t coord = { .x = x, .y = y };
 
     path_t* tempPath = entity->entityPath;
+    enum Direction tempDir = entity->direction;
     *entity = Entities[entityID];
     entity->coord = coord;
     entity->originalTile = screen->biomeMap[y][x];
     entity->entityPath = tempPath;
+    entity->direction = tempDir;
 
     SwitchTile(&(screen->biomeMap[y][x]), Tiles[entityID]);
 
@@ -119,7 +123,7 @@ int SpawnAllNPC(screen_t* screen) {
     SpawnNPC(screen, HIKER);
 
     for(int i = 2; i < numNPC; i++) {
-
+        SpawnNPC(screen, TILENUM - ENTITYNUM + (rand() % (ENTITYNUM - 1) + 1));
     }
 
     return 1;

@@ -54,6 +54,15 @@ enum __attribute__ ((__packed__)) Tile {
     EXPLORER
 };
 
+enum __attribute__ ((__packed__)) Direction {
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+};
+
+struct Screen;
+
 typedef struct NoiseMap {
     float map[WIDTH][LENGTH];
 } noisemap_t;
@@ -103,6 +112,8 @@ typedef struct EntityType {
     vector_t coord;
     int weightFactor[TILENUM];
     path_t* entityPath;
+    path_t* (*getPath)(struct Screen* screen, struct EntityType* entity);
+    enum Direction direction;
 } entityType_t;
 
 typedef struct Screen {

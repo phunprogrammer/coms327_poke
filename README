@@ -1,5 +1,10 @@
-# COMS 327 - Assignment 03
-This is assignment 03 of the Pokemon game for COMS 327. In this iteration, when running the game, the map will still generate and be traversalable but along with that a PC will spawn on the map denoted as `@`. The PC will generate randomly but will bias towards paths. After the map is generated, two cost maps will generate with it that shows the costs for the HIKER and the RIVAL NPCs to get the PC. This implements travel in eight directions and the costs are provided by the Professor.
+# COMS 327 - Assignment 04
+This is assignment 03 of the Pokemon game for COMS 327. In this iteration, when running the game, the map will generate with a PC and a default value (10) npcs. Use `--numtrainers #` to generate any number of npcs. As the PC you can move around using `W,A,S,D`. As the PC you can also use click `enter` to skip your turn otherwise it will automatically skip your turn in three seconds. To fast-forward, hold down the `enter` key.
+
+## KNOWN BUGS:
+Wanderers behave very similarly to explorers.
+Sometimes NPCs will freeze, especially the pacer.
+Moving the PC will regenerate NPC paths so that can fix stuck NPCS.
 
 ## HOW TO RUN:
 To run use `make` in the terminal then run the `game` executable generated from it. Use `make clean` to delete generated files.

@@ -58,6 +58,33 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     } while ((input = getc(stdin)) != 'q');
 }
 
+void CheckQueue(screen_t* screen, pqueue_t* moveQueue, int currentPriority) {
+    void* nextMove;
+
+    do {
+        pq_dequeue(moveQueue, &nextMove);
+
+        entityType_t* npc = (entityType_t*)nextMove;
+
+        vector_t npcMove = { .x = npc->entityPath->coord.x, .y = npc->entityPath->coord.y };
+
+        // if (npc->tile.biomeID == PACER) {
+        //     printf("Hi");
+        // }
+
+        //printf("%d: (%d, %d), %d\n", npc->tile.biomeID, (int)npc->entityPath->coord.x, (int)npc->entityPath->coord.y, moveQueue->array[pq_size(moveQueue)].priority);
+
+        if(MoveEntity(screen, npc, npcMove) == 0 && npc->entityPath->previous == NULL) {
+            AddPathToQ(moveQueue, screen, npc, currentPriority);
+            continue;
+        }
+
+        path_t* tempPath = npc->entityPath;
+        npc->entityPath = npc->entityPath->previous;
+        free(tempPath);
+    } while (pq_size(moveQueue) > 0 && moveQueue->array[pq_size(moveQueue) - 1].priority <= currentPriority);
+}
+
 void GameLoop(screen_t* screen, waves_t waves, int currX, int currY, int argc, char *argv[]) {
     fd_set detectInput;
     struct timeval timeout;
@@ -70,7 +97,6 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY, int argc, c
 
     pqueue_t moveQueue;
     pq_init(&moveQueue);
-
     GetAllNPCMoves(screen, &moveQueue);
 
     int currentPriority = 0;
@@ -105,26 +131,14 @@ void GameLoop(screen_t* screen, waves_t waves, int currX, int currY, int argc, c
             }
         }
 
+        printf("Size: %d\n", pq_size(&moveQueue));
+        if(pq_size(&moveQueue) > 1000)
+            GetAllNPCMoves(screen, &moveQueue);
+
         if (pq_size(&moveQueue) == 0)
             continue;
 
-        void* nextMove;
-
-        do {
-            pq_dequeue(&moveQueue, &nextMove);
-
-            entityType_t* npc = (entityType_t*)nextMove;
-            vector_t npcMove = { .x = npc->entityPath->coord.x, .y = npc->entityPath->coord.y };
-
-            printf("%d: (%d, %d), %d\n", npc->tile.biomeID, (int)npc->entityPath->coord.x, (int)npc->entityPath->coord.y, moveQueue.array[pq_size(&moveQueue)].priority);
-
-            if(MoveEntity(screen, npc, npcMove) == 0 || npc->entityPath->previous == NULL) {
-                GetAllNPCMoves(screen, &moveQueue);
-                break;
-            }
-
-            npc->entityPath = npc->entityPath->previous;
-        } while (pq_size(&moveQueue) > 0 && moveQueue.array[pq_size(&moveQueue) - 1].priority <= currentPriority);
+        CheckQueue(screen, &moveQueue, currentPriority);
     }
 }
 

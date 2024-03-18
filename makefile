@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g
+CFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g -lncurses
 
 IDIR =./include
 ODIR=./obj
@@ -7,10 +7,10 @@ SDIR=./src
 
 LIBS=-lm
 
-_DEPS = AStar.h Config.h NoiseGenerator.h PerlinNoise.h PPMGenerator.h PQueue.h TerrainGenerator.h EntityGenerator.h EntityMover.h
+_DEPS = AStar.h Config.h NoiseGenerator.h PerlinNoise.h PPMGenerator.h PQueue.h TerrainGenerator.h EntityGenerator.h EntityMover.h InputController.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o AStar.o Config.o NoiseGenerator.o PerlinNoise.o PPMGenerator.o PQueue.o TerrainGenerator.o EntityGenerator.o EntityMover.o
+_OBJ = main.o AStar.o Config.o NoiseGenerator.o PerlinNoise.o PPMGenerator.o PQueue.o TerrainGenerator.o EntityGenerator.o EntityMover.o InputController.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS) | $(ODIR)

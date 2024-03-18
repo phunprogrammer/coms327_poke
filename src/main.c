@@ -5,11 +5,13 @@
 #include "PQueue.h"
 #include "EntityGenerator.h"
 #include "EntityMover.h"
+#include "InputController.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+#include <ncurses.h>
 
 void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     char input = 0;
@@ -85,61 +87,28 @@ void CheckQueue(screen_t* screen, pqueue_t* moveQueue, int currentPriority) {
     } while (pq_size(moveQueue) > 0 && moveQueue->array[pq_size(moveQueue) - 1].priority <= currentPriority);
 }
 
-void GameLoop(screen_t* screen, waves_t waves, int currX, int currY, int argc, char *argv[]) {
-    fd_set detectInput;
-    struct timeval timeout;
-    char input[1024];
-
+void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
     *screen = ScreenGenerator(waves);
     InitSize(screen, argc, argv);
     RandomizePC(screen);
-    SpawnAllNPC(screen);
 
-    pqueue_t moveQueue;
-    pq_init(&moveQueue);
-    GetAllNPCMoves(screen, &moveQueue);
+    char currInput = 0;
+    
+    while(currInput != 'Q') {
+        for(int y = 0; y < WIDTH; y++)
+            for(int x = 0; x < LENGTH; x++)
+                mvprintw(y, x, "%c", screen->biomeMap[y][x].type);
 
-    int currentPriority = 0;
-
-    while (1) {        
-        for(int y = 0; y < WIDTH; y++) {
-            for(int x = 0; x < LENGTH; x++) {
-                printf("%c", screen->biomeMap[y][x].type);
-            }
-            printf("\n");
-        } 
         printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
+        refresh();
 
-        FD_ZERO(&detectInput);
-        FD_SET(0, &detectInput);
-        timeout.tv_sec = 3;
-        timeout.tv_usec = 0;
+        currInput = getch();
 
-        currentPriority = moveQueue.array[pq_size(&moveQueue) - 1].priority;
-
-        if(select(1, &detectInput, NULL, NULL, &timeout) == 1) {
-            char buffer[1024];
-            fgets(buffer, sizeof(buffer), stdin);
-            sprintf(input, "%s", buffer);
-
-            if (input[0] == 'q')
-                return;
-                
-            if (PCController(screen, input[0])) {
-                GetAllNPCMoves(screen, &moveQueue);
-                currentPriority = Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
-            }
-        }
-
-        printf("Size: %d\n", pq_size(&moveQueue));
-        if(pq_size(&moveQueue) > 1000)
-            GetAllNPCMoves(screen, &moveQueue);
-
-        if (pq_size(&moveQueue) == 0)
-            continue;
-
-        CheckQueue(screen, &moveQueue, currentPriority);
+        MovePC(screen, currInput);
     }
+
+    DestroyScreen(screen);
+    endwin();
 }
 
 int main (int argc, char *argv[]) {
@@ -159,7 +128,9 @@ int main (int argc, char *argv[]) {
     if(DEVMODE == 1)
         DevLoop(&screen, waves, currX, currY);
 
-    GameLoop(&screen, waves, currX, currY, argc, argv);
+    initscr();
     
+    GameLoop(&screen, waves, argc, argv);
+
     return 0;
 }

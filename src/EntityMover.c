@@ -87,34 +87,6 @@ int AssignPathFunc(entityType_t* entity) {
     return 1;
 }
 
-int PCController(screen_t* screen, char input) {
-    vector_t move;
-
-    switch(input) {
-        case 'w':
-            move.x = screen->pc.coord.x;
-            move.y = screen->pc.coord.y - 1;
-            break;
-        case 'a':
-            move.x = screen->pc.coord.x - 1;
-            move.y = screen->pc.coord.y;
-            break;
-        case 's':
-            move.x = screen->pc.coord.x;
-            move.y = screen->pc.coord.y + 1;
-            break;
-        case 'd':
-            move.x = screen->pc.coord.x + 1;
-            move.y = screen->pc.coord.y;
-            break;
-        default:
-            return 0;
-    }
-
-    MoveEntity(screen, &(screen->pc), move);
-    return 1;
-}
-
 path_t* GetHikerPath (screen_t* screen, entityType_t* entity) {
     float biomeFactor = 1.0;
     int neighbors = 8;

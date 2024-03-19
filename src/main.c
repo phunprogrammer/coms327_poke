@@ -60,51 +60,85 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     } while ((input = getc(stdin)) != 'q');
 }
 
-void CheckQueue(screen_t* screen, pqueue_t* moveQueue, int currentPriority) {
-    void* nextMove;
-
-    do {
-        pq_dequeue(moveQueue, &nextMove);
-
-        entityType_t* npc = (entityType_t*)nextMove;
-
-        vector_t npcMove = { .x = npc->entityPath->coord.x, .y = npc->entityPath->coord.y };
-
-        // if (npc->tile.biomeID == PACER) {
-        //     printf("Hi");
-        // }
-
-        //printf("%d: (%d, %d), %d\n", npc->tile.biomeID, (int)npc->entityPath->coord.x, (int)npc->entityPath->coord.y, moveQueue->array[pq_size(moveQueue)].priority);
-
-        if(MoveEntity(screen, npc, npcMove) == 0 && npc->entityPath->previous == NULL) {
-            AddPathToQ(moveQueue, screen, npc, currentPriority);
-            continue;
-        }
-
-        path_t* tempPath = npc->entityPath;
-        npc->entityPath = npc->entityPath->previous;
-        free(tempPath);
-    } while (pq_size(moveQueue) > 0 && moveQueue->array[pq_size(moveQueue) - 1].priority <= currentPriority);
-}
-
 void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
     *screen = ScreenGenerator(waves);
     InitSize(screen, argc, argv);
     RandomizePC(screen);
+    SpawnNPC(screen, RIVAL);
+    SpawnNPC(screen, HIKER);
 
+    pqueue_t moveQueue;
+    GetAllNPCMoves(screen, &moveQueue);
+
+    int currentPriority = 0;
     char currInput = 0;
     
     while(currInput != 'Q') {
-        for(int y = 0; y < WIDTH; y++)
-            for(int x = 0; x < LENGTH; x++)
-                mvprintw(y, x, "%c", screen->biomeMap[y][x].type);
+        int line;
+        for(line = 0; line < WIDTH; line++) {
+            int x;
+            for(x = 0; x < LENGTH; x++) {
+                mvprintw(line, x, "%c", screen->biomeMap[line][x].type);
+                mvprintw(WIDTH, x, "%d", x);
+            }
+            mvprintw(line, x, "%d", line);
+        }
+        line++;
+        mvprintw(line++, 0, "(%d, %d)", MIDDLEX, MIDDLEY);
 
-        printf("(%d, %d)\n", currX - MIDDLEX, currY - MIDDLEY);
-        refresh();
+
+        // path_t* path = GetRivalPath(screen, &screen->npcs[0]);
+
+        // while (path != NULL) {
+        //     mvprintw(line++, 0, "Path: (%f, %f), Score: %d", path->coord.x, path->coord.y, path->gCost);
+        //     path = path->previous;
+        // }
+        
+        // free(path);
+
+        // void* node = NULL;
+
+        // while(!pq_isEmpty(&moveQueue)) {
+        //     pq_dequeue(&moveQueue, &node);
+        //     entityMove_t* move = (entityMove_t*)node;
+        //     mvprintw(line++, 0, "%d: (%f, %f), Score: %d", move->entityIndex, move->coord.x, move->coord.y, moveQueue.array[pq_size(&moveQueue)].priority);
+        // }
 
         currInput = getch();
+        clear();
 
-        MovePC(screen, currInput);
+        int pcMoved = MovePC(screen, currInput);
+
+        if(!pcMoved)
+            continue;
+
+        currentPriority += Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
+        
+        while (!pq_isEmpty(&moveQueue)) {
+            void* node;
+            pq_peek(&moveQueue, &node);
+            entityMove_t* move = (entityMove_t*)node;
+
+            if(move == NULL) 
+                pq_dequeue(&moveQueue, &node);
+            else if(move->priority <= currentPriority) {
+                pq_dequeue(&moveQueue, &node);
+
+                if(!MoveEntity(screen, &screen->npcs[move->entityIndex], move->coord) || move->next == NULL || pcMoved) {
+                    entityMove_t* remove = ((entityMove_t*)node)->next;
+                    while (remove != NULL) {
+                        entityMove_t* next = remove->next;
+                        free(remove);
+                        remove = next;
+                    }
+                    AddPathToQ(&moveQueue, screen, move->entityIndex, move->priority);
+                }
+
+                free(node);
+            }
+            else
+                break;
+        }
     }
 
     DestroyScreen(screen);
@@ -129,6 +163,7 @@ int main (int argc, char *argv[]) {
         DevLoop(&screen, waves, currX, currY);
 
     initscr();
+    noecho();
     
     GameLoop(&screen, waves, argc, argv);
 

@@ -1,5 +1,6 @@
 #include "EntityGenerator.h"
 #include "TerrainGenerator.h"
+#include "EntityMover.h"
 #include "aStar.h"
 #include "PQueue.h"
 #include <stdlib.h>
@@ -87,6 +88,7 @@ int SetEntity(screen_t* screen, entityType_t* entity, int x, int y, enum Tile en
     entity->direction = tempDir;
 
     SwitchTile(&(screen->biomeMap[y][x]), Tiles[entityID]);
+    AssignPathFunc(entity);
 
     return 0;
 }

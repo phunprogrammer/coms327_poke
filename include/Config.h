@@ -12,8 +12,8 @@
 #define GENERATEPPM 0
 
 //Screen
-#define WIDTH 21
-#define LENGTH 80
+#define WIDTH 11
+#define LENGTH 11
 #define MIDDLEX 200
 #define MIDDLEY 200
 #define MAXSIZE 400
@@ -97,6 +97,13 @@ typedef struct Path {
     int gCost;
     struct Path* previous;
 } path_t;
+
+typedef struct EntityMove {
+    int entityIndex;
+    vector_t coord;
+    int priority;
+    struct EntityMove* next;
+} entityMove_t;
 
 typedef struct TileType {
     enum Tile biomeID;

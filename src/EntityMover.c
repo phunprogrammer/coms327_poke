@@ -30,35 +30,42 @@ int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
     pq_init(moveq);
 
     for (int i = 0; i < screen->npcSize; i++) {
-        AddPathToQ(moveq, screen, &(screen->npcs[i]), 0);
+        AddPathToQ(moveq, screen, i, 0);
     }
 
     return 1;
 }
 
-int AddPathToQ(pqueue_t* moveq, screen_t* screen, entityType_t* entity, int currentPriority) {
-    AssignPathFunc(entity);
+int AddPathToQ(pqueue_t* moveq, screen_t* screen, int entityIndex, int currentPriority) {
+    path_t* entityPath = screen->npcs[entityIndex].getPath(screen, &screen->npcs[entityIndex]);
+    entityMove_t* previousMove = NULL;
 
-    if (entity->tile.biomeID == SENTRY)
-        return 0;
+    while(entityPath != NULL) {
+        entityMove_t* move = (entityMove_t*)malloc(sizeof(entityMove_t));
 
-    path_t* entityPath = entity->getPath(screen, entity);
-    entity->entityPath = entityPath;
+        move->entityIndex = entityIndex;
+        move->coord.x = entityPath->coord.x;
+        move->coord.y = entityPath->coord.y;
+        move->priority = entityPath->gCost + currentPriority;
+        move->next = previousMove;
 
-    while(entityPath->previous != NULL) {
-        pq_enqueue(moveq, entity, entityPath->gCost + currentPriority);
+        pq_enqueue(moveq, move, entityPath->gCost + currentPriority);
+
+        path_t* tempPath = entityPath;
         entityPath = entityPath->previous;
+        previousMove = move;
+        free(tempPath);
     } 
 
-    if(entity->tile.biomeID == PACER || entity->tile.biomeID == WANDERER || entity->tile.biomeID == EXPLORER)
-        pq_enqueue(moveq, entity, entityPath->gCost + currentPriority);
+    // if(entity->tile.biomeID == PACER || entity->tile.biomeID == WANDERER || entity->tile.biomeID == EXPLORER)
+    //     pq_enqueue(moveq, entity, entityPath->gCost + currentPriority);
 
-    void* data;
-    pq_dequeue(moveq, &data);
-    entityType_t* npc = (entityType_t*)data;
+    // void* data;
+    // pq_dequeue(moveq, &data);
+    // entityType_t* npc = (entityType_t*)data;
 
-    if(npc->entityPath->previous != NULL)
-        npc->entityPath = npc->entityPath->previous;
+    // if(npc->entityPath->previous != NULL)
+    //     npc->entityPath = npc->entityPath->previous;
 
     return 1;
 }
@@ -99,7 +106,7 @@ path_t* GetHikerPath (screen_t* screen, entityType_t* entity) {
     }
 
     biomeGrid[(int)entity->coord.y][(int)entity->coord.x] = entity->weightFactor[(int)entity->originalTile.biomeID];
-    return aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, entity->coord.x, entity->coord.y, biomeFactor, neighbors);
+    return aStar(biomeGrid, WIDTH - 2, LENGTH - 2, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
 }
 
 path_t* GetRivalPath (screen_t* screen, entityType_t* entity) {
@@ -114,7 +121,7 @@ path_t* GetRivalPath (screen_t* screen, entityType_t* entity) {
     }
 
     biomeGrid[(int)entity->coord.y][(int)entity->coord.x] = entity->weightFactor[(int)entity->originalTile.biomeID];
-    return aStar(biomeGrid, WIDTH - 2, LENGTH - 2, screen->pc.coord.x, screen->pc.coord.y, entity->coord.x, entity->coord.y, biomeFactor, neighbors);
+    return aStar(biomeGrid, WIDTH - 2, LENGTH - 2, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
 }
 
 path_t* GetPacerPath (screen_t* screen, entityType_t* entity) {

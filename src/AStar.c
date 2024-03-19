@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <ncurses.h>
 
 #define NEIGHBORARR (vector_t[]) { { .x = 0, .y = -1 }, { .x = -1, .y = 0 }, { .x = 1, .y = 0 }, { .x = 0, .y = 1 }, { .x = -1, .y = -1 }, { .x = 1, .y = -1 }, { .x = -1, .y = 1 }, { .x = 1, .y = 1 } }
 
@@ -54,6 +55,8 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
     int startKey = startY * LENGTH + startX;
     int endKey = endY * LENGTH + endX;
 
+    grid[endKey / LENGTH][endKey % LENGTH] = -1;
+
     pqueue_t open;
     pq_init(&open);
 
@@ -78,7 +81,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
 
         if(currentKey == endKey) {
             pq_destroy(&open);
-            return ConstructPath(cameFrom, gCost, currentKey, startKey);
+            return ConstructPath(cameFrom, gCost, currentKey, startKey, neighbors == 8);
         }
 
         for(int i = 0; i < neighbors; i++) {
@@ -122,22 +125,33 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
  * @param start Stopping point of the path
  * @return path_t* 
  */
-path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH], int current, int start) {
+path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH], int current, int start, int entity) {
         path_t* path = (path_t *)malloc(sizeof(path_t));
         path->coord.x = current % LENGTH;
         path->coord.y = current / LENGTH;
         path->previous = NULL;
         path_t* tempPath = path;
 
+        // for(int i = 0; i < WIDTH; i++) {
+        //     for(int j = 0; j < LENGTH; j++) {
+        //         mvprintw(i, j * 4 + LENGTH + 3, "%2d", (int)gCost[i * LENGTH + j]);
+        //     }
+        // }
+
         while (current != start) {
+            if(entity && cameFrom[current] == start) {
+                path = path->previous;
+                break;
+            }
+            
             current = cameFrom[current];
             
             tempPath->previous = (path_t *)malloc(sizeof(path_t));
             tempPath->previous->coord.x = current % LENGTH;
             tempPath->previous->coord.y = current / LENGTH;
-            tempPath->gCost = (int)gCost[current];
+            tempPath->previous->gCost = (int)gCost[current];
             tempPath->previous->previous = NULL;
-            
+
             tempPath = tempPath->previous;
         }
 

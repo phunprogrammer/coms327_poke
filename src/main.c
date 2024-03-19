@@ -64,11 +64,11 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
     *screen = ScreenGenerator(waves);
     InitSize(screen, argc, argv);
     RandomizePC(screen);
+    SpawnNPC(screen, PACER);
     SpawnNPC(screen, RIVAL);
-    SpawnNPC(screen, HIKER);
 
     pqueue_t moveQueue;
-    GetAllNPCMoves(screen, &moveQueue);
+    pq_init(&moveQueue);
 
     int currentPriority = 0;
     char currInput = 0;
@@ -85,7 +85,6 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
         }
         line++;
         mvprintw(line++, 0, "(%d, %d)", MIDDLEX, MIDDLEY);
-
 
         // path_t* path = GetRivalPath(screen, &screen->npcs[0]);
 
@@ -107,10 +106,10 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
         currInput = getch();
         clear();
 
-        int pcMoved = MovePC(screen, currInput);
-
-        if(!pcMoved)
+        if(!MovePC(screen, currInput))
             continue;
+
+        GetAllNPCMoves(screen, &moveQueue, currentPriority);
 
         currentPriority += Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
         
@@ -119,25 +118,13 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
             pq_peek(&moveQueue, &node);
             entityMove_t* move = (entityMove_t*)node;
 
-            if(move == NULL) 
-                pq_dequeue(&moveQueue, &node);
-            else if(move->priority <= currentPriority) {
-                pq_dequeue(&moveQueue, &node);
-
-                if(!MoveEntity(screen, &screen->npcs[move->entityIndex], move->coord) || move->next == NULL || pcMoved) {
-                    entityMove_t* remove = ((entityMove_t*)node)->next;
-                    while (remove != NULL) {
-                        entityMove_t* next = remove->next;
-                        free(remove);
-                        remove = next;
-                    }
-                    AddPathToQ(&moveQueue, screen, move->entityIndex, move->priority);
-                }
-
-                free(node);
-            }
-            else
+            if(move->priority > currentPriority)
                 break;
+
+            pq_dequeue(&moveQueue, &node);
+            
+            if(!MoveEntity(screen, &screen->npcs[move->entityIndex], move->coord))
+                AddPathToQ(&moveQueue, screen, move->entityIndex, move->priority);
         }
     }
 

@@ -7,8 +7,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <ncurses.h>
 
-int MoveEntity(screen_t* screen, entityType_t* entity, vector_t move) {
+int ValidMove(screen_t* screen, entityType_t* entity, vector_t move) {
     if(move.x < 0 || move.x >= LENGTH || move.y < 0 || move.y >= WIDTH)
         return 0;
 
@@ -19,18 +20,22 @@ int MoveEntity(screen_t* screen, entityType_t* entity, vector_t move) {
         screen->biomeMap[(int)move.y][(int)move.x].biomeID >= (TILENUM - ENTITYNUM))
         return 0;
 
+    return 1;
+}
+
+int MoveEntity(screen_t* screen, entityType_t* entity, vector_t move) {
+    if(!ValidMove(screen, entity, move))
+        return 0;
+
     SwitchTile(&(screen->biomeMap[(int)entity->coord.y][(int)(int)entity->coord.x]), Tiles[entity->originalTile.biomeID]);
     SetEntity(screen, entity, move.x, move.y, entity->tile.biomeID);
 
     return 1;
 }
 
-int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
-    pq_destroy_static(moveq);
-    pq_init(moveq);
-
+int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq, int currentPriority) {
     for (int i = 0; i < screen->npcSize; i++) {
-        AddPathToQ(moveq, screen, i, 0);
+        AddPathToQ(moveq, screen, i, currentPriority);
     }
 
     return 1;
@@ -38,34 +43,31 @@ int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq) {
 
 int AddPathToQ(pqueue_t* moveq, screen_t* screen, int entityIndex, int currentPriority) {
     path_t* entityPath = screen->npcs[entityIndex].getPath(screen, &screen->npcs[entityIndex]);
-    entityMove_t* previousMove = NULL;
 
-    while(entityPath != NULL) {
-        entityMove_t* move = (entityMove_t*)malloc(sizeof(entityMove_t));
+    // path_t* printPath = entityPath;
+    // int line = 20;
+    // while(printPath != NULL) {
+    //     mvprintw(line++, 0,"%d: (%d, %d), Score: %d", entityIndex, (int)printPath->coord.x, (int)printPath->coord.y, printPath->gCost + currentPriority);
+    //     printPath = printPath->previous;
+    // }
 
-        move->entityIndex = entityIndex;
-        move->coord.x = entityPath->coord.x;
-        move->coord.y = entityPath->coord.y;
-        move->priority = entityPath->gCost + currentPriority;
-        move->next = previousMove;
+    if(entityPath == NULL) return 0;
 
-        pq_enqueue(moveq, move, entityPath->gCost + currentPriority);
-
+    while(entityPath->previous != NULL) {
         path_t* tempPath = entityPath;
         entityPath = entityPath->previous;
-        previousMove = move;
         free(tempPath);
     } 
 
-    // if(entity->tile.biomeID == PACER || entity->tile.biomeID == WANDERER || entity->tile.biomeID == EXPLORER)
-    //     pq_enqueue(moveq, entity, entityPath->gCost + currentPriority);
+    entityMove_t* move = (entityMove_t*)malloc(sizeof(entityMove_t));
 
-    // void* data;
-    // pq_dequeue(moveq, &data);
-    // entityType_t* npc = (entityType_t*)data;
+    move->entityIndex = entityIndex;
+    move->coord.x = entityPath->coord.x;
+    move->coord.y = entityPath->coord.y;
+    move->priority = entityPath->gCost + currentPriority;
 
-    // if(npc->entityPath->previous != NULL)
-    //     npc->entityPath = npc->entityPath->previous;
+    pq_enqueue(moveq, move, entityPath->gCost + currentPriority);
+    free(entityPath);
 
     return 1;
 }
@@ -125,47 +127,20 @@ path_t* GetRivalPath (screen_t* screen, entityType_t* entity) {
 }
 
 path_t* GetPacerPath (screen_t* screen, entityType_t* entity) {
-    int directionX = 0;
-    int directionY = 0;
+    vector_t move = { .x = entity->direction.x + entity->coord.x, .y = entity->direction.y + entity->coord.y };
 
-    switch(entity->direction) {
-        case NORTH:
-            directionY = 1;
-            entity->direction = SOUTH;
-            break;
-        case SOUTH:
-            directionY = -1;
-            entity->direction = NORTH;
-            break;
-        case EAST:
-            directionX = -1;
-            entity->direction = WEST;
-            break;
-        case WEST:
-            directionX = 1;
-            entity->direction = EAST;
-            break;
-        default:
-            break;
+    if(!ValidMove(screen, entity, move)) {
+        entity->direction.x *= -1;
+        entity->direction.y *= -1;
     }
+
+    enum Tile nextTile = screen->biomeMap[(int)(entity->coord.y + entity->direction.y)][(int)(entity->coord.x + entity->direction.x)].biomeID;
 
     path_t* path = (path_t *)malloc(sizeof(path_t));
-    path->coord.x = entity->coord.x;
-    path->coord.y = entity->coord.y;
-    path->gCost = 0;
+    path->coord.x = entity->coord.x + entity->direction.x;
+    path->coord.y = entity->coord.y + entity->direction.y;
+    path->gCost = entity->weightFactor[nextTile];
     path->previous = NULL;
-    path_t* tempPath = path;
-
-    while(entity->weightFactor[screen->biomeMap[(int)tempPath->coord.y][(int)tempPath->coord.x].biomeID] != 0) {    
-        //printf("(%f, %f)\n", tempPath->coord.x + directionX, tempPath->coord.y + directionY);      
-        tempPath->previous = (path_t *)malloc(sizeof(path_t));
-        tempPath->previous->coord.x = tempPath->coord.x + directionX;
-        tempPath->previous->coord.y = tempPath->coord.y + directionY;
-        tempPath->previous->gCost = tempPath->gCost + entity->weightFactor[screen->biomeMap[(int)tempPath->coord.y + directionY][(int)tempPath->coord.x + directionX].biomeID];
-        tempPath->previous->previous = NULL;
-        
-        tempPath = tempPath->previous;
-    }
 
     return path;
 }

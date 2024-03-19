@@ -68,8 +68,10 @@ int SpawnNPC(screen_t* screen, enum Tile entity) {
     } while(Entities[entity].weightFactor[screen->biomeMap[randY][randX].biomeID] == 0 || 
                 screen->biomeMap[randY][randX].biomeID > BIOMENUM);
 
-    if(entity == PACER)
-        screen->npcs[screen->npcSize].direction = rand() % 4;
+    if(entity == PACER) {
+        screen->npcs[screen->npcSize].direction.x = (rand() % 4 < 2) ? 0 : ((rand() % 2 == 0) ? -1 : 1);
+        screen->npcs[screen->npcSize].direction.y = (screen->npcs[screen->npcSize].direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : 0;
+    }
 
     SetEntity(screen, &(screen->npcs[screen->npcSize++]), randX, randY, entity);
 
@@ -80,7 +82,7 @@ int SetEntity(screen_t* screen, entityType_t* entity, int x, int y, enum Tile en
     vector_t coord = { .x = x, .y = y };
 
     path_t* tempPath = entity->entityPath;
-    enum Direction tempDir = entity->direction;
+    vector_t tempDir = entity->direction;
     *entity = Entities[entityID];
     entity->coord = coord;
     entity->originalTile = screen->biomeMap[y][x];

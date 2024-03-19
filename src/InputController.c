@@ -25,6 +25,5 @@ int MovePC(screen_t* screen, char input) {
             return 0;
     }
 
-    MoveEntity(screen, &(screen->pc), move);
-    return 1;
+    return MoveEntity(screen, &(screen->pc), move);
 }

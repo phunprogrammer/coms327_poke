@@ -60,25 +60,23 @@ void Initialize() {
  * 
  * @return waves_t 
  */
-waves_t GetWaves() {
+waves_t GetWaves(int* seed) {
     waves_t waves;
 
     int i = 0;
-    int seed = rand();
-    seed = 549798832;
-    
-    printf("seed: %d\n", seed);
+    *seed = rand();
+    //*seed = 549798832;
 
     for (; i < WAVENUM; i++) {
         waves.Altitude[i].amplitude = AMPLITUDE[i];
         waves.Altitude[i].frequency = FREQUENCY[i];
-        waves.Altitude[i].seed = seed / 10000.0;
+        waves.Altitude[i].seed = *seed / 10000.0;
     }
 
     for (int j = 0; j < WAVENUM; j++) {
         waves.Humidity[j].amplitude = AMPLITUDE[i];
         waves.Humidity[j].frequency = FREQUENCY[i];
-        waves.Humidity[j].seed = seed / 10000.0;
+        waves.Humidity[j].seed = *seed / 10000.0;
     }
 
     return waves;

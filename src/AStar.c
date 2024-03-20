@@ -77,6 +77,10 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
 
         pq_dequeue(&open, &node);
         int currentKey = *(int *)node;
+
+        if(currentKey != startKey)
+            free(node);
+
         closed[currentKey] = 1;
 
         if(currentKey == endKey) {
@@ -131,13 +135,7 @@ path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH],
         path->coord.y = current / LENGTH;
         path->previous = NULL;
         path_t* tempPath = path;
-
-        // for(int i = 0; i < WIDTH; i++) {
-        //     for(int j = 0; j < LENGTH; j++) {
-        //         mvprintw(i, j * 4 + LENGTH + 3, "%2d", (int)gCost[i * LENGTH + j]);
-        //     }
-        // }
-
+        
         while (current != start) {
             if(entity && cameFrom[current] == start) {
                 path = path->previous;

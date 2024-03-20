@@ -60,7 +60,7 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     } while ((input = getc(stdin)) != 'q');
 }
 
-void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
+void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[]) {
     *screen = ScreenGenerator(waves);
     InitSize(screen, argc, argv);
     RandomizePC(screen);
@@ -73,23 +73,44 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
     char currInput = 0;
     
     while(currInput != 'Q') {
-        int line;
-        for(line = 0; line < WIDTH; line++) {
+        clear();
+        mvprintw(0, 0, "Seed: %d", seed);
+        int line = 2;
+        for(; line < WIDTH + 2; line++) {
             int x;
             for(x = 0; x < LENGTH; x++) {
-                mvprintw(line, x, "%c", screen->biomeMap[line][x].type);
-                //mvprintw(WIDTH, x, "%d", x);
+                attron(COLOR_PAIR(screen->biomeMap[line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[line - 2][x].biomeID + 1 : 6));
+                mvprintw(line, x, "%c", screen->biomeMap[line - 2][x].type);
+                attroff(COLOR_PAIR(screen->biomeMap[line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[line - 2][x].biomeID + 1 : 6));
             }
             //mvprintw(line, x, "%d", line);
         }
         //line++;
+    
         mvprintw(line++, 0, "(%d, %d)", MIDDLEX, MIDDLEY);
 
+        mvprintw(line++, 0, "Input: %c", currInput);
         currInput = getch();
-        clear();
 
-        if(!MovePC(screen, currInput))
-            continue;
+        switch(currInput) {
+            case 't':
+                ListTrainers(screen);
+                continue;
+            case '>':
+                EnterBuilding(screen);
+                continue;
+            case '5':
+            case 's':
+                break;
+            default:
+                if(!MovePC(screen, currInput))
+                    continue;
+        }
+
+        if(pq_size(&moveQueue) >= 1900) {
+            pq_destroy(&moveQueue);
+            pq_init(&moveQueue);
+        }
 
         GetAllNPCMoves(screen, &moveQueue, currentPriority);
 
@@ -107,17 +128,21 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
             
             if(!MoveEntity(screen, &screen->npcs[move->entityIndex], move->coord))
                 AddPathToQ(&moveQueue, screen, move->entityIndex, move->priority);
+
+            free(node);
         }
     }
 
     DestroyScreen(screen);
+    pq_destroy(&moveQueue);
     endwin();
 }
 
 int main (int argc, char *argv[]) {
     Initialize();
-    
-    waves_t waves = GetWaves();
+
+    int seed;
+    waves_t waves = GetWaves(&seed);
 
     if(GENERATEPPM)
         GeneratePPM(waves);
@@ -133,8 +158,13 @@ int main (int argc, char *argv[]) {
 
     initscr();
     noecho();
+    cbreak();
+    keypad(stdscr, TRUE);
+    curs_set(0);
+    start_color();
+    InitColors();
     
-    GameLoop(&screen, waves, argc, argv);
+    GameLoop(&screen, waves, seed, argc, argv);
 
     return 0;
 }

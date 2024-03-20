@@ -21,6 +21,9 @@
 #define DEFAULTENTITIES 10
 #define DEVMODE 0
 
+//Menu
+#define MENUMARGIN 4
+
 //Path
 #define PATHMARGIN 3
 #define QUADRANT 4
@@ -144,7 +147,7 @@ extern const entityType_t Entities[TILENUM];
 
 void Initialize();
 
-waves_t GetWaves();
+waves_t GetWaves(int* seed);
 
 int Init_Entities();
 

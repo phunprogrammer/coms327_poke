@@ -141,9 +141,12 @@ path_t* GetPacerPath (screen_t* screen, entityType_t* entity) {
 }
 
 path_t* GetWandererPath (screen_t* screen, entityType_t* entity) {
+    int count = 0;
+    int limit = 100;
     enum Tile nextTile = screen->biomeMap[(int)(entity->coord.y + entity->direction.y)][(int)(entity->coord.x + entity->direction.x)].biomeID;
 
-    while(nextTile != entity->originalTile.biomeID) {
+    while(nextTile != entity->originalTile.biomeID && count < limit) {
+        count++;
         entity->direction.x = (rand() % 3) - 1;
         entity->direction.y = (entity->direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : (rand() % 3) - 1;
 
@@ -161,9 +164,12 @@ path_t* GetWandererPath (screen_t* screen, entityType_t* entity) {
 }
 
 path_t* GetExplorerPath (screen_t* screen, entityType_t* entity) {
+    int count = 0;
+    int limit = 100;
     vector_t move = { .x = entity->direction.x + entity->coord.x, .y = entity->direction.y + entity->coord.y };
 
-    while(!ValidMove(screen, entity, move)) {
+    while(!ValidMove(screen, entity, move) && count < limit) {
+        count++;
         entity->direction.x = (rand() % 3) - 1;
         entity->direction.y = (entity->direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : (rand() % 3) - 1;
 

@@ -112,7 +112,7 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
         }
     }
 
-    PrintWeightMap(gCost, startX, startY);
+    //PrintWeightMap(gCost, startX, startY);
     pq_destroy(&open);
     return NULL;
 }   

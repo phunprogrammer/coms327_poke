@@ -42,14 +42,9 @@ int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq, int currentPriority) {
 }
 
 int AddPathToQ(pqueue_t* moveq, screen_t* screen, int entityIndex, int currentPriority) {
-    path_t* entityPath = screen->npcs[entityIndex].getPath(screen, &screen->npcs[entityIndex]);
+    if(screen->npcs[entityIndex].tile.biomeID == SENTRY) return 0;
 
-    // path_t* printPath = entityPath;
-    // int line = 20;
-    // while(printPath != NULL) {
-    //     mvprintw(line++, 0,"%d: (%d, %d), Score: %d", entityIndex, (int)printPath->coord.x, (int)printPath->coord.y, printPath->gCost + currentPriority);
-    //     printPath = printPath->previous;
-    // }
+    path_t* entityPath = screen->npcs[entityIndex].getPath(screen, &screen->npcs[entityIndex]);
 
     if(entityPath == NULL) return 0;
 
@@ -146,53 +141,43 @@ path_t* GetPacerPath (screen_t* screen, entityType_t* entity) {
 }
 
 path_t* GetWandererPath (screen_t* screen, entityType_t* entity) {
-    int direction = rand() % 4;
-    int directionX[4] = { 0, 1, 0, -1 };
-    int directionY[4] = { -1, 0, 1, 0 };
+    enum Tile nextTile = screen->biomeMap[(int)(entity->coord.y + entity->direction.y)][(int)(entity->coord.x + entity->direction.x)].biomeID;
+
+    while(nextTile != entity->originalTile.biomeID) {
+        entity->direction.x = (rand() % 3) - 1;
+        entity->direction.y = (entity->direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : (rand() % 3) - 1;
+
+        nextTile = screen->biomeMap[(int)(entity->coord.y + entity->direction.y)][(int)(entity->coord.x + entity->direction.x)].biomeID;
+    }
+
 
     path_t* path = (path_t *)malloc(sizeof(path_t));
-    path->coord.x = entity->coord.x;
-    path->coord.y = entity->coord.y;
-    path->gCost = 0;
+    path->coord.x = entity->coord.x + entity->direction.x;
+    path->coord.y = entity->coord.y + entity->direction.y;
+    path->gCost = entity->weightFactor[nextTile];
     path->previous = NULL;
-    path_t* tempPath = path;
-    enum Tile originalTile = entity->originalTile.biomeID;
-    do {    
-        //printf("(%f, %f)\n", tempPath->coord.x + directionX, tempPath->coord.y + directionY);      
-        tempPath->previous = (path_t *)malloc(sizeof(path_t));
-        tempPath->previous->coord.x = tempPath->coord.x + directionX[direction];
-        tempPath->previous->coord.y = tempPath->coord.y + directionY[direction];
-        tempPath->previous->gCost = tempPath->gCost + entity->weightFactor[screen->biomeMap[(int)tempPath->coord.y + directionY[direction]][(int)tempPath->coord.x + directionX[direction]].biomeID];
-        tempPath->previous->previous = NULL;
-        
-        tempPath = tempPath->previous;
-    } while(entity->weightFactor[screen->biomeMap[(int)tempPath->coord.y][(int)tempPath->coord.x].biomeID] != 0 || originalTile == screen->biomeMap[(int)tempPath->coord.y][(int)tempPath->coord.x].biomeID);
 
     return path;
 }
 
 path_t* GetExplorerPath (screen_t* screen, entityType_t* entity) {
-    int direction = rand() % 4;
-    int directionX[4] = { 0, 1, 0, -1 };
-    int directionY[4] = { -1, 0, 1, 0 };
+    vector_t move = { .x = entity->direction.x + entity->coord.x, .y = entity->direction.y + entity->coord.y };
+
+    while(!ValidMove(screen, entity, move)) {
+        entity->direction.x = (rand() % 3) - 1;
+        entity->direction.y = (entity->direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : (rand() % 3) - 1;
+
+        move.x = entity->direction.x + entity->coord.x;
+        move.y = entity->direction.y + entity->coord.y;
+    }
+
+    enum Tile nextTile = screen->biomeMap[(int)(entity->coord.y + entity->direction.y)][(int)(entity->coord.x + entity->direction.x)].biomeID;
 
     path_t* path = (path_t *)malloc(sizeof(path_t));
-    path->coord.x = entity->coord.x;
-    path->coord.y = entity->coord.y;
-    path->gCost = 0;
+    path->coord.x = entity->coord.x + entity->direction.x;
+    path->coord.y = entity->coord.y + entity->direction.y;
+    path->gCost = entity->weightFactor[nextTile];
     path->previous = NULL;
-    path_t* tempPath = path;
-
-    while(entity->weightFactor[screen->biomeMap[(int)tempPath->coord.y][(int)tempPath->coord.x].biomeID] != 0) {    
-        //printf("(%f, %f)\n", tempPath->coord.x + directionX, tempPath->coord.y + directionY);      
-        tempPath->previous = (path_t *)malloc(sizeof(path_t));
-        tempPath->previous->coord.x = tempPath->coord.x + directionX[direction];
-        tempPath->previous->coord.y = tempPath->coord.y + directionY[direction];
-        tempPath->previous->gCost = tempPath->gCost + entity->weightFactor[screen->biomeMap[(int)tempPath->coord.y + directionY[direction]][(int)tempPath->coord.x + directionX[direction]].biomeID];
-        tempPath->previous->previous = NULL;
-        
-        tempPath = tempPath->previous;
-    }
 
     return path;
 }

@@ -68,9 +68,9 @@ int SpawnNPC(screen_t* screen, enum Tile entity) {
     } while(Entities[entity].weightFactor[screen->biomeMap[randY][randX].biomeID] == 0 || 
                 screen->biomeMap[randY][randX].biomeID > BIOMENUM);
 
-    if(entity == PACER) {
-        screen->npcs[screen->npcSize].direction.x = (rand() % 4 < 2) ? 0 : ((rand() % 2 == 0) ? -1 : 1);
-        screen->npcs[screen->npcSize].direction.y = (screen->npcs[screen->npcSize].direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : 0;
+    if(entity == PACER || entity == WANDERER) {
+        screen->npcs[screen->npcSize].direction.x = (rand() % 3) - 1;
+        screen->npcs[screen->npcSize].direction.y = (screen->npcs[screen->npcSize].direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : (rand() % 3) - 1;
     }
 
     SetEntity(screen, &(screen->npcs[screen->npcSize++]), randX, randY, entity);

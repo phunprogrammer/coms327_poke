@@ -64,8 +64,7 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
     *screen = ScreenGenerator(waves);
     InitSize(screen, argc, argv);
     RandomizePC(screen);
-    SpawnNPC(screen, PACER);
-    SpawnNPC(screen, RIVAL);
+    SpawnAllNPC(screen);
 
     pqueue_t moveQueue;
     pq_init(&moveQueue);
@@ -79,29 +78,12 @@ void GameLoop(screen_t* screen, waves_t waves, int argc, char *argv[]) {
             int x;
             for(x = 0; x < LENGTH; x++) {
                 mvprintw(line, x, "%c", screen->biomeMap[line][x].type);
-                mvprintw(WIDTH, x, "%d", x);
+                //mvprintw(WIDTH, x, "%d", x);
             }
-            mvprintw(line, x, "%d", line);
+            //mvprintw(line, x, "%d", line);
         }
-        line++;
+        //line++;
         mvprintw(line++, 0, "(%d, %d)", MIDDLEX, MIDDLEY);
-
-        // path_t* path = GetRivalPath(screen, &screen->npcs[0]);
-
-        // while (path != NULL) {
-        //     mvprintw(line++, 0, "Path: (%f, %f), Score: %d", path->coord.x, path->coord.y, path->gCost);
-        //     path = path->previous;
-        // }
-        
-        // free(path);
-
-        // void* node = NULL;
-
-        // while(!pq_isEmpty(&moveQueue)) {
-        //     pq_dequeue(&moveQueue, &node);
-        //     entityMove_t* move = (entityMove_t*)node;
-        //     mvprintw(line++, 0, "%d: (%f, %f), Score: %d", move->entityIndex, move->coord.x, move->coord.y, moveQueue.array[pq_size(&moveQueue)].priority);
-        // }
 
         currInput = getch();
         clear();

@@ -12,13 +12,13 @@
 #define GENERATEPPM 0
 
 //Screen
-#define WIDTH 11
-#define LENGTH 11
+#define WIDTH 21
+#define LENGTH 80
 #define MIDDLEX 200
 #define MIDDLEY 200
 #define MAXSIZE 400
 #define MINSIZE 0
-#define DEFAULTENTITIES 1
+#define DEFAULTENTITIES 10
 #define DEVMODE 0
 
 //Menu

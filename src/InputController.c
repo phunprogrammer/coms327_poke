@@ -148,7 +148,7 @@ int EnterBattle(screen_t* screen, int entityIndex) {
         wclear(menu);
         box(menu, 0, 0);
 
-        mvwprintw(menu, 1, 2, "%c wants to battle, (%d,%d)", challenger.tile.type, (int)challenger.coord.x, (int)challenger.coord.y);
+        mvwprintw(menu, 1, 2, "%c wants to battle!", challenger.tile.type);
 
         wrefresh(menu);
     } while((input = getch()) != 27);

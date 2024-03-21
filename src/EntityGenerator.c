@@ -73,6 +73,8 @@ int SpawnNPC(screen_t* screen, enum Tile entity) {
         screen->npcs[screen->npcSize].direction.y = (screen->npcs[screen->npcSize].direction.x == 0) ? ((rand() % 2 == 0) ? -1 : 1) : (rand() % 3) - 1;
     }
 
+    screen->npcs[screen->npcSize].defeated = 0;
+
     SetEntity(screen, &(screen->npcs[screen->npcSize++]), randX, randY, entity);
 
     return 0;
@@ -83,11 +85,13 @@ int SetEntity(screen_t* screen, entityType_t* entity, int x, int y, enum Tile en
 
     path_t* tempPath = entity->entityPath;
     vector_t tempDir = entity->direction;
+    int tempInt = entity->defeated;
     *entity = Entities[entityID];
     entity->coord = coord;
     entity->originalTile = screen->biomeMap[y][x];
     entity->entityPath = tempPath;
     entity->direction = tempDir;
+    entity->defeated = tempInt;
 
     SwitchTile(&(screen->biomeMap[y][x]), Tiles[entityID]);
     AssignPathFunc(entity);

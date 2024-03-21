@@ -12,13 +12,13 @@
 #define GENERATEPPM 0
 
 //Screen
-#define WIDTH 21
-#define LENGTH 80
+#define WIDTH 11
+#define LENGTH 11
 #define MIDDLEX 200
 #define MIDDLEY 200
 #define MAXSIZE 400
 #define MINSIZE 0
-#define DEFAULTENTITIES 10
+#define DEFAULTENTITIES 1
 #define DEVMODE 0
 
 //Menu
@@ -117,6 +117,7 @@ typedef struct EntityType {
     path_t* entityPath;
     path_t* (*getPath)(struct Screen* screen, struct EntityType* entity);
     vector_t direction;
+    int defeated;
 } entityType_t;
 
 typedef struct Screen {

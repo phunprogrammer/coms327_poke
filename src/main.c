@@ -71,25 +71,15 @@ void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[])
 
     int currentPriority = 0;
     char currInput = 0;
+
+    GetAllNPCMoves(screen, &moveQueue, currentPriority);
     
     while(currInput != 'Q') {
         clear();
         mvprintw(0, 0, "Seed: %d", seed);
         int line = 2;
-        for(; line < WIDTH + 2; line++) {
-            int x;
-            for(x = 0; x < LENGTH; x++) {
-                attron(COLOR_PAIR(screen->biomeMap[line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[line - 2][x].biomeID + 1 : 6));
-                mvprintw(line, x, "%c", screen->biomeMap[line - 2][x].type);
-                attroff(COLOR_PAIR(screen->biomeMap[line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[line - 2][x].biomeID + 1 : 6));
-            }
-            //mvprintw(line, x, "%d", line);
-        }
-        //line++;
-    
-        mvprintw(line++, 0, "(%d, %d)", MIDDLEX, MIDDLEY);
+        PrintMap(screen, &line);
 
-        mvprintw(line++, 0, "Input: %c", currInput);
         currInput = getch();
 
         switch(currInput) {
@@ -107,13 +97,6 @@ void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[])
                     continue;
         }
 
-        if(pq_size(&moveQueue) >= 1900) {
-            pq_destroy(&moveQueue);
-            pq_init(&moveQueue);
-        }
-
-        GetAllNPCMoves(screen, &moveQueue, currentPriority);
-
         currentPriority += Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
         
         while (!pq_isEmpty(&moveQueue)) {
@@ -125,8 +108,21 @@ void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[])
                 break;
 
             pq_dequeue(&moveQueue, &node);
-            
-            if(!MoveEntity(screen, &screen->npcs[move->entityIndex], move->coord))
+
+            int entityMove = MoveEntity(screen, &screen->npcs[move->entityIndex], move->coord);
+
+            line = 2;
+            PrintMap(screen, &line);
+            refresh();
+            entityType_t* currEntity = &screen->npcs[move->entityIndex];
+
+            if (entityMove == 2 && !currEntity->defeated) {
+                EnterBattle(screen, move->entityIndex);
+                currEntity->defeated = 1;
+                SwitchTile(&(screen->biomeMap[(int)currEntity->coord.y][(int)currEntity->coord.x]), Tiles[currEntity->originalTile.biomeID]);
+            }
+
+            if(!currEntity->defeated)
                 AddPathToQ(&moveQueue, screen, move->entityIndex, move->priority);
 
             free(node);

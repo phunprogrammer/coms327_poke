@@ -135,6 +135,29 @@ int EnterBuilding(screen_t* screen) {
     return 1;
 }
 
+int EnterBattle(screen_t* screen, int entityIndex) {
+    const int strlen = 23;
+    const int listSize = 5;
+    entityType_t challenger = screen->npcs[entityIndex];
+
+    WINDOW* menu = newwin(listSize + 2, strlen + 4, MENUMARGIN, MENUMARGIN + 10);
+
+    int input = 0;
+
+    do {
+        wclear(menu);
+        box(menu, 0, 0);
+
+        mvwprintw(menu, 1, 2, "%c wants to battle, (%d,%d)", challenger.tile.type, (int)challenger.coord.x, (int)challenger.coord.y);
+
+        wrefresh(menu);
+    } while((input = getch()) != 27);
+
+    delwin(menu);
+
+    return 1;
+}
+
 void InitColors() {
     init_pair(1, COLOR_BLACK, COLOR_GREEN);
     init_pair(2, COLOR_BLACK, COLOR_WHITE);
@@ -144,4 +167,26 @@ void InitColors() {
     init_pair(6, COLOR_WHITE, COLOR_BLACK);
     init_pair(7, COLOR_RED, COLOR_BLACK);
     init_pair(8, COLOR_BLUE, COLOR_BLACK);
+}
+
+int DefeatedWeight(entityType_t* entity) {
+    for(int i = 0; i < TILENUM; i++) {
+        entity->weightFactor[i] *= 2;
+    }
+
+    return 1;
+}
+
+int PrintMap(screen_t* screen, int* line) {
+    for(; *line < WIDTH + 2; (*line)++) {
+        int x;
+        for(x = 0; x < LENGTH; x++) {
+            attron(COLOR_PAIR(screen->biomeMap[*line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[*line - 2][x].biomeID + 1 : 6));
+            mvprintw(*line, x, "%c", screen->biomeMap[*line - 2][x].type);
+            attroff(COLOR_PAIR(screen->biomeMap[*line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[*line - 2][x].biomeID + 1 : 6));
+        }
+    }
+    mvprintw((*line)++, 0, "(%d, %d)", MIDDLEX, MIDDLEY);
+
+    return 1;
 }

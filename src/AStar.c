@@ -138,7 +138,7 @@ path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH],
         
         while (current != start) {
             if(entity && cameFrom[current] == start) {
-                path = path->previous;
+                //path = path->previous;
                 break;
             }
             

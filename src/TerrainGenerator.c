@@ -404,6 +404,9 @@ int GenerateBuildings(screen_t* screen) {
         verticalPath = verticalPath->previous;
     }
 
+    if(pq_size(&buildingQueue) == 0)
+        return 0;
+
     void* node;
     pq_dequeue(&buildingQueue, &node);
     building_t* pokemart = (building_t*)node;
@@ -412,7 +415,7 @@ int GenerateBuildings(screen_t* screen) {
 
     int constructed = 1;
 
-    while(constructed == 1 || pq_size(&buildingQueue) == 0){
+    while(constructed == 1 && pq_size(&buildingQueue) > 0){
         pq_dequeue(&buildingQueue, &node);
         building_t* pokecenter = (building_t*)node;
         constructed = ConstructBuilding(screen, pokecenter, Tiles[POKEC]);
@@ -421,7 +424,7 @@ int GenerateBuildings(screen_t* screen) {
 
     pq_destroy(&buildingQueue);
 
-    return 0;
+    return 1;
 }
 
 /**

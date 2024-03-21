@@ -5,6 +5,7 @@
 #define ENTITYMOVER_H
 
 int ValidMove(screen_t* screen, entityType_t* entity, vector_t move);
+int InBounds(entityType_t* entity);
 int MoveEntity(screen_t* screen, entityType_t* entity, vector_t move);
 int AssignPathFunc(entityType_t* entity);
 int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq, int currentPriority);

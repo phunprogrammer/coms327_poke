@@ -4,6 +4,7 @@
  * @date 2/8/24
  */
 #include <vector>
+#include "PQueue.h"
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -130,6 +131,7 @@ typedef struct Screen {
     entityType_t pc;
     entityType_t* npcs;
     int npcSize;
+    pqueue_t* moveQueue;
 } screen_t;
 
 typedef struct Building {

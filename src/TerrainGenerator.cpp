@@ -57,6 +57,8 @@ int DestroyScreen(screen_t* screen) {
         free(tempPath);
     }
 
+    pq_destroy(screen->moveQueue);
+
     return 0;
 }
 

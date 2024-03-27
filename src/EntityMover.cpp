@@ -44,15 +44,15 @@ int MoveEntity(screen_t* screen, entityType_t* entity, vector_t move) {
     return 1;
 }
 
-int GetAllNPCMoves(screen_t* screen, pqueue_t* moveq, int currentPriority) {
+int GetAllNPCMoves(screen_t* screen, int currentPriority) {
     for (int i = 0; i < screen->npcSize; i++) {
-        AddPathToQ(moveq, screen, i, currentPriority);
+        AddPathToQ(screen, i, currentPriority);
     }
 
     return 1;
 }
 
-int AddPathToQ(pqueue_t* moveq, screen_t* screen, int entityIndex, int currentPriority) {
+int AddPathToQ(screen_t* screen, int entityIndex, int currentPriority) {
     if(screen->npcs[entityIndex].tile.biomeID == SENTRY) return 0;
 
     path_t* entityPath = screen->npcs[entityIndex].getPath(screen, &screen->npcs[entityIndex]);
@@ -72,7 +72,7 @@ int AddPathToQ(pqueue_t* moveq, screen_t* screen, int entityIndex, int currentPr
     move->coord.y = entityPath->coord.y;
     move->priority = entityPath->gCost + currentPriority;
 
-    pq_enqueue(moveq, move, entityPath->gCost + currentPriority);
+    pq_enqueue(screen->moveQueue, move, entityPath->gCost + currentPriority);
     free(entityPath);
 
     return 1;

@@ -66,13 +66,13 @@ void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[])
     RandomizePC(screen);
     SpawnAllNPC(screen);
 
-    pqueue_t moveQueue;
-    pq_init(&moveQueue);
+    screen->moveQueue = new pqueue_t;
+    pq_init(screen->moveQueue);
 
     int currentPriority = 0;
     char currInput = 0;
 
-    GetAllNPCMoves(screen, &moveQueue, currentPriority);
+    GetAllNPCMoves(screen, currentPriority);
     
     while(currInput != 'Q') {
         clear();
@@ -99,15 +99,15 @@ void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[])
 
         currentPriority += Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
         
-        while (!pq_isEmpty(&moveQueue)) {
+        while (!pq_isEmpty(screen->moveQueue)) {
             void* node;
-            pq_peek(&moveQueue, &node);
+            pq_peek(screen->moveQueue, &node);
             entityMove_t* move = (entityMove_t*)node;
 
             if(move->priority > currentPriority)
                 break;
 
-            pq_dequeue(&moveQueue, &node);
+            pq_dequeue(screen->moveQueue, &node);
 
             int entityMove = MoveEntity(screen, &screen->npcs[move->entityIndex], move->coord);
 
@@ -123,14 +123,13 @@ void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[])
             }
 
             if(!currEntity->defeated)
-                AddPathToQ(&moveQueue, screen, move->entityIndex, move->priority);
+                AddPathToQ(screen, move->entityIndex, move->priority);
 
             free(node);
         }
     }
 
     DestroyScreen(screen);
-    pq_destroy(&moveQueue);
     endwin();
 }
 

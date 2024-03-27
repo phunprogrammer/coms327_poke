@@ -81,7 +81,9 @@ int SpawnNPC(screen_t* screen, enum Tile entity) {
 }
 
 int SetEntity(screen_t* screen, entityType_t* entity, int x, int y, enum Tile entityID) {
-    vector_t coord = { .x = x, .y = y };
+    vector_t coord;
+    coord.x = x;
+    coord.y = y;
 
     path_t* tempPath = entity->entityPath;
     vector_t tempDir = entity->direction;
@@ -123,7 +125,7 @@ int SpawnAllNPC(screen_t* screen) {
         return 0;
 
     if(numNPC == 1) {
-        SpawnNPC(screen, TILENUM - ENTITYNUM + (rand() % 2 + 1));
+        SpawnNPC(screen, (enum Tile)(TILENUM - ENTITYNUM + (rand() % 2 + 1)));
         return 1;
     }
 
@@ -131,7 +133,7 @@ int SpawnAllNPC(screen_t* screen) {
     SpawnNPC(screen, HIKER);
 
     for(int i = 2; i < numNPC; i++) {
-        SpawnNPC(screen, TILENUM - ENTITYNUM + (rand() % (ENTITYNUM - 1) + 1));
+        SpawnNPC(screen, (enum Tile)(TILENUM - ENTITYNUM + (rand() % (ENTITYNUM - 1) + 1)));
     }
 
     return 1;

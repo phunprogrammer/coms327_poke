@@ -95,6 +95,7 @@ int ListTrainers(screen_t* screen) {
                 index = min(screen->npcSize - listSize, index + 1);
                 break;
             default:
+                break;
         }
 
         wclear(menu);
@@ -182,7 +183,8 @@ int PrintMap(screen_t* screen, int* line) {
         int x;
         for(x = 0; x < LENGTH; x++) {
             attron(COLOR_PAIR(screen->biomeMap[*line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[*line - 2][x].biomeID + 1 : 6));
-            mvprintw(*line, x, "%c", screen->biomeMap[*line - 2][x].type);
+            char print =  screen->biomeMap[*line - 2][x].type;
+            mvprintw(*line, x, "%c", print);
             attroff(COLOR_PAIR(screen->biomeMap[*line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[*line - 2][x].biomeID + 1 : 6));
         }
     }

@@ -12,7 +12,7 @@
  * @brief Current offset of the world
  * 
  */
-static vector_t offset = { .x = 0, .y = 0 };
+static vector_t offset;
 
 /**
  * @brief Generates a screen with all components in it
@@ -21,7 +21,8 @@ static vector_t offset = { .x = 0, .y = 0 };
  * @return screen_t 
  */
 screen_t ScreenGenerator(waves_t waves) {
-    screen_t screen = { .screenCoords = offset };
+    screen_t screen;
+    screen.screenCoords = offset;
 
     GenerateTerrain(waves, &screen);
     GeneratePath(waves, &screen);

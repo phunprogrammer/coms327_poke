@@ -51,7 +51,9 @@ int pq_destroy_static(pqueue_t* queue) {
  * @return int 
  */
 int pq_enqueue(pqueue_t *queue, void *data, int priority) {
-    pqnode_t node = { .data = data, .priority = priority };
+    pqnode_t node;
+    node.data = data;
+    node.priority = priority;
 
     queue->array[pq_size(queue)] = node;
 

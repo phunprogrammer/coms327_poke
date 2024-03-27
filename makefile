@@ -1,7 +1,7 @@
-CC=gcc
-CFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g -lncurses
+CXX=g++
+CXXFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g -lncurses
 
-IDIR =./include
+IDIR=./include
 ODIR=./obj
 SDIR=./src
 
@@ -13,11 +13,11 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = main.o AStar.o Config.o NoiseGenerator.o PerlinNoise.o PPMGenerator.o PQueue.o TerrainGenerator.o EntityGenerator.o EntityMover.o InputController.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-$(ODIR)/%.o: $(SDIR)/%.c $(DEPS) | $(ODIR)
-	$(CC) -c -o $@ $< $(CFLAGS)
+$(ODIR)/%.o: $(SDIR)/%.cpp $(DEPS) | $(ODIR)
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 game: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS)
 
 $(ODIR):
 	mkdir -p $(ODIR)

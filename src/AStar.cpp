@@ -6,7 +6,16 @@
 #include <math.h>
 #include <ncurses.h>
 
-#define NEIGHBORARR (vector_t[]) { { .x = 0, .y = -1 }, { .x = -1, .y = 0 }, { .x = 1, .y = 0 }, { .x = 0, .y = 1 }, { .x = -1, .y = -1 }, { .x = 1, .y = -1 }, { .x = -1, .y = 1 }, { .x = 1, .y = 1 } }
+const vector_t NEIGHBORARR[] = {
+    {0, -1},
+    {-1, 0}, 
+    {1, 0}, 
+    {0, 1},  
+    {-1, -1}, 
+    {1, -1},
+    {-1, 1}, 
+    {1, 1} 
+};
 
 /**
  * @brief Calculates the distance cost between two points

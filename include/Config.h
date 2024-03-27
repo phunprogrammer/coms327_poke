@@ -3,6 +3,7 @@
  * @author phun
  * @date 2/8/24
  */
+#include <vector>
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -31,8 +32,8 @@
 
 //Waves
 #define WAVENUM 2
-#define AMPLITUDE (float[]){  1.0, 1.5,  1.0,  0.8 }
-#define FREQUENCY (float[]){ 0.1, 0.05, 0.06, 0.08 }
+extern const float FREQUENCY[];
+extern const float AMPLITUDE[];
 
 //Biomes
 #define BIOMENUM 5
@@ -98,15 +99,14 @@ typedef struct EntityMove {
     int entityIndex;
     vector_t coord;
     int priority;
-    struct EntityMove* next;
 } entityMove_t;
 
 typedef struct TileType {
     enum Tile biomeID;
     float minHeight;
     float minHumidity;
-    int weight;
     char type;
+    int weight;
 } tileType_t;
 
 typedef struct EntityType {
@@ -117,7 +117,7 @@ typedef struct EntityType {
     path_t* entityPath;
     path_t* (*getPath)(struct Screen* screen, struct EntityType* entity);
     vector_t direction;
-    int defeated;
+    bool defeated;
 } entityType_t;
 
 typedef struct Screen {

@@ -121,6 +121,7 @@ int GenWeightMap(screen_t* screen, entityType_t entity) {
 }
 
 int SpawnAllNPC(screen_t* screen) {
+    screen->npcSize = 0;
     if(numNPC <= 0)
         return 0;
 

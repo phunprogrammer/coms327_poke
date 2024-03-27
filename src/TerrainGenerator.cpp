@@ -9,27 +9,18 @@
 #include <time.h>
 
 /**
- * @brief Current offset of the world
- * 
- */
-static vector_t offset;
-
-/**
  * @brief Generates a screen with all components in it
  * 
  * @param waves Waves generated from getWaves();
  * @return screen_t 
  */
-screen_t ScreenGenerator(waves_t waves) {
-    screen_t screen;
-    screen.screenCoords = offset;
+int ScreenGenerator(screen_t* screen, waves_t waves) {
+    GenerateTerrain(waves, screen);
+    GeneratePath(waves, screen);
+    RandomizeBuildings(screen);
+    BorderDetector(screen);
 
-    GenerateTerrain(waves, &screen);
-    GeneratePath(waves, &screen);
-    RandomizeBuildings(&screen);
-    BorderDetector(&screen);
-
-    return screen;
+    return 1;
 }
 
 /**
@@ -69,13 +60,13 @@ int DestroyScreen(screen_t* screen) {
  * @return int 
  */
 int BorderDetector(screen_t* screen) {
-    if (offset.x == MAXSIZE * LENGTH)
+    if (screen->coord.x == MAXSIZE * LENGTH)
         SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.end][LENGTH - 1]), Tiles[MOUNTAIN]);
-    if (offset.y == MAXSIZE * WIDTH)
+    if (screen->coord.y == MAXSIZE * WIDTH)
         SwitchTile(&(screen->biomeMap[WIDTH - 1][screen->verticalEndpoints.end]), Tiles[MOUNTAIN]);
-    if (offset.x == MINSIZE * LENGTH)
+    if (screen->coord.x == MINSIZE * LENGTH)
         SwitchTile(&(screen->biomeMap[screen->horizontalEndpoints.start][0]), Tiles[MOUNTAIN]);
-    if (offset.y == MINSIZE * WIDTH)
+    if (screen->coord.y == MINSIZE * WIDTH)
         SwitchTile(&(screen->biomeMap[0][screen->verticalEndpoints.start]), Tiles[MOUNTAIN]);
 
     return 0;
@@ -94,8 +85,8 @@ tileType_t** GenerateTerrain(waves_t waves, screen_t* screen) {
     for (int i = 0; i < WIDTH; ++i)
         screen->biomeMap[i] = (tileType_t*)malloc(LENGTH * sizeof(tileType_t));
 
-    noisemap_t altitudeMap = GenerateNoise(1, waves.Altitude, offset);
-    noisemap_t humidityMap = GenerateNoise(1, waves.Humidity, offset);
+    noisemap_t altitudeMap = GenerateNoise(1, waves.Altitude, screen->coord);
+    noisemap_t humidityMap = GenerateNoise(1, waves.Humidity, screen->coord);
 
     for (int y = 0; y < WIDTH; y++) {
         for (int x = 0; x < LENGTH; x++) {
@@ -171,9 +162,11 @@ tileType_t ChooseBiome(float altitude, float humidity) {
  * @param x 
  * @param y 
  */
-void UpdateOffset(int x, int y) {
-    offset.x = x * LENGTH;
-    offset.y = y * WIDTH;
+int UpdateOffset(screen_t* screen, int x, int y) {
+    screen->coord.x = x;
+    screen->coord.y = y;
+
+    return 1;
 }
 
 /**
@@ -183,8 +176,8 @@ void UpdateOffset(int x, int y) {
  * @param screen 
  */
 void GeneratePath(waves_t waves, screen_t* screen) {
-    expandedmap_t expandedAltitudeMap = MapExpander(waves.Altitude);
-    expandedmap_t expandedHumidityMap = MapExpander(waves.Humidity);
+    expandedmap_t expandedAltitudeMap = MapExpander(screen, waves.Altitude);
+    expandedmap_t expandedHumidityMap = MapExpander(screen, waves.Humidity);
 
     endPointSelector(&(screen->verticalEndpoints), WIDTH, LENGTH, expandedAltitudeMap, expandedHumidityMap);
 
@@ -300,14 +293,14 @@ int endPointSelector(pathgates_t* path, int width, int length, expandedmap_t alt
  * @param wave 
  * @return expandedmap_t 
  */
-expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
+expandedmap_t MapExpander (screen_t* screen, wave_t wave[WAVENUM]) {
     expandedmap_t expandedMap;
 
     vector_t pathOffsets[QUADRANT] = {
-        [0] = { .x = LENGTH / -2 + offset.x, .y = WIDTH / -2 + offset.y },
-        [1] =  { .x = (LENGTH - LENGTH / 2) + offset.x, .y = WIDTH / -2 + offset.y },
-        [2] = { .x = LENGTH / -2 + offset.x, .y = (WIDTH - WIDTH / 2) + offset.y },
-        [3] = { .x = (LENGTH - LENGTH / 2) + offset.x, .y = (WIDTH - WIDTH / 2) + offset.y }
+        [0] = { .x = LENGTH / -2 + screen->coord.x, .y = WIDTH / -2 + screen->coord.y },
+        [1] =  { .x = (LENGTH - LENGTH / 2) + screen->coord.x, .y = WIDTH / -2 + screen->coord.y },
+        [2] = { .x = LENGTH / -2 + screen->coord.x, .y = (WIDTH - WIDTH / 2) + screen->coord.y },
+        [3] = { .x = (LENGTH - LENGTH / 2) + screen->coord.x, .y = (WIDTH - WIDTH / 2) + screen->coord.y }
     };
 
     vector_t translation[QUADRANT] = {
@@ -338,7 +331,7 @@ expandedmap_t MapExpander (wave_t wave[WAVENUM]) {
  */
 int RandomizeBuildings(screen_t* screen) {
     int chance = 100;
-    int dist = abs((int)(offset.x / LENGTH) - MAXSIZE / 2) + abs((int)(offset.y / WIDTH) - MAXSIZE / 2);
+    int dist = abs((int)(screen->coord.x / LENGTH) - MAXSIZE / 2) + abs((int)(screen->coord.y / WIDTH) - MAXSIZE / 2);
 
     if (dist > 0)
         chance = pow(0.975, dist - 155) + 5;

@@ -18,21 +18,21 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     do {
         switch (input) {
             case 'n':
-                UpdateOffset(currX, (currY = fmax(--currY, MINSIZE)));
+                UpdateOffset(screen, currX, (currY = fmax(--currY, MINSIZE)));
                 break;
             case 'e':
-                UpdateOffset((currX = fmin(++currX, MAXSIZE)), currY);
+                UpdateOffset(screen, (currX = fmin(++currX, MAXSIZE)), currY);
                 break;
             case 's':
-                UpdateOffset(currX, (currY = fmin(++currY, MAXSIZE)));
+                UpdateOffset(screen, currX, (currY = fmin(++currY, MAXSIZE)));
                 break;
             case 'w':
-                UpdateOffset((currX = fmax(--currX, MINSIZE)), currY);
+                UpdateOffset(screen, (currX = fmax(--currX, MINSIZE)), currY);
                 break;
             case 'f':
                 int x, y;
                 scanf("%d %d", &x, &y);
-                UpdateOffset((currX = (int)fmax(fmin(MIDDLEX + x, MAXSIZE), MINSIZE)), (currY = (int)fmax(fmin(MIDDLEY + y, MAXSIZE), MINSIZE)));
+                UpdateOffset(screen, (currX = (int)fmax(fmin(MIDDLEX + x, MAXSIZE), MINSIZE)), (currY = (int)fmax(fmin(MIDDLEY + y, MAXSIZE), MINSIZE)));
                 break;
             case 0:
                 break;
@@ -43,7 +43,7 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
                 continue;
         }
         
-        *screen = ScreenGenerator(waves);
+        ScreenGenerator(screen, waves);
         RandomizePC(screen);
         SpawnNPC(screen, HIKER);
 
@@ -61,7 +61,7 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
 }
 
 void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[]) {
-    *screen = ScreenGenerator(waves);
+    ScreenGenerator(screen, waves);
     InitSize(screen, argc, argv);
     RandomizePC(screen);
     SpawnAllNPC(screen);
@@ -145,8 +145,8 @@ int main (int argc, char *argv[]) {
     int currX = MIDDLEX;
     int currY = MIDDLEY;
 
-    UpdateOffset(currX, currY);
     screen_t screen;
+    UpdateOffset(&screen, currX, currY);
 
     if(DEVMODE == 1)
         DevLoop(&screen, waves, currX, currY);

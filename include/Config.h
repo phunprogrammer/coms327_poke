@@ -123,7 +123,7 @@ typedef struct EntityType {
 
 typedef struct Screen {
     tileType_t** biomeMap;
-    vector_t screenCoords;
+    vector_t coord;
     pathgates_t horizontalEndpoints;
     pathgates_t verticalEndpoints;
     path_t* horizontalPath;

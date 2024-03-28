@@ -16,12 +16,14 @@ int ValidMove(screen_t* screen, entityType_t* entity, vector_t move) {
     if(fabs(entity->coord.x - move.x) > 1 || fabs(entity->coord.y - move.y) > 1)
         return 0;
 
+    if(entity->tile.biomeID != PC && screen->biomeMap[(int)move.y][(int)move.x].biomeID == PC)
+        return 2;
+    else if(entity->tile.biomeID == PC && screen->biomeMap[(int)move.y][(int)move.x].biomeID > PC)
+        return 2;
+
     if(Entities[entity->tile.biomeID].weightFactor[screen->biomeMap[(int)move.y][(int)move.x].biomeID] == 0 ||
         screen->biomeMap[(int)move.y][(int)move.x].biomeID > (TILENUM - ENTITYNUM))
         return 0;
-
-    if(screen->biomeMap[(int)move.y][(int)move.x].biomeID == PC)
-        return 2;
 
     return 1;
 }
@@ -114,7 +116,7 @@ path_t* GetHikerPath (screen_t* screen, entityType_t* entity) {
     }
 
     biomeGrid[(int)entity->coord.y][(int)entity->coord.x] = entity->weightFactor[(int)entity->originalTile.biomeID];
-    return aStar(biomeGrid, WIDTH - 1, LENGTH - 1, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
+    return aStar(biomeGrid, WIDTH, LENGTH, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
 }
 
 path_t* GetRivalPath (screen_t* screen, entityType_t* entity) {
@@ -129,7 +131,7 @@ path_t* GetRivalPath (screen_t* screen, entityType_t* entity) {
     }
 
     biomeGrid[(int)entity->coord.y][(int)entity->coord.x] = entity->weightFactor[(int)entity->originalTile.biomeID];
-    return aStar(biomeGrid, WIDTH - 1, LENGTH - 1, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
+    return aStar(biomeGrid, WIDTH, LENGTH, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
 }
 
 path_t* GetPacerPath (screen_t* screen, entityType_t* entity) {

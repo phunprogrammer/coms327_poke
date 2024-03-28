@@ -10,5 +10,6 @@ int EnterBattle(screen_t* screen, int entityIndex);
 void InitColors();
 int PrintMap(screen_t* screen, int* line);
 int fly(vector_t* coord);
+int changeScreen(screen_t* screen, char* cameFrom, int* updateScreen, vector_t* screenCoord, vector_t move);
 
 #endif

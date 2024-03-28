@@ -201,3 +201,35 @@ int fly(vector_t* coord) {
 
     return 1;
 }
+
+int changeScreen(screen_t* screen, char* cameFrom, int* updateScreen, vector_t* screenCoord, vector_t move) {
+    if(move.x < 0) {
+        screenCoord->x = fmax(screen->coord.x - 1, MINSIZE);
+        *cameFrom = 'e';
+        *updateScreen = 1;
+        return 1;
+    }
+
+    if (move.x >= LENGTH) {
+        screenCoord->x = fmin(screen->coord.x + 1, MAXSIZE);
+        *cameFrom = 'w';
+        *updateScreen = 1;
+        return 1;
+    }
+
+    if (move.y < 0) {
+        screenCoord->y = fmax(screen->coord.y - 1, MINSIZE);
+        *cameFrom = 's';
+        *updateScreen = 1;
+        return 1;
+    }
+
+    if (move.y >= WIDTH) {
+        screenCoord->y = fmin(screen->coord.y + 1, MAXSIZE);
+        *cameFrom = 'n';
+        *updateScreen = 1;
+        return 1;
+    }
+
+    return 0;
+}

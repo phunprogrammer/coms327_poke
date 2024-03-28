@@ -120,36 +120,26 @@ void GameLoop(waves_t waves, int seed, int argc, char *argv[]) {
             default:
                 vector_t move = MovePC(screen, currInput);
 
-                if(move.x < 0) {
-                    screenCoord.x = fmax(screen->coord.x - 1, MINSIZE);
-                    cameFrom = 'e';
-                    updateScreen = 1;
+                if((move.x < 0 || move.x >= LENGTH || move.y < 0 || move.y >= WIDTH) && changeScreen(screen, &cameFrom, &updateScreen, &screenCoord, move))
+                    continue;
+                
+                int pcMove = MoveEntity(screen, &(screen->pc), move);
+                if((move.x == 0 && move.y == 0) || pcMove == 0)
+                    continue;
+
+                PrintMap(screen, &line);
+
+                if (pcMove == 2) {
+                    int i;
+                    for(i = 0; i < screen->npcSize; i++) {
+                        if(move.x == screen->npcs[i].coord.x && move.y == screen->npcs[i].coord.y)
+                            break;
+                    }
+                    EnterBattle(screen, i);
+                    screen->npcs[i].defeated = 1;
+                    SwitchTile(&(screen->biomeMap[(int)screen->npcs[i].coord.y][(int)screen->npcs[i].coord.x]), Tiles[screen->npcs[i].originalTile.biomeID]);
                     continue;
                 }
-
-                if (move.x >= LENGTH) {
-                    screenCoord.x = fmin(screen->coord.x + 1, MAXSIZE);
-                    cameFrom = 'w';
-                    updateScreen = 1;
-                    continue;
-                }
-
-                if (move.y < 0) {
-                    screenCoord.y = fmax(screen->coord.y - 1, MINSIZE);
-                    cameFrom = 's';
-                    updateScreen = 1;
-                    continue;
-                }
-
-                if (move.y >= WIDTH) {
-                    screenCoord.y = fmin(screen->coord.y + 1, MAXSIZE);
-                    cameFrom = 'n';
-                    updateScreen = 1;
-                    continue;
-                }
-
-                if((move.x == 0 && move.y == 0) || !MoveEntity(screen, &(screen->pc), move))
-                    continue;
         }
 
         screen->priority += Entities[PC].weightFactor[screen->pc.originalTile.biomeID];

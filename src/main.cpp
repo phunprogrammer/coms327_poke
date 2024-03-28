@@ -59,15 +59,22 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     } while ((input = getc(stdin)) != 'q');
 }
 
-void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[]) {
+void GameLoop(waves_t waves, int seed, int argc, char *argv[]) {
     char currInput = 0;
     int updateScreen = 1;
     char cameFrom;
     int hasFlown = 1;
     vector_t screenCoord = { .x = MIDDLEX, .y = MIDDLEY };
+    screen_t* screens[MAXSIZE][MAXSIZE] = { };
+    screen_t* screen;
 
     while(currInput != 'Q') {
-        if(updateScreen) {
+        if(updateScreen && screens[(int)screenCoord.y][(int)screenCoord.x] != nullptr) {
+            screen = screens[(int)screenCoord.y][(int)screenCoord.x];
+        }
+        else if(updateScreen) {
+            screen = new screen_t;
+            screens[(int)screenCoord.y][(int)screenCoord.x] = screen;
             ScreenGenerator(screen, waves, (int)screenCoord.x, (int)screenCoord.y);
             InitSize(screen, argc, argv);
 
@@ -206,7 +213,7 @@ int main (int argc, char *argv[]) {
     start_color();
     InitColors();
     
-    GameLoop(&screen, waves, seed, argc, argv);
+    GameLoop(waves, seed, argc, argv);
 
     return 0;
 }

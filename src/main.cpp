@@ -18,21 +18,21 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     do {
         switch (input) {
             case 'n':
-                UpdateOffset(screen, currX, (currY = fmax(--currY, MINSIZE)));
+                ScreenGenerator(screen, waves, currX, (currY = fmax(--currY, MINSIZE)));
                 break;
             case 'e':
-                UpdateOffset(screen, (currX = fmin(++currX, MAXSIZE)), currY);
+                ScreenGenerator(screen, waves, (currX = fmin(++currX, MAXSIZE)), currY);
                 break;
             case 's':
-                UpdateOffset(screen, currX, (currY = fmin(++currY, MAXSIZE)));
+                ScreenGenerator(screen, waves, currX, (currY = fmin(++currY, MAXSIZE)));
                 break;
             case 'w':
-                UpdateOffset(screen, (currX = fmax(--currX, MINSIZE)), currY);
+                ScreenGenerator(screen, waves, (currX = fmax(--currX, MINSIZE)), currY);
                 break;
             case 'f':
                 int x, y;
                 scanf("%d %d", &x, &y);
-                UpdateOffset(screen, (currX = (int)fmax(fmin(MIDDLEX + x, MAXSIZE), MINSIZE)), (currY = (int)fmax(fmin(MIDDLEY + y, MAXSIZE), MINSIZE)));
+                ScreenGenerator(screen, waves, (currX = (int)fmax(fmin(MIDDLEX + x, MAXSIZE), MINSIZE)), (currY = (int)fmax(fmin(MIDDLEY + y, MAXSIZE), MINSIZE)));
                 break;
             case 0:
                 break;
@@ -42,8 +42,7 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
                 printf("ERROR: Not a valid command\n");
                 continue;
         }
-        
-        ScreenGenerator(screen, waves);
+    
         RandomizePC(screen);
         SpawnNPC(screen, HIKER);
 
@@ -61,20 +60,34 @@ void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
 }
 
 void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[]) {
-    ScreenGenerator(screen, waves);
-    InitSize(screen, argc, argv);
-    RandomizePC(screen);
-    SpawnAllNPC(screen);
-
-    screen->moveQueue = new pqueue_t;
-    pq_init(screen->moveQueue);
-
-    int currentPriority = 0;
     char currInput = 0;
+    int updateScreen = 1;
+    char cameFrom;
+    int hasFlown = 1;
+    vector_t screenCoord = { .x = MIDDLEX, .y = MIDDLEY };
 
-    GetAllNPCMoves(screen, currentPriority);
-    
     while(currInput != 'Q') {
+        if(updateScreen) {
+            ScreenGenerator(screen, waves, (int)screenCoord.x, (int)screenCoord.y);
+            InitSize(screen, argc, argv);
+
+            if(hasFlown) {
+                RandomizePC(screen);
+                hasFlown = 0;
+            }
+            else 
+                PlacePC(screen, cameFrom);
+
+            SpawnAllNPC(screen);
+
+            screen->moveQueue = new pqueue_t;
+            pq_init(screen->moveQueue);
+            screen->priority = 0;
+            GetAllNPCMoves(screen, screen->priority);
+
+            updateScreen = 0;
+        }
+        
         clear();
         mvprintw(0, 0, "Seed: %d", seed);
         int line = 2;
@@ -92,19 +105,54 @@ void GameLoop(screen_t* screen, waves_t waves, int seed, int argc, char *argv[])
             case '5':
             case 's':
                 break;
+            case 'f':
+                fly(&screenCoord);
+                updateScreen = 1;
+                hasFlown = 1;
+                continue;
             default:
-                if(!MovePC(screen, currInput))
+                vector_t move = MovePC(screen, currInput);
+
+                if(move.x < 0) {
+                    screenCoord.x = fmax(screen->coord.x - 1, MINSIZE);
+                    cameFrom = 'e';
+                    updateScreen = 1;
+                    continue;
+                }
+
+                if (move.x >= LENGTH) {
+                    screenCoord.x = fmin(screen->coord.x + 1, MAXSIZE);
+                    cameFrom = 'w';
+                    updateScreen = 1;
+                    continue;
+                }
+
+                if (move.y < 0) {
+                    screenCoord.y = fmax(screen->coord.y - 1, MINSIZE);
+                    cameFrom = 's';
+                    updateScreen = 1;
+                    continue;
+                }
+
+                if (move.y >= WIDTH) {
+                    screenCoord.y = fmin(screen->coord.y + 1, MAXSIZE);
+                    cameFrom = 'n';
+                    updateScreen = 1;
+                    continue;
+                }
+
+                if((move.x == 0 && move.y == 0) || !MoveEntity(screen, &(screen->pc), move))
                     continue;
         }
 
-        currentPriority += Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
+        screen->priority += Entities[PC].weightFactor[screen->pc.originalTile.biomeID];
         
         while (!pq_isEmpty(screen->moveQueue)) {
             void* node;
             pq_peek(screen->moveQueue, &node);
             entityMove_t* move = (entityMove_t*)node;
 
-            if(move->priority > currentPriority)
+            if(move->priority > screen->priority)
                 break;
 
             pq_dequeue(screen->moveQueue, &node);
@@ -146,16 +194,15 @@ int main (int argc, char *argv[]) {
     int currY = MIDDLEY;
 
     screen_t screen;
-    UpdateOffset(&screen, currX, currY);
 
     if(DEVMODE == 1)
         DevLoop(&screen, waves, currX, currY);
 
     initscr();
     noecho();
+    curs_set(0);
     cbreak();
     keypad(stdscr, TRUE);
-    curs_set(0);
     start_color();
     InitColors();
     

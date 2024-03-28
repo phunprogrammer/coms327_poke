@@ -58,6 +58,35 @@ int RandomizePC(screen_t* screen) {
     return 0;
 }
 
+int PlacePC(screen_t* screen, char cameFrom) {
+    int x = 0;
+    int y = 0;
+
+    switch(cameFrom) {
+        case 'w':
+            y = screen->horizontalEndpoints.start;
+            x = 0;
+            break;
+        case 'e':
+            y = screen->horizontalEndpoints.end;
+            x = LENGTH - 1;
+            break;
+        case 's':
+            x = screen->verticalEndpoints.end;
+            y = WIDTH - 1;
+            break;
+        case 'n':
+            x = screen->verticalEndpoints.start;
+            y = 0;
+            break;
+        default:
+            return 0;
+    }
+
+    SetEntity(screen, &(screen->pc), x, y, PC);
+    return 1;
+}
+
 int SpawnNPC(screen_t* screen, enum Tile entity) {
     int randX;
     int randY;
@@ -122,6 +151,7 @@ int GenWeightMap(screen_t* screen, entityType_t entity) {
 
 int SpawnAllNPC(screen_t* screen) {
     screen->npcSize = 0;
+    
     if(numNPC <= 0)
         return 0;
 

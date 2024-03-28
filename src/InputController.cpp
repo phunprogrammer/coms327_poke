@@ -18,8 +18,8 @@
     _a < _b ? _a : _b;       \
 })
 
-int MovePC(screen_t* screen, char input) {
-    vector_t move;
+vector_t MovePC(screen_t* screen, char input) {
+    vector_t move = { .x = 0, .y = 0 };
 
     switch(input) {
         case '7':
@@ -63,10 +63,10 @@ int MovePC(screen_t* screen, char input) {
             move.y = screen->pc.coord.y + 1;
             break;
         default:
-            return 0;
+            break;
     }
 
-    return MoveEntity(screen, &(screen->pc), move);
+    return move;
 }
 
 int ListTrainers(screen_t* screen) {
@@ -170,14 +170,6 @@ void InitColors() {
     init_pair(8, COLOR_BLUE, COLOR_BLACK);
 }
 
-int DefeatedWeight(entityType_t* entity) {
-    for(int i = 0; i < TILENUM; i++) {
-        entity->weightFactor[i] *= 2;
-    }
-
-    return 1;
-}
-
 int PrintMap(screen_t* screen, int* line) {
     for(; *line < WIDTH + 2; (*line)++) {
         int x;
@@ -188,7 +180,24 @@ int PrintMap(screen_t* screen, int* line) {
             attroff(COLOR_PAIR(screen->biomeMap[*line - 2][x].biomeID < BIOMENUM + STRUCNUM ? screen->biomeMap[*line - 2][x].biomeID + 1 : 6));
         }
     }
-    mvprintw((*line)++, 0, "(%d, %d)", MIDDLEX, MIDDLEY);
+    mvprintw((*line)++, 0, "(%d, %d)", (int)screen->coord.x - MAXSIZE / 2, (int)screen->coord.y - MAXSIZE / 2);
+    move(*line, 0);
+
+    return 1;
+}
+
+int fly(vector_t* coord) {
+    echo();
+    curs_set(1);
+
+    int x, y;
+    if(scanw("%d %d", &x, &y) == 2) {
+        coord->x = fmax(fmin(MIDDLEX + x, MAXSIZE), MINSIZE);
+        coord->y = fmax(fmin(MIDDLEY + y, MAXSIZE), MINSIZE);
+    }
+
+    noecho();
+    curs_set(0);
 
     return 1;
 }

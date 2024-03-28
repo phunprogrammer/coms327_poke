@@ -132,6 +132,7 @@ typedef struct Screen {
     entityType_t* npcs;
     int npcSize;
     pqueue_t* moveQueue;
+    int priority;
 } screen_t;
 
 typedef struct Building {

@@ -114,7 +114,7 @@ path_t* GetHikerPath (screen_t* screen, entityType_t* entity) {
     }
 
     biomeGrid[(int)entity->coord.y][(int)entity->coord.x] = entity->weightFactor[(int)entity->originalTile.biomeID];
-    return aStar(biomeGrid, WIDTH - 2, LENGTH - 2, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
+    return aStar(biomeGrid, WIDTH - 1, LENGTH - 1, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
 }
 
 path_t* GetRivalPath (screen_t* screen, entityType_t* entity) {
@@ -129,7 +129,7 @@ path_t* GetRivalPath (screen_t* screen, entityType_t* entity) {
     }
 
     biomeGrid[(int)entity->coord.y][(int)entity->coord.x] = entity->weightFactor[(int)entity->originalTile.biomeID];
-    return aStar(biomeGrid, WIDTH - 2, LENGTH - 2, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
+    return aStar(biomeGrid, WIDTH - 1, LENGTH - 1, entity->coord.x, entity->coord.y, screen->pc.coord.x, screen->pc.coord.y, biomeFactor, neighbors);
 }
 
 path_t* GetPacerPath (screen_t* screen, entityType_t* entity) {

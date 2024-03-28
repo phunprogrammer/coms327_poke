@@ -1,8 +1,7 @@
-# COMS 327 - Assignment 05
-This is assignment 05 of the Pokemon game for COMS 327. In this iteration, when running the game, use the key pad to move the PC around, all other controls should be according to the assignment. When entering a building shift must be held down. After battling a trainer they will die leaving this world.
+# COMS 327 - Assignment 06
+This is assignment 06 of the Pokemon game for COMS 327. In this iteration, the `PC` can now traverse between screens. When traversing the position and data on previous screens' entities will be saved. Also, the user can fly by hitting `f` then typing in two integers between -200-200. In addition to these features all files have been converted to c++ and utilize new c++ functionality.
 
 ## KNOWN BUGS:
-PC cannot initiate battles.
 Using escape to backout has a slight delay. (I think this is a bug with ncurses)
 
 ## HOW TO RUN:

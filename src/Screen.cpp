@@ -1,7 +1,10 @@
 #include "Screen.h"
 #include "PerlinNoise.h"
 #include "AStar.h"
+#include "PQItem.h"
 #include <iostream>
+#include <queue>
+#include <cmath>
 
 Screen::Screen(waves_t waves, coord_t coord) : 
     coord(coord), 
@@ -11,7 +14,7 @@ Screen::Screen(waves_t waves, coord_t coord) :
     GenerateTerrain(waves);
     SelectEndpoints(1, ExpandWaveMap(waves.Height), ExpandWaveMap(waves.Humidity));
     GeneratePath(waves);
-    // RandomizeBuildings();
+    RandomizeBuildings();
     // DetectBorder();
 }
 
@@ -72,11 +75,22 @@ int Screen::GeneratePath(waves_t waves) {
 
     for(path_t path : paths.verticalPath)
         structureMap[path.coord.y][path.coord.x] = StructureTile(Structure::PATH);
+
+    return 1;
 }
 
-// int Screen::RandomizeBuildings() {
+int Screen::RandomizeBuildings() {
+    int chance = 100;
+    int dist = abs((int)(coord.x) - MAXSIZE / 2) + abs((int)(coord.y) - MAXSIZE / 2);
 
-// }
+    if (dist > 0)
+        chance = std::pow(0.975, dist - 155) + 5;
+
+    if((rand() % 100) < chance)
+        GenerateBuildings();
+
+    return 1;
+}
 // int Screen::DetectBorder() {
 
 // }
@@ -227,15 +241,145 @@ int Screen::SelectEndpoints(int horizontal, std::vector<std::vector<float>> heig
 
     return 1;
 }
-// int Screen::GenerateBuildings() {
 
-// }
-// int Screen::isValidBuilding(int currX, int currY, int* value, int inverse, int vertical) {
+int Screen::GenerateBuildings() {
+    int horizontalBias = rand() % LENGTH;
+    int verticalBias = rand() % WIDTH;
 
-// }
-// int Screen::ConstructBuilding(building_t* building, StructureTile tile) {
+    std::priority_queue<PQItem<building_t>> buildingQueue;
 
-// }
+    for(path_t path : paths.horizontalPath) {
+        int x = path.coord.x;
+        int y = path.coord.y;
+
+        for(int i = -1; i <= 1; i += 2) {
+            int value = 0;
+
+            if (isValidBuilding(x, y, value, i, 0)) {
+                building_t building;
+                building.path = path;
+                building.inverse = i;
+                building.vertical = 0;
+                buildingQueue.push(PQItem(building, value + abs(horizontalBias - x) + rand() % 10));
+            }
+        }
+    }
+
+    for(path_t path : paths.verticalPath) {
+        int x = path.coord.x;
+        int y = path.coord.y;
+
+        for(int i = -1; i < 0; i += 2) {
+            int value = 0;
+
+            if (isValidBuilding(x, y, value, i, 1)) {
+                building_t building;
+                building.path = path;
+                building.inverse = i;
+                building.vertical = 1;
+                buildingQueue.push(PQItem(building, value + abs(verticalBias - y) + rand() % 10));
+            }
+        }
+    }
+
+    if(buildingQueue.empty())
+        return 0;
+
+    building_t pokemart = buildingQueue.top().getData();
+    buildingQueue.pop();
+    ConstructBuilding(pokemart, Structure::PMART); 
+
+    int constructed = 1;
+
+    while(constructed == 1 && !buildingQueue.empty()){
+        building_t pokecenter = buildingQueue.top().getData();
+        buildingQueue.pop();
+        constructed = ConstructBuilding(pokecenter, Structure::PCNTR);
+    }
+
+    return 1;
+}
+
+int Screen::isValidBuilding(int currX, int currY, int &value, int inverse, int vertical) {
+    vector_t buildingOffset[QUADRANT] = {
+        [0] = { .x = 0, .y = 1 },
+        [1] =  { .x = 0, .y = 2 },
+        [2] = { .x = 1, .y = 2 },
+        [3] = { .x = 1, .y = 1 }
+    };
+
+    for (int j = 0; j < QUADRANT; j++) {
+        int newX = 0;
+        int newY = 0;
+
+        if (!vertical) {
+            newX = currX + buildingOffset[j].x;
+            newY = currY + buildingOffset[j].y * inverse;
+        }
+        else {
+            newX = currX + buildingOffset[j].y * inverse;
+            newY = currY + buildingOffset[j].x;
+        }
+
+        if((newX <= 0 && newY && 0 && newX >= LENGTH - 1 && newY >= WIDTH - 1) || structureMap[newY][newX].getStructure() == Structure::PATH)
+            return 0;
+
+        value += terrainMap[newY][newX].getWeight();
+    }
+
+    if(!vertical && structureMap[currY][currX + 1].getStructure() != Structure::PATH)
+        return 0;
+
+    if(vertical && structureMap[currY + 1][currX].getStructure() != Structure::PATH)
+        return 0;
+
+    value /= QUADRANT;
+
+    return 1;
+}
+
+int Screen::ConstructBuilding(building_t building, Structure tile) {
+    coord_t buildingOffset[QUADRANT] = {
+        [0] = { .x = 0, .y = 1 },
+        [1] =  { .x = 0, .y = 2 },
+        [2] = { .x = 1, .y = 2 },
+        [3] = { .x = 1, .y = 1 }
+    };
+
+    coord_t placed[QUADRANT];
+
+    int currX = building.path.coord.x;
+    int currY = building.path.coord.y;
+    int inverse = building.inverse;
+    int vertical = building.vertical;
+
+    for (int j = 0; j < QUADRANT; j++) {
+        int newX = 0;
+        int newY = 0;
+
+        if (!vertical) {
+            newX = currX + buildingOffset[j].x;
+            newY = currY + buildingOffset[j].y * inverse;
+        }
+        else {
+            newX = currX + buildingOffset[j].y * inverse;
+            newY = currY + buildingOffset[j].x;
+        }
+
+        if (structureMap[newY][newX].getStructure() == Structure::PMART)
+            return 1;
+
+        
+        placed[j].x = newX;
+        placed[j].y = newY;
+    }
+
+    for (int j = 0; j < QUADRANT; j++) {
+        structureMap[(int)(placed[j].y)][(int)(placed[j].x)] = StructureTile(tile);
+    }
+
+    return 0;
+}
 
 waves_t Screen::GetWaves(int* seed) {
     waves_t waves;

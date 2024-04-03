@@ -125,7 +125,7 @@ typedef struct EntityMove {
 // } screen_t;
 
 typedef struct Building {
-    path_t* path;
+    path_t path;
     int vertical;
     int inverse;
 } building_t;

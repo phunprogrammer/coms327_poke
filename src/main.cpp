@@ -7,7 +7,7 @@ int main() {
 
     int seed;
     waves_t waves = Screen::GetWaves(&seed);
-    coord_t coord = { 0, 0 };
+    coord_t coord = { MIDDLEX, MIDDLEY };
 
     Screen screen = Screen(waves, coord);
 

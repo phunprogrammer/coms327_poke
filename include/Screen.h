@@ -52,8 +52,8 @@ class Screen {
         std::vector<std::vector<float>> ExpandWaveMap(std::vector<wave_t> waves);
         int SelectEndpoints(int vertical, std::vector<std::vector<float>> altitudeMap, std::vector<std::vector<float>> humidityMap);
         int GenerateBuildings();
-        int isValidBuilding(int currX, int currY, int* value, int inverse, int vertical);
-        int ConstructBuilding(building_t* building, StructureTile tile);
+        int isValidBuilding(int currX, int currY, int& value, int inverse, int vertical);
+        int ConstructBuilding(building_t building, Structure tile);
     public:
         Screen(waves_t waves, coord_t coord);
 

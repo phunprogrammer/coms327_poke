@@ -1,7 +1,7 @@
 #include "EntityGenerator.h"
 #include "TerrainGenerator.h"
 #include "EntityMover.h"
-#include "aStar.h"
+#include "AStar.h"
 #include "PQueue.h"
 #include <stdlib.h>
 #include <stdio.h>

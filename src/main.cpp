@@ -69,12 +69,12 @@ void GameLoop(waves_t waves, int seed, int argc, char *argv[]) {
     screen_t* screen;
 
     while(currInput != 'Q') {
-        if(updateScreen && screens[(int)screenCoord.y][(int)screenCoord.x] != nullptr) {
-            screen = screens[(int)screenCoord.y][(int)screenCoord.x];
+        if(updateScreen && screens[(int)screenCoord.y - 1][(int)screenCoord.x - 1] != nullptr) {
+            screen = screens[(int)screenCoord.y - 1][(int)screenCoord.x - 1];
         }
         else if(updateScreen) {
             screen = new screen_t;
-            screens[(int)screenCoord.y][(int)screenCoord.x] = screen;
+            screens[(int)screenCoord.y - 1][(int)screenCoord.x - 1] = screen;
             ScreenGenerator(screen, waves, (int)screenCoord.x, (int)screenCoord.y);
             InitSize(screen, argc, argv);
 

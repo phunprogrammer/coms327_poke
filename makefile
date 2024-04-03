@@ -1,32 +1,29 @@
-CXX=g++
-CXXFLAGS=-I$(IDIR) -Wall -Wextra -Werror -g -lncurses
+INC_DIR := include
+SRC_DIR := src
+OBJ_DIR := obj
+INC_DIRS := $(shell find $(INC_DIR) -type d)
+SRC_DIRS := $(shell find $(SRC_DIR) -type d)
+CC := g++
+LINKS := -lm -lncurses
+CFLAGS := $(addprefix -I, $(INC_DIRS)) -Wall -Wextra -Werror -g
+DEPS := $(wildcard $(INC_DIRS)/*.h)
+SRCS := $(wildcard $(addsuffix /*.cpp, $(SRC_DIRS)))
+OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+TARGET := ./game
 
-IDIR=./include
-ODIR=./obj
-SDIR=./src
+$(shell mkdir -p $(OBJ_DIR))
+$(shell mkdir -p $(patsubst $(SRC_DIR)/%, $(OBJ_DIR)/%, $(SRC_DIRS)))
 
-LIBS=-lm
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-_DEPS = AStar.h Config.h NoiseGenerator.h PerlinNoise.h PPMGenerator.h PQueue.h TerrainGenerator.h EntityGenerator.h EntityMover.h InputController.h
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
-
-_OBJ = main.o AStar.o Config.o NoiseGenerator.o PerlinNoise.o PPMGenerator.o PQueue.o TerrainGenerator.o EntityGenerator.o EntityMover.o InputController.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
-
-$(ODIR)/%.o: $(SDIR)/%.cpp $(DEPS) | $(ODIR)
-	$(CXX) -c -o $@ $< $(CXXFLAGS)
-
-game: $(OBJ)
-	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS)
-
-$(ODIR):
-	mkdir -p $(ODIR)
+$(TARGET): $(OBJS) $(DEPS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LINKS)
 
 .PHONY: clean
 
 clean:
-	rm -fr $(ODIR)/*.o *~ core $(INCDIR)/*~ 
-	rmdir $(ODIR)
+	rm -fr $(OBJ_DIR)
 	rm -f ./game
 	rm -f ./map.png
 	rm -f ./map.ppm

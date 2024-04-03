@@ -19,5 +19,13 @@ int main() {
         std::cout << '\n';
     }
 
+    std::vector<std::vector<StructureTile>> structureMap = screen.getStructureMap();
+
+    for(int i = 0; i < (int)structureMap.size(); i++) {
+        for(int j = 0; j < (int)structureMap[i].size(); j++)
+            std::cout << (char)(structureMap[i][j].getStructure());
+        std::cout << '\n';
+    }
+
     return 0;
 }

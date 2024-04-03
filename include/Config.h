@@ -68,16 +68,22 @@ typedef struct Coord {
     int y;
 } coord_t;
 
-typedef struct PathGates {
-    int start;
-    int end;
-} pathgates_t;
+typedef struct Gates {
+    coord_t north;
+    coord_t south;
+    coord_t east;
+    coord_t west;
+} gates_t;
 
 typedef struct Path {
-    vector_t coord;
+    coord_t coord;
     int gCost;
-    struct Path* previous;
 } path_t;
+
+typedef struct Paths {
+    std::vector<path_t> horizontalPath;
+    std::vector<path_t> verticalPath;
+} paths_t;
 
 typedef struct EntityMove {
     int entityIndex;

@@ -11,7 +11,7 @@ void TerrainTile::setTerrain(Terrain terrain) {
     this->weight = WEIGHTS.at(terrain);
 }
 
-StructureTile::StructureTile(Structure structure, int weight) : 
+StructureTile::StructureTile(Structure structure) : 
             structure(structure), weight(WEIGHTS.at(structure)) {}
 
 StructureTile::StructureTile() : 

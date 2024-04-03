@@ -1,5 +1,6 @@
 #include "Screen.h"
 #include "PerlinNoise.h"
+#include "AStar.h"
 #include <iostream>
 
 Screen::Screen(waves_t waves, coord_t coord) : 
@@ -8,7 +9,8 @@ Screen::Screen(waves_t waves, coord_t coord) :
     structureMap(WIDTH, std::vector<StructureTile>(LENGTH)) {
 
     GenerateTerrain(waves);
-    // GeneratePath(waves);
+    SelectEndpoints(1, ExpandWaveMap(waves.Height), ExpandWaveMap(waves.Humidity));
+    GeneratePath(waves);
     // RandomizeBuildings();
     // DetectBorder();
 }
@@ -35,9 +37,43 @@ int Screen::GenerateTerrain(waves_t waves) {
     return 1;
 }
 
-// int Screen::GeneratePath(waves_t waves) {
+int Screen::GeneratePath(waves_t waves) {
+    std::vector<std::vector<float>> expandedHeightMap = ExpandWaveMap(waves.Height);
+    std::vector<std::vector<float>> expandedHumidityMap = ExpandWaveMap(waves.Humidity);
 
-// }
+    SelectEndpoints(0, expandedHeightMap, expandedHumidityMap);
+
+    for (int i = 0; i < PATHOFFSET; i++) {
+        structureMap[gates.north.y + i][gates.north.x] = StructureTile(Structure::PATH);
+        structureMap[gates.south.y - i][gates.south.x] = StructureTile(Structure::PATH);
+    }
+
+    SelectEndpoints(1, expandedHeightMap, expandedHumidityMap);
+
+    for (int i = 0; i < PATHOFFSET; i++) {
+        structureMap[gates.east.y][gates.east.x - i] = StructureTile(Structure::PATH);
+        structureMap[gates.west.y][gates.west.x + i] = StructureTile(Structure::PATH);
+    }
+
+    int biomeGrid[WIDTH][LENGTH];
+
+    for (int y = 0; y < WIDTH; y++) {
+        for (int x = 0; x < LENGTH; x++) {
+            biomeGrid[y][x] = terrainMap[y][x].getWeight();
+        }
+    }
+
+    paths.horizontalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, PATHOFFSET, gates.west.y, (LENGTH - 1) - PATHOFFSET, gates.east.y, 0.08, 4);
+
+    for(path_t path : paths.horizontalPath)
+        structureMap[path.coord.y][path.coord.x] = StructureTile(Structure::PATH);
+
+    paths.verticalPath = aStar(biomeGrid, WIDTH - 4, LENGTH - 4, gates.north.x, PATHOFFSET, gates.south.x, (WIDTH - 1) - PATHOFFSET, 0.08, 4);
+
+    for(path_t path : paths.verticalPath)
+        structureMap[path.coord.y][path.coord.x] = StructureTile(Structure::PATH);
+}
+
 // int Screen::RandomizeBuildings() {
 
 // }
@@ -104,7 +140,7 @@ std::vector<std::vector<float>> Screen::GenerateNoiseMap(float scale, std::vecto
 }
 
 std::vector<std::vector<float>> Screen::ExpandWaveMap(std::vector<wave_t> waves) {
-    std::vector<std::vector<float>> expandedMap(WIDTH, std::vector<float>(LENGTH));
+    std::vector<std::vector<float>> expandedMap(WIDTH * 2, std::vector<float>(LENGTH * 2));
 
     coord_t pathOffsets[QUADRANT] = {
         [0] = { .x = LENGTH / -2 + coord.x * LENGTH, .y = WIDTH / -2 + coord.y * WIDTH },
@@ -125,7 +161,7 @@ std::vector<std::vector<float>> Screen::ExpandWaveMap(std::vector<wave_t> waves)
 
         for(int y = 0; y < WIDTH; y++) {
             for(int x = 0; x < LENGTH; x++) {
-                expandedMap[y + WIDTH * (int)translation[i].y][x + LENGTH * (int)translation[i].x] = temp[y][x];
+                expandedMap[y + WIDTH * translation[i].y][x + LENGTH * translation[i].x] = temp[y][x];
             }
         }
     }
@@ -133,9 +169,64 @@ std::vector<std::vector<float>> Screen::ExpandWaveMap(std::vector<wave_t> waves)
     return expandedMap;
 }
 
-// int Screen::SelectEndpoints(float** altitudeMap, float** humidityMap) {
+int Screen::SelectEndpoints(int horizontal, std::vector<std::vector<float>> heightMap, std::vector<std::vector<float>> humidityMap) {
+    int width = WIDTH;
+    int length = LENGTH;
 
-// }
+    if(horizontal) {
+        width = LENGTH;
+        length = WIDTH;
+    }
+
+    for(int i = 0; i < 2; i++) {
+        float bestAbsAvg = length * WEIGHTS.at(Terrain::OCEAN) * 2;
+        for(int x = length / 2 + PATHOFFSET; x < length + length / 2 - PATHOFFSET; x++) {
+            int average = 0;
+            for(int y = width / 2 - PATHMARGIN + (width * i); y < width / 2 + PATHMARGIN + (width * i); y++) {
+                int j = y;
+                int k = x;
+
+                if(horizontal) {
+                    j = x;
+                    k = y;
+                }
+
+                average += ChooseBiome(heightMap[j][k], humidityMap[j][k]).getWeight();
+            }
+
+            average /= PATHMARGIN * 2;
+
+            float absAvg = average * length + (abs(length - x) / 4);
+
+            if(absAvg < bestAbsAvg) {
+                bestAbsAvg = absAvg;
+
+                if(horizontal) {
+                    if(i == 0) {
+                        gates.west.y = x - length / 2;
+                        gates.west.x = 0;
+                    }
+                    else {
+                        gates.east.y = x - length / 2;
+                        gates.east.x = LENGTH - 1;
+                    }
+                }
+                else {
+                    if(i == 0) {
+                        gates.north.x = x - length / 2;
+                        gates.north.y = 0;
+                    }
+                    else {
+                        gates.south.x = x - length / 2;
+                        gates.south.y = WIDTH - 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return 1;
+}
 // int Screen::GenerateBuildings() {
 
 // }

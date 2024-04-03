@@ -5,7 +5,7 @@
 #define TILES_H
 
 enum Terrain : char {
-    NULL_TERRAIN = 0,
+    NULL_TERRAIN = ' ',
     FOREST = '^',
     MOUNTAIN = '%',
     CLEARING = '.',
@@ -22,7 +22,7 @@ const std::vector<Terrain> TERRAINS {
 };
 
 enum Structure : char {
-    NULL_STRUCT = 0,
+    NULL_STRUCT = ' ',
     PATH = '#',
     PMART = 'M',
     PCNTR = 'C'
@@ -65,7 +65,7 @@ class StructureTile {
 
     public:
         StructureTile();
-        StructureTile(Structure structure, int weight);
+        StructureTile(Structure structure);
 
         Structure getStructure() const { return structure; }
         int getWeight() const { return weight; }

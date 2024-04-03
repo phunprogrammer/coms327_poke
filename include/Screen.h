@@ -39,6 +39,8 @@ class Screen {
         coord_t coord;
         std::vector<std::vector<TerrainTile>> terrainMap;
         std::vector<std::vector<StructureTile>> structureMap;
+        gates_t gates;
+        paths_t paths;
 
         int GenerateTerrain(waves_t waves);
         int GeneratePath(waves_t waves);
@@ -48,7 +50,7 @@ class Screen {
         TerrainTile ChooseBiome(float altitude, float humidity);
         std::vector<std::vector<float>> GenerateNoiseMap(float scale, std::vector<wave_t> waves, coord_t offset);
         std::vector<std::vector<float>> ExpandWaveMap(std::vector<wave_t> waves);
-        int SelectEndpoints(float** altitudeMap, float** humidityMap);
+        int SelectEndpoints(int vertical, std::vector<std::vector<float>> altitudeMap, std::vector<std::vector<float>> humidityMap);
         int GenerateBuildings();
         int isValidBuilding(int currX, int currY, int* value, int inverse, int vertical);
         int ConstructBuilding(building_t* building, StructureTile tile);
@@ -58,6 +60,8 @@ class Screen {
         static waves_t GetWaves(int* seed);
 
         std::vector<std::vector<TerrainTile>> getTerrainMap() { return terrainMap; }
+        std::vector<std::vector<StructureTile>> getStructureMap() { return structureMap; }
+        gates_t getGates() { return gates; }
 };
 
 #endif

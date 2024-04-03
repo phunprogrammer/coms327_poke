@@ -1,0 +1,63 @@
+#include "Config.h"
+#include "Tiles.h"
+
+#ifndef SCREEN_H
+#define SCREEN_H
+
+typedef struct Wave {
+    float seed;
+    float frequency;
+    float amplitude;
+} wave_t;
+
+typedef struct Waves {
+    std::vector<wave_t> Height;
+    std::vector<wave_t> Humidity;
+} waves_t;
+
+const std::vector<float> FREQUENCY({ 0.1f, 0.05f, 0.06f, 0.08f });
+const std::vector<float> AMPLITUDE({ 1.0f, 1.5f, 1.0f, 0.8f });
+
+const std::map<Terrain, double> MIN_HEIGHT ({
+    { Terrain::FOREST, -0.5 },
+    { Terrain::MOUNTAIN, 0.25 },
+    { Terrain::CLEARING, -0.5 },
+    { Terrain::GRASSLAND, -0.5 },
+    { Terrain::OCEAN, -0.8 }
+});
+
+const std::map<Terrain, double> MIN_HUMIDITY ({
+    { Terrain::FOREST, 0.35 },
+    { Terrain::MOUNTAIN, -0.6 },
+    { Terrain::CLEARING, -0.35 },
+    { Terrain::GRASSLAND, 0.05 },
+    { Terrain::OCEAN, -0.8 }
+});
+
+class Screen {
+    private:
+        coord_t coord;
+        std::vector<std::vector<TerrainTile>> terrainMap;
+        std::vector<std::vector<StructureTile>> structureMap;
+
+        int GenerateTerrain(waves_t waves);
+        int GeneratePath(waves_t waves);
+        int RandomizeBuildings();
+        int DetectBorder();
+
+        TerrainTile ChooseBiome(float altitude, float humidity);
+        std::vector<std::vector<float>> GenerateNoiseMap(float scale, std::vector<wave_t> waves, coord_t offset);
+        std::vector<std::vector<float>> ExpandWaveMap(std::vector<wave_t> waves);
+        int SelectEndpoints(float** altitudeMap, float** humidityMap);
+        int GenerateBuildings();
+        int isValidBuilding(int currX, int currY, int* value, int inverse, int vertical);
+        int ConstructBuilding(building_t* building, StructureTile tile);
+    public:
+        Screen(waves_t waves, coord_t coord);
+
+        static waves_t GetWaves(int* seed);
+
+        std::vector<std::vector<TerrainTile>> getTerrainMap() { return terrainMap; }
+};
+
+#endif

@@ -15,7 +15,7 @@ Screen::Screen(waves_t waves, coord_t coord) :
     SelectEndpoints(1, ExpandWaveMap(waves.Height), ExpandWaveMap(waves.Humidity));
     GeneratePath(waves);
     RandomizeBuildings();
-    // DetectBorder();
+    DetectBorder();
 }
 
 int Screen::GenerateTerrain(waves_t waves) {
@@ -91,9 +91,18 @@ int Screen::RandomizeBuildings() {
 
     return 1;
 }
-// int Screen::DetectBorder() {
+int Screen::DetectBorder() {
+    if (coord.x == MAXSIZE)
+        structureMap[gates.east.y][gates.east.x].setStructure(Structure::NULL_STRUCT);
+    if (coord.y == MAXSIZE)
+        structureMap[gates.south.y][gates.south.x].setStructure(Structure::NULL_STRUCT);
+    if (coord.x == MINSIZE)
+        structureMap[gates.west.y][gates.west.x].setStructure(Structure::NULL_STRUCT);
+    if (coord.y == MINSIZE)
+        structureMap[gates.north.y][gates.north.x].setStructure(Structure::NULL_STRUCT);
 
-// }
+    return 1;
+}
 
 TerrainTile Screen::ChooseBiome(float height, float humidity) {
     std::vector<Terrain> compatibleTerrain;

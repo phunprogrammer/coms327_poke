@@ -16,3 +16,8 @@ StructureTile::StructureTile(Structure structure) :
 
 StructureTile::StructureTile() : 
             structure(Structure::NULL_STRUCT), weight(0) {}
+
+void StructureTile::setStructure(Structure structure) {
+    this->structure = structure;
+    this->weight = WEIGHTS.at(structure);
+}

@@ -29,11 +29,13 @@ enum Structure : char {
 };
 
 const std::map<char, int> WEIGHTS ({
+    { Terrain::NULL_TERRAIN, 0 },
     { Terrain::FOREST, 50 },
     { Terrain::MOUNTAIN, 90 },
     { Terrain::CLEARING, 15 },
     { Terrain::GRASSLAND, 25 },
     { Terrain::OCEAN, 100 },
+    { Structure::NULL_STRUCT, 0 },
     { Structure::PATH, -5 },
     { Structure::PMART, 100 },
     { Structure::PCNTR, 100 }
@@ -69,6 +71,8 @@ class StructureTile {
 
         Structure getStructure() const { return structure; }
         int getWeight() const { return weight; }
+
+        void setStructure(Structure structure);
 };
 
 #endif

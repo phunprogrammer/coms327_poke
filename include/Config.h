@@ -9,6 +9,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+const int MAX =  1000000;
+
 //PPM
 #define SCREENS 11
 #define GENERATEPPM 0

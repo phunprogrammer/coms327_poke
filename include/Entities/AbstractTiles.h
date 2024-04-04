@@ -36,7 +36,7 @@ class EntityTile {
         virtual ~EntityTile() noexcept = default;
 };
 
-static EntityTile* null_value;
+[[maybe_unused]] const static EntityTile* null_value;
 
 class NPCTile : public EntityTile {
     protected:

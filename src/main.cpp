@@ -13,9 +13,8 @@
 #include <malloc.h>
 #include <ncurses.h>
 
-#include "Parser.h"
+#include "Parsing.h"
 #include "Pokemon.h"
-#include "Move.h"
 
 void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     char input = 0;
@@ -182,30 +181,7 @@ void GameLoop(waves_t waves, int seed, int argc, char *argv[]) {
     endwin();
 }
 
-int main (int argc, char *argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
-        return 1;
-    }
-
-    std::string filename = argv[1];
-    std::string filepath1 = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
-    std::string filepath2 = std::string(std::getenv("HOME")) + "/.poke327/pokedex/pokedex/data/csv/" + filename + ".csv";
-
-    Parser<Pokemon> parser(filepath1);
-    std::vector<Pokemon> pokemonData = parser.parse();
-
-    if (pokemonData.empty()) {
-        parser = Parser<Pokemon>(filepath2);
-        pokemonData = parser.parse();
-    }
-
-    for (const Pokemon &pokemon : pokemonData) {
-        std::cout << pokemon.toString() << std::endl;
-    }
-
-    return 0;
-
+/* int main (int argc, char *argv[]) {
     Initialize();
 
     int seed;
@@ -231,6 +207,30 @@ int main (int argc, char *argv[]) {
     InitColors();
     
     GameLoop(waves, seed, argc, argv);
+
+    return 0;
+} */
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+        return 1;
+    }
+
+    std::string filename = argv[1];
+    std::string filepath1 = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
+    std::string filepath2 = std::string(std::getenv("HOME")) + "/.poke327/pokedex/pokedex/data/csv/" + filename + ".csv";
+
+    Parser<Pokemon> parser(filepath1);
+    std::vector<Pokemon*> pokemonData = parser.parse();
+
+    if (pokemonData.empty()) {
+        parser = Parser<Pokemon>(filepath2);
+        pokemonData = parser.parse();
+    }
+
+    for(Pokemon* pokemon : pokemonData)
+        std::cout << pokemon->toString() << std::endl;
 
     return 0;
 }

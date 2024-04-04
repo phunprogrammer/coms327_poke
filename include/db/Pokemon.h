@@ -1,12 +1,12 @@
-#include <iostream>
-#include <vector>
+#include "Parsing.h"
+
 #include <string>
 #include <tuple>
 
 #ifndef POKEMON_H
 #define POKEMON_H
 
-class Pokemon {
+class Pokemon : public Data {
     private:
         std::tuple
         <
@@ -26,6 +26,8 @@ class Pokemon {
         auto getData() const { return data; }
 
         std::string toString() const;
+
+        static std::vector<Data*> parse(const std::string& filename);
 };
 
 #endif

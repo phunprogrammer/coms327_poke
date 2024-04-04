@@ -5,36 +5,18 @@
 
 #include "Parsing.h"
 #include "Pokemon.h"
-
-template<typename T>
-Parser<T>::Parser(const std::string& filename) : filename(filename) {}
-
-template<typename T>
-std::vector<T*> Parser<T>::parse() {
-    std::vector<T*> data;
-    std::ifstream file(filename);
-
-    if (!file.is_open()) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return data;
-    }
-
-    std::string line;
-    while (std::getline(file, line)) {
-        data.push_back(new T(line));
-    }
-
-    file.close();
-
-    return data;
-}
-
-template class Parser<Pokemon>;
+#include "Move.h"
+#include "PokemonMove.h"
 
 bool ParserUtil::isNumber(const std::string& string) {
+    if (string.empty())
+        return false;
     std::string::const_iterator it = string.begin();
-    while (it != string.end() && std::isdigit(*it)) ++it;
-    return !string.empty() && it == string.end();
+    if (*it == '-')
+        ++it;
+    while (it != string.end() && std::isdigit(*it))
+        ++it;
+    return it == string.end();
 }
 
 int ParserUtil::getInt(std::istringstream& stream) {

@@ -4,15 +4,6 @@
 #ifndef PARSING_H
 #define PARSING_H
 
-template<typename T>
-class Parser {
-    private:
-        std::string filename;
-    public:
-        Parser(const std::string& filename);
-        std::vector<T*> parse();
-};
-
 class ParserUtil {
     public:
         static bool isNumber(const std::string& string);
@@ -20,6 +11,13 @@ class ParserUtil {
         static std::string getString(std::istringstream& stream);
         static std::string toString(const int& num);
         static std::string toString(const std::string& string);
+
+        template<typename T>
+        static std::vector<T*> parseFile(std::string& name, std::string& file);
 };
 
+class Data {
+    public:
+        virtual std::string toString() const = 0;
+};
 #endif

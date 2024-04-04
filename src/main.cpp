@@ -15,6 +15,10 @@
 
 #include "Parsing.h"
 #include "Pokemon.h"
+#include <iostream>
+#include <Move.h>
+#include <PokemonMove.h>
+#include <PokemonSpecies.h>
 
 void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     char input = 0;
@@ -218,19 +222,26 @@ int main(int argc, char *argv[]) {
     }
 
     std::string filename = argv[1];
-    std::string filepath1 = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
+    std::string filepath = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
     std::string filepath2 = std::string(std::getenv("HOME")) + "/.poke327/pokedex/pokedex/data/csv/" + filename + ".csv";
 
-    Parser<Pokemon> parser(filepath1);
-    std::vector<Pokemon*> pokemonData = parser.parse();
-
-    if (pokemonData.empty()) {
-        parser = Parser<Pokemon>(filepath2);
-        pokemonData = parser.parse();
+    std::vector<Data*> pokemonData;
+    if (filename == "pokemon") {
+        pokemonData = Pokemon::parse(filepath);
+    } else if (filename == "moves") {
+        pokemonData = Move::parse(filepath);
+    } else if (filename == "pokemon_moves") {
+        pokemonData = PokemonMove::parse(filepath);
+    } else if (filename == "pokemon_species") {
+        pokemonData = PokemonSpecies::parse(filepath);
+    } else {
+        std::cerr << "Invalid filename: " << filename << std::endl;
+        return 1;
     }
 
-    for(Pokemon* pokemon : pokemonData)
-        std::cout << pokemon->toString() << std::endl;
+    for (const auto& pokemonPtr : pokemonData) {
+        std::cout << pokemonPtr->toString() << std::endl;
+    }
 
     return 0;
 }

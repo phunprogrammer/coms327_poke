@@ -19,7 +19,10 @@ class MapVector {
             vector.push_back(value);
         }
 
-        const V& operator[](const K& key) const { return map.at(key); }
+        const V& operator[](const K& key) const { 
+            static V null_value;
+            return map.count(key) ? map.at(key) : null_value; 
+        }
 
         const V& operator[](std::size_t index) const { return vector.at(index); }
 

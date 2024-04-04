@@ -1,7 +1,7 @@
 #include "AbstractTiles.h"
 
-#ifndef WandererTile_H
-#define WandererTile_H
+#ifndef WANDERERTILE_H
+#define WANDERERTILE_H
 
 class Screen;
 

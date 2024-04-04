@@ -1,7 +1,7 @@
 #include "AbstractTiles.h"
 
-#ifndef RivalTile_H
-#define RivalTile_H
+#ifndef RIVALTILE_H
+#define RIVALTILE_H
 
 class Screen;
 

@@ -20,7 +20,7 @@ coord_t NPCTile::random() {
     } while(speed.at(screen->getTerrainMap()[coord.y][coord.x].getTerrain()) == 0 || 
                 (screen->getStructureMap()[coord.y][coord.x].getStructure() != Structure::PATH && 
                 screen->getStructureMap()[coord.y][coord.x].getStructure() != Structure::NULL_STRUCT) ||
-                screen->getEntities()[{ coord.y, coord.x }] != nullptr);
+                screen->getEntities()[{ coord.y, coord.x }] != null_value);
     return coord;
 }
 

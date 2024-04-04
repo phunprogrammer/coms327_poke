@@ -18,6 +18,7 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player) :
     initialize(waves);
     player->setScreen(*this);
     entityManager.RandomizePC();
+    entityManager.SpawnAllNPC();
 }
 
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord) : 
@@ -29,6 +30,12 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord
     initialize(waves);
     player->setScreen(*this);
     player->setCoord(playerCoord);
+    entityManager.SpawnAllNPC();
+}
+
+Screen::~Screen() {
+    for(int i = 0; i < (int)entities.size(); i++)
+        delete entities[i];
 }
 
 void Screen::initialize(waves_t waves) {

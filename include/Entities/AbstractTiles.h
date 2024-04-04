@@ -3,8 +3,8 @@
 
 #include <map>
 
-#ifndef ENTITIES_H
-#define ENTITIES_H
+#ifndef ABSTRACTTILES_H
+#define ABSTRACTTILES_H
 
 enum Entity : char {
     NULL_ENTITY = ' ',
@@ -16,6 +16,8 @@ enum Entity : char {
     SENTRY = 's',
     EXPLORER = 'e'
 };
+
+const std::vector<Entity> ENTITIES({ HIKER, RIVAL, PACER, WANDERER, SENTRY, EXPLORER });
 
 class Screen;
 
@@ -31,7 +33,10 @@ class EntityTile {
         virtual Entity getEntity() = 0;
         virtual coord_t getCoord() = 0;
         virtual void setCoord(coord_t coord) = 0;
+        virtual ~EntityTile() noexcept = default;
 };
+
+static EntityTile* null_value;
 
 class NPCTile : public EntityTile {
     protected:
@@ -40,7 +45,11 @@ class NPCTile : public EntityTile {
         coord_t randomDirection();
         bool defeated;
     public:
+        ~NPCTile() noexcept override = default;
         virtual std::vector<path_t> move() = 0;
+        Entity getEntity() { return entity; }
+        coord_t getCoord() { return coord; }
+        void setCoord(coord_t coord) { this->coord = coord; }
 };
 
 const std::map<char, int> PC_SPEED ({
@@ -88,7 +97,8 @@ const std::map<Entity, std::map<char, int>> ENTITY_SPEED ({
     { Entity::RIVAL, DEFAULT_SPEED },
     { Entity::PACER, DEFAULT_SPEED },
     { Entity::WANDERER, DEFAULT_SPEED },
-    { Entity::EXPLORER, DEFAULT_SPEED }
+    { Entity::EXPLORER, DEFAULT_SPEED },
+    { Entity::SENTRY, DEFAULT_SPEED }
 });
 
 #endif

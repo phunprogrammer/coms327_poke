@@ -1,7 +1,7 @@
 #include "AbstractTiles.h"
 
-#ifndef PacerTile_H
-#define PacerTile_H
+#ifndef PACERTILE_H
+#define PACERTILE_H
 
 class Screen;
 

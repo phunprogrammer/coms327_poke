@@ -1,7 +1,7 @@
 #include "AbstractTiles.h"
 
-#ifndef ExplorerTile_H
-#define ExplorerTile_H
+#ifndef EXPLORERTILE_H
+#define EXPLORERTILE_H
 
 class Screen;
 

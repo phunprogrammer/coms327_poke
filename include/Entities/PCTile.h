@@ -8,6 +8,7 @@ class Screen;
 class PCTile : public EntityTile {
     public:
         PCTile(Screen& screen, coord_t coord);
+        ~PCTile() noexcept override = default;
         
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }

@@ -67,7 +67,7 @@ class Screen {
     public:
         Screen(waves_t waves, coord_t coord, PCTile* player);
         Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoords);
-        ~Screen() {}
+        ~Screen();
 
         static waves_t GetWaves(int* seed);
 

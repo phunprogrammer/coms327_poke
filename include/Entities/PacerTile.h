@@ -6,11 +6,9 @@
 class Screen;
 
 class PacerTile : public NPCTile {
-    private:
-        coord_t direction;
     public:
         PacerTile(Screen& screen);
-        std::vector<path_t> move();
+        int move();
 };
 
 #endif

@@ -8,7 +8,7 @@ class Screen;
 class SentryTile : public NPCTile {
     public:
         SentryTile(Screen& screen);
-        std::vector<path_t> move();
+        int move();
 };
 
 #endif

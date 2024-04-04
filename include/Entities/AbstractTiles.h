@@ -25,14 +25,19 @@ class EntityTile {
     protected:
         EntityTile(Entity entity, coord_t coord, Screen& screen);
         EntityTile(Entity entity, Screen& screen);
+        coord_t randomDirection();
+        coord_t randomCoord();
+        
         Entity entity;
-        coord_t coord;
         Screen* screen;
         std::map<char, int> speed;
+        coord_t coord;
+        coord_t direction;
     public:
         virtual Entity getEntity() = 0;
         virtual coord_t getCoord() = 0;
         virtual void setCoord(coord_t coord) = 0;
+        virtual int move() = 0;
         virtual ~EntityTile() noexcept = default;
 };
 
@@ -40,16 +45,14 @@ class EntityTile {
 
 class NPCTile : public EntityTile {
     protected:
+        NPCTile(Entity entity, coord_t coord, Screen& screen);
         NPCTile(Entity entity, Screen& screen);
-        coord_t random();
-        coord_t randomDirection();
         bool defeated;
     public:
         ~NPCTile() noexcept override = default;
-        virtual std::vector<path_t> move() = 0;
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }
-        void setCoord(coord_t coord) { this->coord = coord; }
+        void setCoord(coord_t coord);
 };
 
 const std::map<char, int> PC_SPEED ({

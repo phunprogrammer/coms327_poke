@@ -8,7 +8,7 @@ class Screen;
 class HikerTile : public NPCTile {
     public:
         HikerTile(Screen& screen);
-        std::vector<path_t> move();
+        int move();
 };
 
 #endif

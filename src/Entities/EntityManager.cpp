@@ -12,42 +12,6 @@
 
 EntityManager::EntityManager(Screen& screen) : screen(screen) {}
 
-int EntityManager::RandomizePC() {
-    int randPathLoc = rand() % (LENGTH + WIDTH) * 2 ;
-
-    int i = 0;
-
-    for(; i < (int)screen.getPaths().horizontalPath.size(); i++) {
-        coord_t current = screen.getPaths().horizontalPath.at(i).coord;
-        if(i == randPathLoc) {
-            screen.getEntities()[0]->setCoord(current);
-            return 0;
-        }
-    }
-
-    for(; i < (int)screen.getPaths().verticalPath.size(); i++) {
-        coord_t current = screen.getPaths().verticalPath.at(i).coord;
-        
-        if(i == randPathLoc) {
-            screen.getEntities()[0]->setCoord(current);
-            return 0;
-        }
-    }
-
-    int randX;
-    int randY;
-
-    do {
-        randX = rand() % (LENGTH - 2) + 1;
-        randY = rand() % (WIDTH - 2) + 1;
-    } while(PC_SPEED.at(screen.getTerrainMap()[randY][randX].getTerrain()) == 0);
-
-    coord_t random = { randX, randY };
-    screen.getEntities()[0]->setCoord(random);
-
-    return 0;
-}
-
 int EntityManager::SpawnAllNPC() {
     if(numNPC <= 0)
         return 0;
@@ -73,27 +37,21 @@ int EntityManager::SpawnNPC(Entity entity) {
     switch (entity) {
         case HIKER:
             npc = new HikerTile(screen);
-            screen.getEntities().insert(npc->getCoord(), npc);
             break;
         case RIVAL:
             npc = new RivalTile(screen);
-            screen.getEntities().insert(npc->getCoord(), npc);
             break;
         case PACER:
             npc = new PacerTile(screen);
-            screen.getEntities().insert(npc->getCoord(), npc);
             break;
         case WANDERER:
             npc = new WandererTile(screen);
-            screen.getEntities().insert(npc->getCoord(), npc);
             break;
         case SENTRY:
             npc = new SentryTile(screen);
-            screen.getEntities().insert(npc->getCoord(), npc);
             break;
         case EXPLORER:
             npc = new ExplorerTile(screen);
-            screen.getEntities().insert(npc->getCoord(), npc);
             break;
         default:
             return 0;

@@ -17,7 +17,7 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player) :
 
     initialize(waves);
     player->setScreen(*this);
-    entityManager.RandomizePC();
+    player->setCoordRandom();
     entityManager.SpawnAllNPC();
 }
 

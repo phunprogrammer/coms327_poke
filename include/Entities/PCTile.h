@@ -12,8 +12,10 @@ class PCTile : public EntityTile {
         
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }
-        void setCoord(coord_t coord) { this->coord = coord; }
+        void setCoord(coord_t coord);
+        void setCoordRandom();
         void setScreen(Screen& screen) { this->screen = &screen; }
+        int move();
 };
 
 #endif

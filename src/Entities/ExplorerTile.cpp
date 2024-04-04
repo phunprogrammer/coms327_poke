@@ -2,13 +2,9 @@
 #include "Screen.h"
 
 ExplorerTile::ExplorerTile(Screen& screen) : 
-    NPCTile(Entity::EXPLORER, screen), direction(randomDirection()) {
-    coord_t coord = random();
-
-    this->coord = coord;
-    screen.getEntities().insert(coord, this);
+    NPCTile(Entity::EXPLORER, screen) {
 }
 
-std::vector<path_t> ExplorerTile::move() {
+int ExplorerTile::move() {
 
 }

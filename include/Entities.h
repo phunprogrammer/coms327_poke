@@ -24,11 +24,12 @@ class EntityTile {
         EntityTile(Entity entity, coord_t coord, Screen& screen, std::map<char, int> speed);
         Entity entity;
         coord_t coord;
-        Screen& screen;
+        Screen* screen;
         std::map<char, int> speed;
     public:
-        virtual Entity getEntity();
-        virtual int Spawn();
+        virtual Entity getEntity() = 0;
+        virtual coord_t getCoord() = 0;
+        virtual void setCoord(coord_t coord) = 0;
 };
 
 const std::map<char, int> PC_SPEED ({
@@ -47,23 +48,25 @@ const std::map<char, int> PC_SPEED ({
 class PCTile : public EntityTile {
     public:
         PCTile(Screen& screen, coord_t coord);
-        int Spawn();
-
+        
         Entity getEntity() { return entity; }
+        coord_t getCoord() { return coord; }
+        void setCoord(coord_t coord) { this->coord = coord; }
+        void setScreen(Screen& screen) { this->screen = &screen; }
 };
 
-class NPCTile : public EntityTile {
-    protected:
-        bool defeated;
-    public:
-        virtual std::vector<path_t> move() = 0;
-};
+// class NPCTile : public EntityTile {
+//     protected:
+//         bool defeated;
+//     public:
+//         virtual std::vector<path_t> move() = 0;
+// };
 
-class HikerTile : public NPCTile {
-    public:
-        HikerTile(Screen& screen);
-        std::vector<path_t> move();
-};
+// class HikerTile : public NPCTile {
+//     public:
+//         HikerTile(Screen& screen);
+//         std::vector<path_t> move();
+// };
 
 
 #endif

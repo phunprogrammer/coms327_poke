@@ -1,5 +1,7 @@
 #include "Config.h"
 #include "EntityManager.h"
+#include "Entities.h"
+#include "MapVector.h"
 #include "Tiles.h"
 
 #ifndef SCREEN_H
@@ -43,12 +45,12 @@ class Screen {
         coord_t coord;
         std::vector<std::vector<TerrainTile>> terrainMap;
         std::vector<std::vector<StructureTile>> structureMap;
-        std::vector<std::vector<EntityTile*>> entityMap;
-        std::vector<EntityTile*> entities;
+        MapVector<coord_t, EntityTile*> entities;
         EntityManager entityManager;
         gates_t gates;
         paths_t paths;
 
+        void initialize(waves_t waves);
         int GenerateTerrain(waves_t waves);
         int GeneratePath(waves_t waves);
         int RandomizeBuildings();
@@ -62,17 +64,18 @@ class Screen {
         int isValidBuilding(int currX, int currY, int& value, int inverse, int vertical);
         int ConstructBuilding(building_t building, Structure tile);
     public:
-        Screen(waves_t waves, coord_t coord);
+        Screen(waves_t waves, coord_t coord, PCTile* player);
+        Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoords);
         ~Screen() {}
 
         static waves_t GetWaves(int* seed);
 
         std::vector<std::vector<TerrainTile>> getTerrainMap() const { return terrainMap; }
         std::vector<std::vector<StructureTile>> getStructureMap() const { return structureMap; }
-        std::vector<std::vector<EntityTile*>> getEntityMap() { return entityMap; }
         gates_t getGates() const { return gates; }
-        std::vector<EntityTile*> getEntities() { return entities; }
         paths_t getPaths() const { return paths; }
+
+        MapVector<coord_t, EntityTile*>& getEntities() { return entities; }
 };
 
 #endif

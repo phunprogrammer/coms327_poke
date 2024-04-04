@@ -12,7 +12,7 @@ class EntityManager {
     public:
         EntityManager(Screen& screen);
         int RandomizePC();
-        int PlacePC(char cameFrom);
+        int SpawnPC(coord_t coord);
         int SpawnNPC(Entity entity);
         int SpawnAllNPC();
         int SpawnEntity(Entity entity, coord_t coord);

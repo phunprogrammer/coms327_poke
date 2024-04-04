@@ -5,27 +5,24 @@
 
 EntityManager::EntityManager(Screen& screen) : screen(screen) {}
 
-
 int EntityManager::RandomizePC() {
     int randPathLoc = rand() % (LENGTH + WIDTH) * 2 ;
 
     int i = 0;
 
-    for(; i < screen.getPaths().horizontalPath.size(); i++) {
+    for(; i < (int)screen.getPaths().horizontalPath.size(); i++) {
         coord_t current = screen.getPaths().horizontalPath.at(i).coord;
         if(i == randPathLoc) {
-            PCTile* pc = new PCTile(screen, current);
-            pc->Spawn();
+            screen.getEntities()[0]->setCoord(current);
             return 0;
         }
     }
 
-    for(; i < screen.getPaths().verticalPath.size(); i++) {
+    for(; i < (int)screen.getPaths().verticalPath.size(); i++) {
         coord_t current = screen.getPaths().verticalPath.at(i).coord;
         
         if(i == randPathLoc) {
-            PCTile* pc = new PCTile(screen, current);
-            pc->Spawn();
+            screen.getEntities()[0]->setCoord(current);
             return 0;
         }
     }
@@ -39,14 +36,9 @@ int EntityManager::RandomizePC() {
     } while(PC_SPEED.at(screen.getTerrainMap()[randY][randX].getTerrain()) == 0);
 
     coord_t random = { randX, randY };
-    PCTile* pc = new PCTile(screen, random);
-    pc->Spawn();
+    screen.getEntities()[0]->setCoord(random);
 
     return 0;
-}
-
-int EntityManager::PlacePC(char cameFrom) {
-
 }
 
 int EntityManager::SpawnNPC(Entity entity) {

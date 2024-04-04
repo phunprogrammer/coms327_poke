@@ -2,34 +2,45 @@
 #include "Screen.h"
 #include "Entities.h"
 #include <iostream>
+#include <ncurses.h>
 
 int main() {
     Initialize();
+    
 
     int seed;
     waves_t waves = Screen::GetWaves(&seed);
     coord_t coord = { 200, 200 };
 
-    Screen screen = Screen(waves, coord);
+
+    Screen screen = Screen(waves, coord, new PCTile(screen, {0, 0}));
 
     std::vector<std::vector<TerrainTile>> terrainMap = screen.getTerrainMap();
     std::vector<std::vector<StructureTile>> structureMap = screen.getStructureMap();
-    std::vector<std::vector<EntityTile*>> entityMap = screen.getEntityMap();
 
-    for(int i = 0; i < (int)terrainMap.size(); i++) {
-        for(int j = 0; j < (int)terrainMap[i].size(); j++) {
-            if(entityMap[i][j] != nullptr) {
-                std::cout << (char)(entityMap[i][j]->getEntity());
-                continue;
-            }
-            if(structureMap[i][j].getStructure() != NULL_STRUCT) {
-                std::cout << (char)(structureMap[i][j].getStructure());
-                continue;
-            }
-            std::cout << (char)(terrainMap[i][j].getTerrain());
+    initscr();
+    cbreak();
+    noecho();
+    curs_set(0);
+    
+    for (int i = 0; i < WIDTH; ++i) {
+        for (int j = 0; j < LENGTH; ++j) {
+            if(structureMap[i][j].getStructure() != NULL_STRUCT)
+                mvaddch(i, j, (char)structureMap[i][j].getStructure());
+            else
+                mvaddch(i, j, (char)terrainMap[i][j].getTerrain());
         }
-        std::cout << '\n';
     }
+
+    MapVector entities = screen.getEntities();
+    for(int i = 0; i < (int)entities.size(); i++) {
+        auto entity = entities[i];
+        mvaddch(entity->getCoord().y, entity->getCoord().x, (char)entity->getEntity());
+    }
+
+    refresh(); // Refresh the screen to display changes
+    getch(); // Wait for user input before exiting
+    endwin(); // End ncurses mode
 
     return 0;
 }

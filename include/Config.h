@@ -43,6 +43,21 @@
 typedef struct Coord {
     int x;
     int y;
+
+    bool operator==(const Coord& compare) const {
+        return this->x == compare.x && this->y == compare.y;
+    }
+
+    bool operator!=(const Coord& compare) const {
+        return this->x != compare.x || this->y != compare.y;
+    }
+
+    bool operator<(const Coord& compare) const {
+        if (this->x == compare.x) {
+            return this->y < compare.y;
+        }
+        return this->x < compare.x;
+    }
 } coord_t;
 
 typedef struct Gates {

@@ -8,18 +8,33 @@
 #include <queue>
 #include <cmath>
 
-Screen::Screen(waves_t waves, coord_t coord) : 
+Screen::Screen(waves_t waves, coord_t coord, PCTile* player) : 
     coord(coord), 
     terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
     structureMap(WIDTH, std::vector<StructureTile>(LENGTH)),
-    entityMap(WIDTH, std::vector<EntityTile*>(LENGTH)),
-    entityManager(*this) {
+    entities({{player->getCoord(), player}}), entityManager(*this) {
 
+    initialize(waves);
+    player->setScreen(*this);
+    entityManager.RandomizePC();
+}
+
+Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord) : 
+    coord(coord), 
+    terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
+    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)),
+    entities({{player->getCoord(), player}}), entityManager(*this) {
+        
+    initialize(waves);
+    player->setScreen(*this);
+    player->setCoord(playerCoord);
+}
+
+void Screen::initialize(waves_t waves) {
     GenerateTerrain(waves);
     GeneratePath(waves);
     RandomizeBuildings();
     DetectBorder();
-    entityManager.RandomizePC();
 }
 
 int Screen::GenerateTerrain(waves_t waves) {

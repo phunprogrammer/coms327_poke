@@ -3,7 +3,8 @@
 #include "AStar.h"
 #include "PQItem.h"
 #include "EntityManager.h"
-#include "Entities.h"
+#include "AbstractTiles.h"
+#include "PCTile.h"
 #include <iostream>
 #include <queue>
 #include <cmath>

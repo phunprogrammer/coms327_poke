@@ -15,7 +15,6 @@ class EntityManager {
         int SpawnPC(coord_t coord);
         int SpawnNPC(Entity entity);
         int SpawnAllNPC();
-        int SpawnEntity(Entity entity, coord_t coord);
 };
 
 #endif

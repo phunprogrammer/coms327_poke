@@ -1,6 +1,6 @@
 #include "Config.h"
 #include "EntityManager.h"
-#include "Entities.h"
+#include "AbstractTiles.h"
 #include "MapVector.h"
 #include "Tiles.h"
 
@@ -39,6 +39,7 @@ const std::map<Terrain, double> MIN_HUMIDITY ({
 
 class EntityTile;
 class EntityManager;
+class PCTile;
 
 class Screen {
     private:

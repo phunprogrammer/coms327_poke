@@ -1,7 +1,8 @@
 #include "EntityManager.h"
 #include "Screen.h"
-#include "Entities.h"
 #include <stdlib.h>
+
+#include "AbstractTiles.h"
 
 EntityManager::EntityManager(Screen& screen) : screen(screen) {}
 
@@ -39,10 +40,6 @@ int EntityManager::RandomizePC() {
     screen.getEntities()[0]->setCoord(random);
 
     return 0;
-}
-
-int EntityManager::SpawnNPC(Entity entity) {
-
 }
 
 int EntityManager::SpawnAllNPC() {

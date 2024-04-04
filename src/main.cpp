@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Screen.h"
-#include "Entities.h"
+#include "AbstractTiles.h"
+#include "PCTile.h"
 #include <iostream>
 #include <ncurses.h>
 

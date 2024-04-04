@@ -34,12 +34,6 @@
 //Waves
 #define WAVENUM 2
 
-//Biomes
-#define BIOMENUM 5
-#define STRUCNUM 3
-#define ENTITYNUM 7
-#define TILENUM BIOMENUM + STRUCNUM + ENTITYNUM
-
 typedef struct Coord {
     int x;
     int y;
@@ -82,17 +76,6 @@ typedef struct EntityMove {
     coord_t coord;
     int priority;
 } entityMove_t;
-
-// typedef struct EntityType {
-//     tileType_t tile;
-//     tileType_t originalTile;
-//     vector_t coord;
-//     int weightFactor[TILENUM];
-//     path_t* entityPath;
-//     path_t* (*getPath)(struct Screen* screen, struct EntityType* entity);
-//     vector_t direction;
-//     bool defeated;
-// } entityType_t;
 
 typedef struct Building {
     path_t path;

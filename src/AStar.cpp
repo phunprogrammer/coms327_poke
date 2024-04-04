@@ -8,7 +8,7 @@
 #include <queue>
 #include <iostream>
 
-const vector_t NEIGHBORARR[] = {
+const coord_t NEIGHBORARR[] = {
     {0, -1},
     {-1, 0}, 
     {1, 0}, 

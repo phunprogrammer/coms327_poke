@@ -1,4 +1,5 @@
 #include "Config.h"
+#include "EntityManager.h"
 #include "Tiles.h"
 
 #ifndef SCREEN_H
@@ -34,11 +35,17 @@ const std::map<Terrain, double> MIN_HUMIDITY ({
     { Terrain::OCEAN, -0.8 }
 });
 
+class EntityTile;
+class EntityManager;
+
 class Screen {
     private:
         coord_t coord;
         std::vector<std::vector<TerrainTile>> terrainMap;
         std::vector<std::vector<StructureTile>> structureMap;
+        std::vector<std::vector<EntityTile*>> entityMap;
+        std::vector<EntityTile*> entities;
+        EntityManager entityManager;
         gates_t gates;
         paths_t paths;
 
@@ -56,12 +63,16 @@ class Screen {
         int ConstructBuilding(building_t building, Structure tile);
     public:
         Screen(waves_t waves, coord_t coord);
+        ~Screen() {}
 
         static waves_t GetWaves(int* seed);
 
-        std::vector<std::vector<TerrainTile>> getTerrainMap() { return terrainMap; }
-        std::vector<std::vector<StructureTile>> getStructureMap() { return structureMap; }
-        gates_t getGates() { return gates; }
+        std::vector<std::vector<TerrainTile>> getTerrainMap() const { return terrainMap; }
+        std::vector<std::vector<StructureTile>> getStructureMap() const { return structureMap; }
+        std::vector<std::vector<EntityTile*>> getEntityMap() { return entityMap; }
+        gates_t getGates() const { return gates; }
+        std::vector<EntityTile*> getEntities() { return entities; }
+        paths_t getPaths() const { return paths; }
 };
 
 #endif

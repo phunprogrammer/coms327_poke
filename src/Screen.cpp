@@ -2,6 +2,8 @@
 #include "PerlinNoise.h"
 #include "AStar.h"
 #include "PQItem.h"
+#include "EntityManager.h"
+#include "Entities.h"
 #include <iostream>
 #include <queue>
 #include <cmath>
@@ -9,13 +11,15 @@
 Screen::Screen(waves_t waves, coord_t coord) : 
     coord(coord), 
     terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
-    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)) {
+    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)),
+    entityMap(WIDTH, std::vector<EntityTile*>(LENGTH)),
+    entityManager(*this) {
 
     GenerateTerrain(waves);
-    SelectEndpoints(1, ExpandWaveMap(waves.Height), ExpandWaveMap(waves.Humidity));
     GeneratePath(waves);
     RandomizeBuildings();
     DetectBorder();
+    entityManager.RandomizePC();
 }
 
 int Screen::GenerateTerrain(waves_t waves) {
@@ -310,7 +314,7 @@ int Screen::GenerateBuildings() {
 }
 
 int Screen::isValidBuilding(int currX, int currY, int &value, int inverse, int vertical) {
-    vector_t buildingOffset[QUADRANT] = {
+    coord_t buildingOffset[QUADRANT] = {
         [0] = { .x = 0, .y = 1 },
         [1] =  { .x = 0, .y = 2 },
         [2] = { .x = 1, .y = 2 },

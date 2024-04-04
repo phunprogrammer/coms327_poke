@@ -40,29 +40,6 @@
 #define ENTITYNUM 7
 #define TILENUM BIOMENUM + STRUCNUM + ENTITYNUM
 
-// enum __attribute__ ((__packed__)) Tile {
-//     FOREST,
-//     MOUNTAIN,
-//     CLEARING,
-//     GRASSLAND,
-//     OCEAN,
-//     PATH,
-//     POKEM,
-//     POKEC,
-//     PC,
-//     HIKER,
-//     RIVAL,
-//     PACER,
-//     WANDERER,
-//     SENTRY,
-//     EXPLORER
-// };
-
-typedef struct Vector {
-    float x;
-    float y;
-} vector_t;
-
 typedef struct Coord {
     int x;
     int y;
@@ -87,17 +64,9 @@ typedef struct Paths {
 
 typedef struct EntityMove {
     int entityIndex;
-    vector_t coord;
+    coord_t coord;
     int priority;
 } entityMove_t;
-
-// typedef struct TileType {
-//     enum Tile biomeID;
-//     float minHeight;
-//     float minHumidity;
-//     char type;
-//     int weight;
-// } tileType_t;
 
 // typedef struct EntityType {
 //     tileType_t tile;
@@ -110,20 +79,6 @@ typedef struct EntityMove {
 //     bool defeated;
 // } entityType_t;
 
-// typedef struct Screen {
-//     tileType_t** biomeMap;
-//     vector_t coord;
-//     pathgates_t horizontalEndpoints;
-//     pathgates_t verticalEndpoints;
-//     path_t* horizontalPath;
-//     path_t* verticalPath;
-//     entityType_t pc;
-//     entityType_t* npcs;
-//     int npcSize;
-//     pqueue_t* moveQueue;
-//     int priority;
-// } screen_t;
-
 typedef struct Building {
     path_t path;
     int vertical;
@@ -134,12 +89,6 @@ extern volatile int initialized;
 
 extern volatile int numNPC;
 
-// extern const tileType_t Tiles[TILENUM];
-
-// extern const entityType_t Entities[TILENUM];
-
 void Initialize();
-
-int Init_Entities();
 
 #endif

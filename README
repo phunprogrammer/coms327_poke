@@ -1,8 +1,8 @@
-# COMS 327 - Assignment 06
-This is assignment 06 of the Pokemon game for COMS 327. In this iteration, the `PC` can now traverse between screens. When traversing the position and data on previous screens' entities will be saved. Also, the user can fly by hitting `f` then typing in two integers between -200-200. In addition to these features all files have been converted to c++ and utilize new c++ functionality.
+# COMS 327 - Assignment 07
+This is assignment 07 of the Pokemon game for COMS 327. In this iteration, you can parse the "pokemon.csv" file. The code will look in 2 locations for this CSV file and print to the console.
 
-## KNOWN BUGS:
-Using escape to backout has a slight delay. (I think this is a bug with ncurses)
+## INCOMPLETE:
+Currently it only works with the pokemon.csv file
 
 ## HOW TO RUN:
-To run use `make` in the terminal then run the `game` executable generated from it. Use `make clean` to delete generated files.
+To run use `make` in the terminal then run the `game <fileName>` executable generated from it. Use `make clean` to delete generated files.

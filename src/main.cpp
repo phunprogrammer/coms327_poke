@@ -19,6 +19,11 @@
 #include <Move.h>
 #include <PokemonMove.h>
 #include <PokemonSpecies.h>
+#include <Experience.h>
+#include <TypeName.h>
+#include <PokemonStat.h>
+#include <Stat.h>
+#include <PokemonType.h>
 
 void DevLoop(screen_t* screen, waves_t waves, int currX, int currY) {
     char input = 0;
@@ -222,18 +227,26 @@ int main(int argc, char *argv[]) {
     }
 
     std::string filename = argv[1];
-    std::string filepath = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
-    std::string filepath2 = std::string(std::getenv("HOME")) + "/.poke327/pokedex/pokedex/data/csv/" + filename + ".csv";
 
     std::vector<Data*> pokemonData;
     if (filename == "pokemon") {
-        pokemonData = Pokemon::parse(filepath);
+        pokemonData = Pokemon::parse(filename);
     } else if (filename == "moves") {
-        pokemonData = Move::parse(filepath);
+        pokemonData = Move::parse(filename);
     } else if (filename == "pokemon_moves") {
-        pokemonData = PokemonMove::parse(filepath);
+        pokemonData = PokemonMove::parse(filename);
     } else if (filename == "pokemon_species") {
-        pokemonData = PokemonSpecies::parse(filepath);
+        pokemonData = PokemonSpecies::parse(filename);
+    } else if (filename == "experience") {
+        pokemonData = Experience::parse(filename);
+    } else if (filename == "type_names") {
+        pokemonData = TypeName::parse(filename);
+    } else if (filename == "pokemon_stats") {
+        pokemonData = PokemonStat::parse(filename);
+    } else if (filename == "stats") {
+        pokemonData = Stat::parse(filename);
+    } else if (filename == "pokemon_types") {
+        pokemonData = PokemonType::parse(filename);
     } else {
         std::cerr << "Invalid filename: " << filename << std::endl;
         return 1;

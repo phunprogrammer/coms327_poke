@@ -35,8 +35,22 @@ std::string Move::toString() const {
 }
 
 std::vector<Data*> Move::parse(const std::string& filename) {
+    std::string filepath = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
+    std::string filepath2 = std::string(std::getenv("HOME")) + "/.poke327/pokedex/pokedex/data/csv/" + filename + ".csv";
+
     std::vector<Data*> data;
-    std::ifstream file(filename);
+    std::ifstream file = std::ifstream(filepath);
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filepath << std::endl;
+
+        file = std::ifstream(filepath2);
+
+        if (!file.is_open()) {
+            std::cerr << "Error opening file: " << filepath2 << std::endl;
+            return data;
+        }
+    }
 
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filename << std::endl;
@@ -44,6 +58,7 @@ std::vector<Data*> Move::parse(const std::string& filename) {
     }
 
     std::string line;
+    std::getline(file, line);
     while (std::getline(file, line)) {
         data.push_back(new Move(line));
     }

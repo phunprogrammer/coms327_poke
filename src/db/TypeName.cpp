@@ -1,24 +1,18 @@
-#include "Pokemon.h"
+#include "TypeName.h"
 #include "Parsing.h"
-
 #include <iostream>
 #include <sstream>
 #include <fstream>
 
-Pokemon::Pokemon(std::string line) {
+TypeName::TypeName(std::string line) {
     std::istringstream stream(line);
 
     std::get<0>(data) = ParserUtil::getInt(stream);
-    std::get<1>(data) = ParserUtil::getString(stream);
-    std::get<2>(data) = ParserUtil::getInt(stream);
-    std::get<3>(data) = ParserUtil::getInt(stream);
-    std::get<4>(data) = ParserUtil::getInt(stream);
-    std::get<5>(data) = ParserUtil::getInt(stream);
-    std::get<6>(data) = ParserUtil::getInt(stream);
-    std::get<7>(data) = ParserUtil::getInt(stream);
+    std::get<1>(data) = ParserUtil::getInt(stream);
+    std::get<2>(data) = ParserUtil::getString(stream);
 }
 
-std::string Pokemon::toString() const {
+std::string TypeName::toString() const {
     std::string out;
     
     std::apply([&out](const auto&... args) {
@@ -28,7 +22,7 @@ std::string Pokemon::toString() const {
     return out;
 }
 
-std::vector<Data*> Pokemon::parse(const std::string& filename) {
+std::vector<Data*> TypeName::parse(const std::string& filename) {
     std::string filepath = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
     std::string filepath2 = std::string(std::getenv("HOME")) + "/.poke327/pokedex/pokedex/data/csv/" + filename + ".csv";
 
@@ -46,15 +40,10 @@ std::vector<Data*> Pokemon::parse(const std::string& filename) {
         }
     }
 
-    if (!file.is_open()) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return data;
-    }
-
     std::string line;
     std::getline(file, line);
     while (std::getline(file, line)) {
-        data.push_back(new Pokemon(line));
+        data.push_back(new TypeName(line));
     }
 
     file.close();

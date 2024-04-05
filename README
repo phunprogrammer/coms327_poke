@@ -1,8 +1,5 @@
 # COMS 327 - Assignment 07
-This is assignment 07 of the Pokemon game for COMS 327. In this iteration, you can parse the "pokemon.csv" file. The code will look in 2 locations for this CSV file and print to the console.
-
-## INCOMPLETE:
-Currently it only works with the pokemon.csv file
+This is assignment 07 of the Pokemon game for COMS 327. In this iteration, you can parse any of the files mentioned in the assignment. `filename` should consist of the name of the `.csv` file without `.csv` on the end. The program will try to look in the two places specified in the assignment.
 
 ## HOW TO RUN:
-To run use `make` in the terminal then run the `game <fileName>` executable generated from it. Use `make clean` to delete generated files.
+To run use `make` in the terminal then run the `game <filename>` executable generated from it. Use `make clean` to delete generated files.

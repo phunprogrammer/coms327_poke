@@ -29,7 +29,7 @@ std::string Pokemon::toString() const {
 }
 
 std::vector<Data*> Pokemon::parse(const std::string& filename) {
-    std::string filepath = "/share/coms327/pokedex/pokedex/data/csv/" + filename + ".csv";
+    std::string filepath = "/share/cs327/pokedex/pokedex/data/csv/" + filename + ".csv";
     std::string filepath2 = std::string(std::getenv("HOME")) + "/.poke327/pokedex/pokedex/data/csv/" + filename + ".csv";
 
     std::vector<Data*> data;

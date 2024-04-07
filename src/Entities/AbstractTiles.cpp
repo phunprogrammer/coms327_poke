@@ -17,7 +17,7 @@ coord_t EntityTile::randomCoord() {
     } while(speed.at(screen->getTerrainMap()[coord.y][coord.x].getTerrain()) == 0 || 
                 (screen->getStructureMap()[coord.y][coord.x].getStructure() != Structure::PATH && 
                 screen->getStructureMap()[coord.y][coord.x].getStructure() != Structure::NULL_STRUCT) ||
-                screen->getEntities()[{ coord.y, coord.x }] != null_value);
+                screen->getEntities()[{ coord.y, coord.x }] != NULL_ENTITY_PTR);
     return coord;
 }
 

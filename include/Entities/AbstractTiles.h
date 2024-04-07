@@ -37,12 +37,11 @@ class EntityTile {
     public:
         virtual Entity getEntity() = 0;
         virtual coord_t getCoord() = 0;
+        virtual coord_t getPrevCoord() = 0;
         virtual void setCoord(coord_t coord) = 0;
         virtual int move() = 0;
         virtual ~EntityTile() noexcept = default;
 };
-
-[[maybe_unused]] const static EntityTile* null_value;
 
 class NPCTile : public EntityTile {
     protected:
@@ -53,6 +52,7 @@ class NPCTile : public EntityTile {
         ~NPCTile() noexcept override = default;
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }
+        coord_t getPrevCoord() { return prevCoord; }
         void setCoord(coord_t coord);
 };
 

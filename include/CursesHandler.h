@@ -4,18 +4,20 @@
 #define CURSESHANDLER_H
 
 class Screen;
+class EntityTile;
 
 class CursesHandler {
     private:
         int start = 2;
         WINDOW* screenWin;
-        WINDOW* entityWin;
         Screen& screen;
         int seed;
+        void InitColors();
     public:
         CursesHandler(Screen& screen, int seed);
         int PrintScreen();
-        int UpdateEntities();
+        int UpdateEntity(int index);
+        int UpdateEntity(EntityTile* entity);
 };
 
 #endif

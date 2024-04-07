@@ -5,6 +5,7 @@
 #include <iostream>
 #include <ncurses.h>
 #include <CursesHandler.h>
+#include <InputHandler.h>
 
 int main()
 {
@@ -16,19 +17,13 @@ int main()
     coord_t coord = {200, 200};
 
     Screen screen = Screen(waves, coord, new PCTile(screen, {0, 0}));
-
     CursesHandler curses = CursesHandler(screen, seed);
+    InputHandler input = InputHandler(screen, curses);
 
     do
     {
-        switch(current) {
-            case 'w':
-                PCTile* pc = (PCTile*)screen.getEntities()[0];
-                pc->setCoord({pc->getCoord().x, pc->getCoord().y - 1});
-                break;
-        }
-
-        curses.UpdateEntities();
+        if(input.HandleInput(current) == 0)
+            continue;
     } while ((current = getch()) != 'Q');
 
     endwin();

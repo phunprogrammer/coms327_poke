@@ -4,6 +4,8 @@
 #ifndef MAPVECTOR_H
 #define MAPVECTOR_H
 
+static EntityTile* NULL_ENTITY_PTR;
+
 template<typename K, typename V>
 class MapVector {
     private:
@@ -26,9 +28,8 @@ class MapVector {
             map.insert(std::move(nodeHandler));
         }
 
-        const V& operator[](const K& key) const { 
-            static V null_value;
-            return map.count(key) ? map.at(key) : null_value; 
+        const V& operator[](const K& key) const {
+            return map.count(key) ? map.at(key) : NULL_ENTITY_PTR; 
         }
 
         const V& operator[](std::size_t index) const { return vector.at(index); }

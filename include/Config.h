@@ -12,6 +12,10 @@
 #define SCREENS 11
 #define GENERATEPPM 0
 
+//Terminal
+#define TERM_WIDTH 24
+#define TERM_LENGTH 80
+
 //Screen
 #define WIDTH 21
 #define LENGTH 80

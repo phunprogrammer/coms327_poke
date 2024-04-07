@@ -10,11 +10,13 @@ int PCTile::move() {
 }
 
 void PCTile::setCoord(coord_t coord) {
+    this->prevCoord = this->coord;
     screen->getEntities().move(this->coord, coord);
     this->coord = coord;
 }
 
 void PCTile::setCoordRandom() {
+    this->prevCoord = this->coord;
     coord_t random = randomCoord();
     screen->getEntities().move(this->coord, random);
     this->coord = random;

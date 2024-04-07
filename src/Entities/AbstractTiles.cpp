@@ -39,6 +39,7 @@ NPCTile::NPCTile(Entity entity, coord_t coord, Screen& screen) :
     }
 
 void NPCTile::setCoord(coord_t coord) {
+    this->prevCoord = this->coord;
     screen->getEntities().move(this->coord, coord);
     this->coord = coord;
 }

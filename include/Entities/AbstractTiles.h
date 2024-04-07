@@ -32,6 +32,7 @@ class EntityTile {
         Screen* screen;
         std::map<char, int> speed;
         coord_t coord;
+        coord_t prevCoord;
         coord_t direction;
     public:
         virtual Entity getEntity() = 0;

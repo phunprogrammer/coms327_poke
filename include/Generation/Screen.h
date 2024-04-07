@@ -75,6 +75,7 @@ class Screen {
         std::vector<std::vector<StructureTile>> getStructureMap() const { return structureMap; }
         gates_t getGates() const { return gates; }
         paths_t getPaths() const { return paths; }
+        coord_t getCoord() const { return coord; }
 
         MapVector<coord_t, EntityTile*>& getEntities() { return entities; }
 };

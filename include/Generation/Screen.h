@@ -3,6 +3,8 @@
 #include "AbstractTiles.h"
 #include "MapVector.h"
 #include "Tiles.h"
+#include <queue>
+#include <PQItem.h>
 
 #ifndef SCREEN_H
 #define SCREEN_H
@@ -46,8 +48,11 @@ class Screen {
         coord_t coord;
         std::vector<std::vector<TerrainTile>> terrainMap;
         std::vector<std::vector<StructureTile>> structureMap;
+
         MapVector<coord_t, EntityTile*> entities;
+        int priority;
         EntityManager entityManager;
+        std::priority_queue<PQItem<EntityTile*>> moveQueue;
         gates_t gates;
         paths_t paths;
 
@@ -70,12 +75,17 @@ class Screen {
         ~Screen();
 
         static waves_t GetWaves(int* seed);
+        char operator[](const coord_t key) const;
 
-        std::vector<std::vector<TerrainTile>> getTerrainMap() const { return terrainMap; }
-        std::vector<std::vector<StructureTile>> getStructureMap() const { return structureMap; }
+        const std::vector<std::vector<TerrainTile>>& getTerrainMap() const { return terrainMap; }
+        const std::vector<std::vector<StructureTile>>& getStructureMap() const { return structureMap; }
+        std::priority_queue<PQItem<EntityTile*>>& getMoveQueue() { return moveQueue; }
+        int& getPriority() { return priority; }
         gates_t getGates() const { return gates; }
         paths_t getPaths() const { return paths; }
         coord_t getCoord() const { return coord; }
+
+        void pushToQueue(const PQItem<EntityTile*>& item);
 
         MapVector<coord_t, EntityTile*>& getEntities() { return entities; }
 };

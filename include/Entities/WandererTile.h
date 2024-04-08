@@ -8,7 +8,7 @@ class Screen;
 class WandererTile : public NPCTile {
     public:
         WandererTile(Screen& screen);
-        int move();
+        int queueMove();
 };
 
 #endif

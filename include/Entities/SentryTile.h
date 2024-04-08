@@ -8,7 +8,7 @@ class Screen;
 class SentryTile : public NPCTile {
     public:
         SentryTile(Screen& screen);
-        int move();
+        int queueMove();
 };
 
 #endif

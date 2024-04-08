@@ -8,7 +8,7 @@ class Screen;
 class RivalTile : public NPCTile {
     public:
         RivalTile(Screen& screen);
-        int move();
+        int queueMove();
 };
 
 #endif

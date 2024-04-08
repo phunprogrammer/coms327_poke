@@ -43,3 +43,35 @@ void NPCTile::setCoord(coord_t coord) {
     screen->getEntities().move(this->coord, coord);
     this->coord = coord;
 }
+
+int NPCTile::ValidMove(coord_t move) {
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR)
+        return 0;
+
+    if(screen->getStructureMap()[move.y][move.x].getStructure() != NULL_STRUCT && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
+        return 0;
+
+    if(speed.at(screen->getTerrainMap()[move.y][move.x].getTerrain()) == 0 && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
+        return 0;
+
+    return 1;
+}
+
+int NPCTile::move() {
+    coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
+    
+    queueMove();
+
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR)
+        return 0;
+
+    if(screen->getStructureMap()[move.y][move.x].getStructure() != NULL_STRUCT && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
+        return 0;
+
+    if(speed.at(screen->getTerrainMap()[move.y][move.x].getTerrain()) == 0 && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
+        return 0;
+
+    setCoord(move);
+
+    return 1;
+}

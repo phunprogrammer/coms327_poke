@@ -5,6 +5,6 @@ SentryTile::SentryTile(Screen& screen) :
     NPCTile(Entity::SENTRY, screen) {
 }
 
-int SentryTile::move() {
+int SentryTile::queueMove() {
 
 }

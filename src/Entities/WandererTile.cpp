@@ -5,6 +5,6 @@ WandererTile::WandererTile(Screen& screen) :
     NPCTile(Entity::WANDERER, screen) {
 }
 
-int WandererTile::move() {
+int WandererTile::queueMove() {
 
 }

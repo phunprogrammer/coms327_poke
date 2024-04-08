@@ -5,6 +5,6 @@ ExplorerTile::ExplorerTile(Screen& screen) :
     NPCTile(Entity::EXPLORER, screen) {
 }
 
-int ExplorerTile::move() {
+int ExplorerTile::queueMove() {
 
 }

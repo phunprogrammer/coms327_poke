@@ -24,11 +24,7 @@ int CursesHandler::PrintScreen() {
     {
         for (int j = 0; j < LENGTH; ++j)
         {
-            char print;
-            if (screen.getStructureMap()[i][j].getStructure() != NULL_STRUCT)
-                print = screen.getStructureMap()[i][j].getStructure();
-            else
-                print = screen.getTerrainMap()[i][j].getTerrain();
+            char print = screen[{ j , i }];
 
             wattron(screenWin, COLOR_PAIR(print));
             mvwprintw(screenWin, i, j, "%c", print);
@@ -57,9 +53,7 @@ int CursesHandler::UpdateEntity(int index) {
 }
 
 int CursesHandler::UpdateEntity(EntityTile* entity) {
-    char structure = screen.getStructureMap()[entity->getPrevCoord().y][entity->getPrevCoord().x].getStructure();
-    char terrain = screen.getTerrainMap()[entity->getPrevCoord().y][entity->getPrevCoord().x].getTerrain();
-    char print = structure != NULL_STRUCT ? structure : terrain;
+    char print = screen[entity->getPrevCoord()];
 
     wattron(screenWin, COLOR_PAIR(Entity::NULL_ENTITY));
     mvwaddch(screenWin, entity->getCoord().y, entity->getCoord().x, (char)entity->getEntity());

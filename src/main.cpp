@@ -22,8 +22,14 @@ int main()
 
     do
     {
-        if(input.HandleInput(current) == 0)
+        int inputOut = input.HandleInput(current);
+
+        if(inputOut == 0)
             continue;
+
+        screen.getMoveQueue().top().getData()->move();
+        screen.getMoveQueue().pop();
+        curses.UpdateEntity(1);
     } while ((current = getch()) != 'Q');
 
     endwin();

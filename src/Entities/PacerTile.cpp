@@ -5,6 +5,6 @@ PacerTile::PacerTile(Screen& screen) :
     NPCTile(Entity::PACER, screen) {
 }
 
-int PacerTile::move() {
+int PacerTile::queueMove() {
 
 }

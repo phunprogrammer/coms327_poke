@@ -4,6 +4,7 @@
 #define ENTITYMANAGER_H
 
 class Screen;
+class EntityTile;
 enum Entity : char;
 
 class EntityManager {
@@ -12,7 +13,7 @@ class EntityManager {
     public:
         EntityManager(Screen& screen);
         int SpawnAllNPC();
-        int SpawnNPC(Entity entity);
+        EntityTile* SpawnNPC(Entity entity);
 };
 
 #endif

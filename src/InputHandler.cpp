@@ -17,6 +17,7 @@ int InputHandler::HandleInput(char input) {
         case 'c':
             return MovePC(input);
         case 's':
+        case '5':
             return 1;
     }
 
@@ -61,8 +62,9 @@ int InputHandler::MovePC(char input) {
             break;
     }
 
-    int out = pc->move();
-    cursesHandler.UpdateEntity(0);
+    int out;
+    if((out = pc->move()))
+        cursesHandler.UpdateEntity(0);
 
     return out;
 }

@@ -5,6 +5,6 @@ RivalTile::RivalTile(Screen& screen) :
     NPCTile(Entity::RIVAL, screen) {
 }
 
-int RivalTile::move() {
+int RivalTile::queueMove() {
 
 }

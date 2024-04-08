@@ -47,6 +47,7 @@ class NPCTile : public EntityTile {
     protected:
         NPCTile(Entity entity, coord_t coord, Screen& screen);
         NPCTile(Entity entity, Screen& screen);
+        int ValidMove(coord_t move);
         bool defeated;
     public:
         ~NPCTile() noexcept override = default;
@@ -54,6 +55,8 @@ class NPCTile : public EntityTile {
         coord_t getCoord() { return coord; }
         coord_t getPrevCoord() { return prevCoord; }
         void setCoord(coord_t coord);
+        int move();
+        virtual int queueMove() = 0;
 };
 
 const std::map<char, int> PC_SPEED ({

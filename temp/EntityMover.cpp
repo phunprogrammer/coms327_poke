@@ -18,6 +18,7 @@ int ValidMove(screen_t* screen, entityType_t* entity, vector_t move) {
 
     if(entity->tile.biomeID != PC && screen->biomeMap[(int)move.y][(int)move.x].biomeID == PC)
         return 2;
+
     else if(entity->tile.biomeID == PC && screen->biomeMap[(int)move.y][(int)move.x].biomeID > PC)
         return 2;
 

@@ -8,7 +8,7 @@ class Screen;
 class HikerTile : public NPCTile {
     public:
         HikerTile(Screen& screen);
-        int move();
+        int queueMove();
 };
 
 #endif

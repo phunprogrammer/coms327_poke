@@ -10,7 +10,7 @@
 #include <cmath>
 
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player) : 
-    coord(coord), 
+    coord(coord), priority(0),
     terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
     structureMap(WIDTH, std::vector<StructureTile>(LENGTH)),
     entities({{player->getCoord(), player}}), entityManager(*this) {
@@ -18,11 +18,12 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player) :
     initialize(waves);
     player->setScreen(*this);
     player->setCoordRandom();
-    entityManager.SpawnAllNPC();
+    entityManager.SpawnNPC(Entity::HIKER);
+    //entityManager.SpawnAllNPC();
 }
 
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord) : 
-    coord(coord), 
+    coord(coord), priority(0),
     terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
     structureMap(WIDTH, std::vector<StructureTile>(LENGTH)),
     entities({{player->getCoord(), player}}), entityManager(*this) {
@@ -30,12 +31,23 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord
     initialize(waves);
     player->setScreen(*this);
     player->setCoord(playerCoord);
-    entityManager.SpawnAllNPC();
+    entityManager.SpawnNPC(Entity::HIKER);
+    //entityManager.SpawnAllNPC();
 }
 
 Screen::~Screen() {
     for(int i = 0; i < (int)entities.size(); i++)
         delete entities[i];
+}
+
+char Screen::operator[](const coord_t coord) const {
+    char structure = this->getStructureMap()[coord.y][coord.x].getStructure();
+    char terrain = this->getTerrainMap()[coord.y][coord.x].getTerrain();
+    return structure != NULL_STRUCT ? structure : terrain;
+}
+
+void Screen::pushToQueue(const PQItem<EntityTile*>& item) {
+    moveQueue.push(item);
 }
 
 void Screen::initialize(waves_t waves) {

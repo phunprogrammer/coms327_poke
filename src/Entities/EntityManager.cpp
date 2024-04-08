@@ -31,8 +31,8 @@ int EntityManager::SpawnAllNPC() {
     return 1;
 }
 
-int EntityManager::SpawnNPC(Entity entity) {
-    NPCTile* npc;
+EntityTile* EntityManager::SpawnNPC(Entity entity) {
+    NPCTile* npc = nullptr;
 
     switch (entity) {
         case HIKER:
@@ -54,8 +54,9 @@ int EntityManager::SpawnNPC(Entity entity) {
             npc = new ExplorerTile(screen);
             break;
         default:
-            return 0;
+            break;
     }
+    npc->queueMove();
 
-    return 1;
+    return npc;
 }

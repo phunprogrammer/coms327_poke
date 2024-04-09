@@ -90,6 +90,6 @@ extern volatile int initialized;
 
 extern volatile int numNPC;
 
-void Initialize();
+void Initialize(int& seed);
 
 #endif

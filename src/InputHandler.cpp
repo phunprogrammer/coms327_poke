@@ -74,6 +74,7 @@ int InputHandler::MovePC(char input) {
     }
 
     int out;
+    
     if((out = pc->move()))
         cursesHandler.UpdateEntity(0);
 

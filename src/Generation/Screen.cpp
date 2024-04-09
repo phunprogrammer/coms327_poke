@@ -425,17 +425,17 @@ int Screen::ConstructBuilding(building_t building, Structure tile) {
     return 0;
 }
 
-waves_t Screen::GetWaves(int* seed) {
+waves_t Screen::GetWaves() {
     waves_t waves;
 
     int i = 0;
-    *seed = rand();
+    int worldSeed = rand();
 
     for (; i < WAVENUM; i++) {
         wave_t wave;
         wave.amplitude = AMPLITUDE[i];
         wave.frequency = FREQUENCY[i];
-        wave.seed = *seed / 10000.0;
+        wave.seed = worldSeed / 10000.0;
         waves.Height.push_back(wave);
     }
 
@@ -443,7 +443,7 @@ waves_t Screen::GetWaves(int* seed) {
         wave_t wave;
         wave.amplitude = AMPLITUDE[i];
         wave.frequency = FREQUENCY[i];
-        wave.seed = *seed / 10000.0;
+        wave.seed = worldSeed / 10000.0;
         waves.Humidity.push_back(wave);
     }
 

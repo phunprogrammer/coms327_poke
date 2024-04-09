@@ -20,6 +20,14 @@ int CursesHandler::PrintScreen() {
 
     mvwprintw(stdscr, 0, 0, "Seed: %d", seed);  
 
+    for(int i = 0; i < LENGTH; i++) {
+        mvwprintw(stdscr, 1, i, "%d", i % 10);  
+    }
+
+    for(int i = 0; i < WIDTH; i++) {
+        mvwprintw(stdscr, i + 2, LENGTH, "%d", i % 10);  
+    }
+
     for (int i = 0; i < WIDTH; ++i)
     {
         for (int j = 0; j < LENGTH; ++j)

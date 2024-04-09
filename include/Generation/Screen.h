@@ -74,7 +74,7 @@ class Screen {
         Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoords);
         ~Screen();
 
-        static waves_t GetWaves(int* seed);
+        static waves_t GetWaves();
         char operator[](const coord_t key) const;
 
         const std::vector<std::vector<TerrainTile>>& getTerrainMap() const { return terrainMap; }

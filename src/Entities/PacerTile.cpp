@@ -13,6 +13,8 @@ int PacerTile::queueMove() {
         direction.y *= -1;
     }
 
+    move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
+
     screen->pushToQueue(PQItem((EntityTile*)this, screen->getPriority() + this->speed.at((*screen)[move])));
     return 1;
 }

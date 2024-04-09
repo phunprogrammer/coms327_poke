@@ -1,5 +1,6 @@
 #include <vector>
 #include <map>
+#include "ncurses.h"
 
 #ifndef MAPVECTOR_H
 #define MAPVECTOR_H
@@ -23,6 +24,9 @@ class MapVector {
         }
 
         void move(const K& oldKey, const K& newKey) {
+            if (map.count(oldKey) == 0)
+                return;
+
             auto nodeHandler = map.extract(oldKey);
             nodeHandler.key() = newKey;
             map.insert(std::move(nodeHandler));
@@ -35,6 +39,8 @@ class MapVector {
         const V& operator[](std::size_t index) const { return vector.at(index); }
 
         std::size_t size() const { return vector.size(); }
+        std::map<K, V> getMap() const { return map; }
+        std::vector<V> getVector() const { return vector; }
 };
 
 #endif

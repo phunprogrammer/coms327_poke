@@ -7,17 +7,21 @@ PCTile::PCTile(Screen& screen, coord_t coord) :
 
 int PCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
-    setCoord(this->coord);
 
-
-    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move] != this)
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move] != this) {
+        setCoord(this->coord);
         return 0;
+    }
 
-    if(screen->getStructureMap()[move.y][move.x].getStructure() != NULL_STRUCT && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
+    if(screen->getStructureMap()[move.y][move.x].getStructure() != NULL_STRUCT && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0) {
+        setCoord(this->coord);
         return 0;
+    }
 
-    if(speed.at(screen->getTerrainMap()[move.y][move.x].getTerrain()) == 0 && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
+    if(speed.at(screen->getTerrainMap()[move.y][move.x].getTerrain()) == 0 && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0) {
+        setCoord(this->coord);
         return 0;
+    }
 
     setCoord(move);
     screen->getPriority() += speed.at((*screen)[this->coord]);

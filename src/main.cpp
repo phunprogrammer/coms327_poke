@@ -7,13 +7,20 @@
 #include <CursesHandler.h>
 #include <InputHandler.h>
 
-int main()
+int main(int argc, char* argv[])
 {
-    Initialize();
+    if (argc == 3 && std::string(argv[1]) == "--trainers") {
+        numNPC = std::atoi(argv[2]);
+        if (numNPC <= 0) {
+            std::cerr << "Error: Invalid number of trainers" << std::endl;
+            return 1; // Error, invalid number of trainers
+        }
+    }
 
-    int seed;
+    int seed = 0;
+    Initialize(seed);
     char current;
-    waves_t waves = Screen::GetWaves(&seed);
+    waves_t waves = Screen::GetWaves();
     coord_t coord = {200, 200};
 
     Screen screen = Screen(waves, coord, new PCTile(screen, {0, 0}));
@@ -36,6 +43,7 @@ int main()
 
             curses.UpdateEntity(top);
         }
+        
     } while ((current = getch()) != 'Q');
 
     endwin();

@@ -12,11 +12,15 @@ volatile int numNPC = DEFAULTENTITIES;
  * @brief Inialization. CALL BEFORE ANYTHING
  * 
  */
-void Initialize() {
+void Initialize(int& seed) {
     if (initialized == 1)
         return;
 
     initialized = 1;
+    // seed = time(NULL);
+    seed = 1712700259;
 
-    srand(time(NULL));    
+    srand(seed);    
+
+    return;
 }

@@ -49,8 +49,8 @@ class Screen {
         std::vector<std::vector<TerrainTile>> terrainMap;
         std::vector<std::vector<StructureTile>> structureMap;
 
-        MapVector<coord_t, EntityTile*> entities;
         int priority;
+        MapVector<coord_t, EntityTile*> entities;
         EntityManager entityManager;
         std::priority_queue<PQItem<EntityTile*>> moveQueue;
         gates_t gates;
@@ -80,6 +80,7 @@ class Screen {
         const std::vector<std::vector<TerrainTile>>& getTerrainMap() const { return terrainMap; }
         const std::vector<std::vector<StructureTile>>& getStructureMap() const { return structureMap; }
         std::priority_queue<PQItem<EntityTile*>>& getMoveQueue() { return moveQueue; }
+        EntityManager& getEntityManager() { return entityManager; }
         int& getPriority() { return priority; }
         gates_t getGates() const { return gates; }
         paths_t getPaths() const { return paths; }

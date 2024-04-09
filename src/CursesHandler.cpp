@@ -55,13 +55,13 @@ int CursesHandler::UpdateEntity(int index) {
 int CursesHandler::UpdateEntity(EntityTile* entity) {
     char print = screen[entity->getPrevCoord()];
 
-    wattron(screenWin, COLOR_PAIR(Entity::NULL_ENTITY));
-    mvwaddch(screenWin, entity->getCoord().y, entity->getCoord().x, (char)entity->getEntity());
-    wattroff(screenWin, COLOR_PAIR(Entity::NULL_ENTITY));
-
     wattron(screenWin, COLOR_PAIR(print));
     mvwaddch(screenWin, entity->getPrevCoord().y, entity->getPrevCoord().x, print);
     wattroff(screenWin, COLOR_PAIR(print));
+
+    wattron(screenWin, COLOR_PAIR(Entity::NULL_ENTITY));
+    mvwaddch(screenWin, entity->getCoord().y, entity->getCoord().x, (char)entity->getEntity());
+    wattroff(screenWin, COLOR_PAIR(Entity::NULL_ENTITY));
 
     wrefresh(screenWin);
 

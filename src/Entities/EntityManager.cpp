@@ -60,3 +60,16 @@ EntityTile* EntityManager::SpawnNPC(Entity entity) {
 
     return npc;
 }
+
+EntityTile* EntityManager::PopTop() {
+    PQItem<EntityTile*> top = screen.getMoveQueue().top();
+
+    if(top.getPriority() <= screen.getPriority()) {
+        top.getData()->move();
+        screen.getMoveQueue().pop();
+    }
+    else
+        return NULL_ENTITY_PTR;
+
+    return top.getData();
+}

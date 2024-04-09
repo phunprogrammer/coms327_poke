@@ -17,14 +17,12 @@ int HikerTile::queueMove() {
         }
     }
 
-    biomeGrid[this->coord.y][this->coord.x] = this->speed.at((*screen)[{ this->coord.x, this->coord.y }]);
+    biomeGrid[this->coord.y][this->coord.x] = this->speed.at((*screen)[this->coord]);
     std::vector<path_t> paths = aStar(biomeGrid, WIDTH, LENGTH, this->coord.x, this->coord.y, screen->getEntities()[0]->getCoord().x, screen->getEntities()[0]->getCoord().y, biomeFactor, neighbors);
     path_t path = paths[paths.size() - 1];
 
     if(!ValidMove(path.coord)) {
-        this->direction.x = 0;
-        this->direction.y = 0;
-        screen->pushToQueue(PQItem((EntityTile*)this, screen->getPriority() + this->speed.at((*screen)[{ this->coord.x, this->coord.y }])));
+        screen->pushToQueue(PQItem((EntityTile*)this, screen->getPriority() + this->speed.at((*screen)[this->coord])));
         return 0;
     }
 

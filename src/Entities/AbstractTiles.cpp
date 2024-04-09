@@ -45,6 +45,9 @@ void NPCTile::setCoord(coord_t coord) {
 }
 
 int NPCTile::ValidMove(coord_t move) {
+    if(move.x <= 0 || move.x >= LENGTH - 1 || move.y <= 0 || move.y >= WIDTH - 1)
+        return 0;
+
     if(screen->getEntities()[move] != NULL_ENTITY_PTR)
         return 0;
 
@@ -59,17 +62,14 @@ int NPCTile::ValidMove(coord_t move) {
 
 int NPCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
+    this->direction = { 0, 0 };
     
     queueMove();
 
-    if(screen->getEntities()[move] != NULL_ENTITY_PTR)
+    if(!ValidMove(move)) {
+        setCoord(this->coord);
         return 0;
-
-    if(screen->getStructureMap()[move.y][move.x].getStructure() != NULL_STRUCT && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
-        return 0;
-
-    if(speed.at(screen->getTerrainMap()[move.y][move.x].getTerrain()) == 0 && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)
-        return 0;
+    }
 
     setCoord(move);
 

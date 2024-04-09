@@ -14,6 +14,7 @@ class EntityManager {
         EntityManager(Screen& screen);
         int SpawnAllNPC();
         EntityTile* SpawnNPC(Entity entity);
+        EntityTile* PopTop();
 };
 
 #endif

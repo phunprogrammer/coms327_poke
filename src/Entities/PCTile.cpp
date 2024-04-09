@@ -7,6 +7,7 @@ PCTile::PCTile(Screen& screen, coord_t coord) :
 
 int PCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
+    setCoord(this->coord);
 
     if(screen->getEntities()[move] != NULL_ENTITY_PTR)
         return 0;
@@ -18,6 +19,7 @@ int PCTile::move() {
         return 0;
 
     setCoord(move);
+    screen->getPriority() += speed.at((*screen)[this->coord]);
 
     return 1;
 }

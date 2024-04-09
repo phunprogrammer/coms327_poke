@@ -10,28 +10,28 @@
 #include <cmath>
 
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player) : 
-    coord(coord), priority(0),
-    terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
-    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)),
+    coord(coord), terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
+    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)), priority(0),
     entities({{player->getCoord(), player}}), entityManager(*this) {
 
     initialize(waves);
     player->setScreen(*this);
     player->setCoordRandom();
     entityManager.SpawnNPC(Entity::HIKER);
+    entityManager.SpawnNPC(Entity::RIVAL);
     //entityManager.SpawnAllNPC();
 }
 
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord) : 
-    coord(coord), priority(0),
-    terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
-    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)),
+    coord(coord), terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
+    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)), priority(0),
     entities({{player->getCoord(), player}}), entityManager(*this) {
         
     initialize(waves);
     player->setScreen(*this);
     player->setCoord(playerCoord);
     entityManager.SpawnNPC(Entity::HIKER);
+    entityManager.SpawnNPC(Entity::RIVAL);
     //entityManager.SpawnAllNPC();
 }
 

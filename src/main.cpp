@@ -27,6 +27,17 @@ int main()
         if(inputOut == 0)
             continue;
 
+        while(!screen.getMoveQueue().empty()) {
+            EntityTile* top = screen.getEntityManager().PopTop();
+
+            if(top == NULL_ENTITY_PTR) {
+                break;
+            }
+
+            curses.UpdateEntity(top);
+        }
+
+        
         screen.getMoveQueue().top().getData()->move();
         screen.getMoveQueue().pop();
         curses.UpdateEntity(1);

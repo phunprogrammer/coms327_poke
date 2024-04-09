@@ -6,5 +6,6 @@ SentryTile::SentryTile(Screen& screen) :
 }
 
 int SentryTile::queueMove() {
-
+    direction = { 0 , 0 };
+    return 0;
 }

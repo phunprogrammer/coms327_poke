@@ -36,11 +36,6 @@ int main()
 
             curses.UpdateEntity(top);
         }
-
-        
-        screen.getMoveQueue().top().getData()->move();
-        screen.getMoveQueue().pop();
-        curses.UpdateEntity(1);
     } while ((current = getch()) != 'Q');
 
     endwin();

@@ -8,17 +8,24 @@ InputHandler::InputHandler(Screen& screen, CursesHandler& cursesHandler) : scree
 int InputHandler::HandleInput(char input) {
     switch(input) {
         case 'q':
+        case '7':
         case 'w':
+        case '8':
         case 'e':
+        case '9':
         case 'a':
+        case '4':
         case 'd':
+        case '6':
         case 'z':
+        case '1':
         case 'x':
+        case '2':
         case 'c':
-            return MovePC(input);
+        case '3':
         case 's':
         case '5':
-            return 1;
+            return MovePC(input);
     }
 
     return 0;
@@ -59,6 +66,10 @@ int InputHandler::MovePC(char input) {
         case 'c':
         case '3':
             pc->setDirection({ 1, 1 });
+            break;
+        case 's':
+        case '5':
+            pc->setDirection({ 0, 0 });
             break;
     }
 

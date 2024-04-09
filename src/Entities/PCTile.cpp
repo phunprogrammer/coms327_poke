@@ -9,7 +9,8 @@ int PCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
     setCoord(this->coord);
 
-    if(screen->getEntities()[move] != NULL_ENTITY_PTR)
+
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move] != this)
         return 0;
 
     if(screen->getStructureMap()[move.y][move.x].getStructure() != NULL_STRUCT && speed.at(screen->getStructureMap()[move.y][move.x].getStructure()) == 0)

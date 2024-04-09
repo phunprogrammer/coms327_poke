@@ -62,16 +62,15 @@ int NPCTile::ValidMove(coord_t move) {
 
 int NPCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
-    this->direction = { 0, 0 };
-    
-    queueMove();
 
     if(!ValidMove(move)) {
         setCoord(this->coord);
+        queueMove();
         return 0;
     }
 
     setCoord(move);
+    queueMove();
 
     return 1;
 }

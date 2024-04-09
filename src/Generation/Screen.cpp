@@ -17,9 +17,7 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player) :
     initialize(waves);
     player->setScreen(*this);
     player->setCoordRandom();
-    entityManager.SpawnNPC(Entity::HIKER);
-    entityManager.SpawnNPC(Entity::RIVAL);
-    //entityManager.SpawnAllNPC();
+    entityManager.SpawnAllNPC();
 }
 
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord) : 
@@ -30,9 +28,7 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord
     initialize(waves);
     player->setScreen(*this);
     player->setCoord(playerCoord);
-    entityManager.SpawnNPC(Entity::HIKER);
-    entityManager.SpawnNPC(Entity::RIVAL);
-    //entityManager.SpawnAllNPC();
+    entityManager.SpawnAllNPC();
 }
 
 Screen::~Screen() {

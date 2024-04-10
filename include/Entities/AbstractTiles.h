@@ -25,6 +25,7 @@ class EntityTile {
     protected:
         EntityTile(Entity entity, coord_t coord, Screen& screen);
         EntityTile(Entity entity, Screen& screen);
+        EntityTile(Entity entity, coord_t coord);
         coord_t randomDirection();
         coord_t randomCoord();
         

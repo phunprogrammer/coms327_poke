@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <CursesHandler.h>
 
-PCTile::PCTile(Screen& screen, coord_t coord) : 
-    EntityTile(Entity::PC, coord, screen) {}
+PCTile::PCTile(coord_t coord) : 
+    EntityTile(Entity::PC, coord) {}
 
 int PCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };

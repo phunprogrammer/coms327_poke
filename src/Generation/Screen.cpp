@@ -35,9 +35,26 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord
     cursesHandler.PrintScreen();
 }
 
+Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord, MapVector<coord_t, EntityTile*> entities) :
+    coord(coord), terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
+    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)), priority(0),
+    entities({{player->getCoord(), player}}), entityManager(*this), cursesHandler(*this) {
+
+    initialize(waves);
+    this->entities = entities;
+
+    player->setScreen(*this);
+    player->setCoord(playerCoord);
+
+    for(int i = 1; i < (int)getEntities().size(); i++) {
+        ((NPCTile*)getEntities()[i])->queueMove();
+    }
+
+    cursesHandler.PrintScreen();
+}
+
 Screen::~Screen() {
-    for(int i = 0; i < (int)entities.size(); i++)
-        delete entities[i];
+
 }
 
 char Screen::operator[](const coord_t coord) const {

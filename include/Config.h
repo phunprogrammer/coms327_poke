@@ -93,11 +93,24 @@ typedef struct Building {
     int inverse;
 } building_t;
 
+typedef struct Wave {
+    float seed;
+    float frequency;
+    float amplitude;
+} wave_t;
+
+typedef struct Waves {
+    std::vector<wave_t> Height;
+    std::vector<wave_t> Humidity;
+} waves_t;
+
 extern volatile int initialized;
 
 extern volatile int numNPC;
 
 extern int seed;
+
+extern waves_t waves;
 
 void Initialize();
 

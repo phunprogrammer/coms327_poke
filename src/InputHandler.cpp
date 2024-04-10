@@ -2,9 +2,22 @@
 #include "Screen.h"
 #include "CursesHandler.h"
 #include "PCTile.h"
+#include "AbstractTiles.h"
+#include "Tiles.h"
 #include <cstdlib>
 
-InputHandler::InputHandler(Screen& screen) : screen(screen) {}
+InputHandler::InputHandler(Screen *screen) : mapGrid(MAXSIZE, std::vector<MapVector<coord_t, EntityTile*>>(MAXSIZE)), screen(screen) {
+    mapGrid[screen->getCoord().y][screen->getCoord().x] = screen->getEntities();
+}
+
+InputHandler::~InputHandler() {
+    for(int y = 0; y < MAXSIZE; y++)
+        for(int x = 0; x < MAXSIZE; x++)
+            for(int i = 1; i < (int)mapGrid[y][x].size(); i++)
+                delete mapGrid[y][x][i];
+
+    delete screen;
+}
 
 int InputHandler::HandleInput(char input) {
     switch(input) {
@@ -28,14 +41,14 @@ int InputHandler::HandleInput(char input) {
         case '5':
             return MovePC(input);
         case 't':
-            return screen.getCursesHandler().ListTrainers();
+            return screen->getCursesHandler().ListTrainers();
     }
 
     return 0;
 }
 
 int InputHandler::MovePC(char input) {
-    PCTile* pc = (PCTile*)screen.getEntities()[0];
+    PCTile* pc = (PCTile*)(screen->getEntities()[0]);
 
     switch(input) {
         case 'q':
@@ -77,8 +90,57 @@ int InputHandler::MovePC(char input) {
     }
 
     int out;
-    
-    out = pc->move();
+    coord_t move = { pc->getCoord().x + pc->getDirection().x, pc->getCoord().y + pc->getDirection().y };
+
+    if(move.x < 0)
+        out = MoveScreen('w');
+    else if(move.x >= LENGTH)
+        out = MoveScreen('e');
+    else if (move.y < 0)
+        out = MoveScreen('n');
+    else if (move.y >= WIDTH)
+        out = MoveScreen('s');
+    else
+        out = pc->move();
 
     return out;
+}
+
+int InputHandler::MoveScreen(char compass) {
+    PCTile* pc = (PCTile*)(screen->getEntities()[0]);
+    coord_t oldCoords = screen->getCoord();
+    mapGrid[oldCoords.y][oldCoords.x] = screen->getEntities();
+    delete screen;
+
+    coord_t screenMove;
+    coord_t pcMove;
+
+    switch(compass) {
+        case 'w':
+            screenMove = { oldCoords.x - 1, oldCoords.y };
+            pcMove = { LENGTH - 1, pc->getCoord().y };
+            break;
+        case 'e':
+            screenMove = { oldCoords.x + 1, oldCoords.y };
+            pcMove = { 0, pc->getCoord().y };
+            break;
+        case 'n':
+            screenMove = { oldCoords.x, oldCoords.y - 1 };
+            pcMove = { pc->getCoord().x, WIDTH - 1 };
+            break;
+        case 's':
+            screenMove = { oldCoords.x, oldCoords.y + 1 };
+            pcMove = { pc->getCoord().x, 0 };
+            break;
+    }
+
+    Screen* newScreen;
+
+    if(mapGrid[screenMove.y][screenMove.x].size() != 0)
+        newScreen = new Screen(waves, screenMove, pc, pcMove, mapGrid[screenMove.y][screenMove.x]);
+    else
+        newScreen = new Screen(waves, screenMove, pc, pcMove);
+
+    this->screen = newScreen;
+    return 1;
 }

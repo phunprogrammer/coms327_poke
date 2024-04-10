@@ -10,17 +10,6 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-typedef struct Wave {
-    float seed;
-    float frequency;
-    float amplitude;
-} wave_t;
-
-typedef struct Waves {
-    std::vector<wave_t> Height;
-    std::vector<wave_t> Humidity;
-} waves_t;
-
 const std::vector<float> FREQUENCY({ 0.1f, 0.05f, 0.06f, 0.08f });
 const std::vector<float> AMPLITUDE({ 1.0f, 1.5f, 1.0f, 0.8f });
 
@@ -76,6 +65,7 @@ class Screen {
     public:
         Screen(waves_t waves, coord_t coord, PCTile* player);
         Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoords);
+        Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoords, MapVector<coord_t, EntityTile*> entities);
         ~Screen();
 
         static waves_t GetWaves();

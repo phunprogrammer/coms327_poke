@@ -10,6 +10,8 @@ volatile int numNPC = DEFAULTENTITIES;
 
 int seed;
 
+waves_t waves;
+
 /**
  * @brief Inialization. CALL BEFORE ANYTHING
  * 

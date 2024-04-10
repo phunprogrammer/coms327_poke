@@ -9,6 +9,9 @@ EntityTile::EntityTile(Entity entity, coord_t coord, Screen& screen) :
 EntityTile::EntityTile(Entity entity, Screen& screen) : 
     entity(entity), screen(&screen), speed(ENTITY_SPEED.at(entity)), coord(randomCoord()),  direction(randomDirection()) {}
 
+EntityTile::EntityTile(Entity entity, coord_t coord) : 
+    entity(entity), speed(ENTITY_SPEED.at(entity)), coord(coord), direction(randomDirection()) {}
+
 coord_t EntityTile::randomCoord() {
     coord_t coord;
     do {

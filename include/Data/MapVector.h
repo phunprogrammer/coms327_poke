@@ -1,6 +1,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include "AbstractTiles.h"
 
 #ifndef MAPVECTOR_H
 #define MAPVECTOR_H
@@ -13,6 +14,8 @@ class MapVector {
         std::map<K, V> map;
         std::vector<V> vector;
     public:
+        MapVector() {}
+
         MapVector(std::initializer_list<std::pair<K, V>> initVector) {
             for (const auto& pair : initVector)
                 insert(pair.first, pair.second);

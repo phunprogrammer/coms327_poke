@@ -70,6 +70,7 @@ class Screen {
         ~Screen();
 
         static waves_t GetWaves();
+        static int RandScreen(float num);
         char operator[](const coord_t key) const;
 
         const std::vector<std::vector<TerrainTile>>& getTerrainMap() const { return terrainMap; }

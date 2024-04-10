@@ -86,6 +86,7 @@ void Screen::pushToQueue(const PQItem<EntityTile*>& item) {
 void Screen::initialize(waves_t waves) {
     GenerateTerrain(waves);
     GeneratePath(waves);
+    srand(RandScreen(terrainMap[0][0].getHeight()));
     RandomizeBuildings();
     DetectBorder();
 }
@@ -324,6 +325,7 @@ int Screen::SelectEndpoints(int horizontal, std::vector<std::vector<float>> heig
 }
 
 int Screen::GenerateBuildings() {
+    srand(waves.Humidity[0].seed);
     int horizontalBias = rand() % LENGTH;
     int verticalBias = rand() % WIDTH;
 
@@ -485,4 +487,18 @@ waves_t Screen::GetWaves() {
     }
 
     return waves;
+}
+
+/**
+ * @brief Returns the first four digits of a float value as an 4 digit int
+ * 
+ * @param num 
+ * @return int 
+ */
+int Screen::RandScreen(float num) {
+    float abs = fabs(num);
+
+    int firstFourDigits = (int)(abs * pow(10, 3 - floor(log10(abs))));
+
+    return firstFourDigits;
 }

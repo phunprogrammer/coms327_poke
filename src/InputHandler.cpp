@@ -27,6 +27,8 @@ int InputHandler::HandleInput(char input) {
         case 's':
         case '5':
             return MovePC(input);
+        case 't':
+            return screen.getCursesHandler().ListTrainers();
     }
 
     return 0;

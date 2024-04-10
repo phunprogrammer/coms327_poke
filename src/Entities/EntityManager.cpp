@@ -21,12 +21,12 @@ int EntityManager::SpawnAllNPC() {
         return 1;
     }
 
-    SpawnNPC(Entity::EXPLORER);
-    //SpawnNPC(Entity::HIKER);
+    SpawnNPC(Entity::RIVAL);
+    SpawnNPC(Entity::HIKER);
 
-    // for(int i = 2; i < numNPC; i++) {
-    //     SpawnNPC(ENTITIES[rand() % ENTITIES.size()]);
-    // }
+    for(int i = 2; i < numNPC; i++) {
+        SpawnNPC(ENTITIES[rand() % ENTITIES.size()]);
+    }
 
     return 1;
 }

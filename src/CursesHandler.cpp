@@ -116,3 +116,45 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
         input = getch();
     }
 }
+
+int CursesHandler::ListTrainers() {
+    const int strlen = 23;
+    const int listSize = 5;
+    WINDOW* trainerWin = newwin(listSize + 2, strlen + 4, start + (WIDTH - (listSize + 2)) / 2, (LENGTH - 27) / 2);
+
+    char menuItems[(int)screen.getEntities().size() - 1][strlen + 1];
+
+    for(int i = 0; i < (int)screen.getEntities().size() - 1; i++) {
+        int coordY = screen.getEntities()[i + 1]->getCoord().y - screen.getEntities()[0]->getCoord().y;
+        int coordX = screen.getEntities()[i + 1]->getCoord().x - screen.getEntities()[0]->getCoord().x;
+        sprintf(menuItems[i], "%c, %2d %s and %2d %s", screen.getEntities()[i + 1]->getEntity(), abs(coordY), coordY > 0 ? "SOUTH" : "NORTH", abs(coordX), coordX > 0 ? "EAST" : "WEST");
+    }
+
+    int index = 0;
+    int input = 0;
+
+    do {
+        switch (input) {
+            case KEY_UP:
+                index = std::max(0, index - 1);
+                break;
+            case KEY_DOWN:
+                index = std::min((int)screen.getEntities().size() - 1 - listSize, index + 1);
+                break;
+            default:
+                break;
+        }
+
+        wclear(trainerWin);
+        box(trainerWin, 0, 0);
+        for(int i = index; i < index + listSize; i++) {
+            mvwprintw(trainerWin, i - index + 1, 2, "%s", menuItems[i]);
+        }
+        wrefresh(trainerWin);
+    } while((input = getch()) != 'Q');
+
+    delwin(trainerWin);
+    PrintScreen();
+
+    return 1;
+}

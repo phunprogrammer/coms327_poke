@@ -21,6 +21,7 @@ class CursesHandler {
         int UpdateEntity(int index);
         int UpdateEntity(EntityTile* entity);
         int BattleScreen(NPCTile* npc, PCTile* pc);
+        int ListTrainers();
 };
 
 #endif

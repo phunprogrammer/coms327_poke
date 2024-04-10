@@ -33,7 +33,7 @@ class Move : public Data {
 
         std::string toString() const;
 
-        static std::vector<Data*> parse(const std::string& filename);
+        static std::vector<Move*> parse(const std::string& filename);
 };
 
 #endif

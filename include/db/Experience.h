@@ -21,7 +21,7 @@ class Experience : public Data {
 
         std::string toString() const;
 
-        static std::vector<Data*> parse(const std::string& filename);
+        static std::vector<Experience*> parse(const std::string& filename);
 };
 
 #endif

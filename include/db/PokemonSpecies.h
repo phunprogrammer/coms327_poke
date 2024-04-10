@@ -38,7 +38,7 @@ class PokemonSpecies : public Data {
 
         std::string toString() const;
 
-        static std::vector<Data*> parse(const std::string& filename);
+        static std::vector<PokemonSpecies*> parse(const std::string& filename);
 };
 
 #endif

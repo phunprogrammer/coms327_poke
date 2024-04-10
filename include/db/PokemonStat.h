@@ -22,7 +22,7 @@ class PokemonStat : public Data {
 
         std::string toString() const;
 
-        static std::vector<Data*> parse(const std::string& filename);
+        static std::vector<PokemonStat*> parse(const std::string& filename);
 };
 
 #endif

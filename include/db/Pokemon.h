@@ -21,13 +21,14 @@ class Pokemon : public Data {
         > data;
 
     public:
+        Pokemon() {}
         Pokemon(std::string line);
 
         auto getData() const { return data; }
 
         std::string toString() const;
 
-        static std::vector<Data*> parse(const std::string& filename);
+        static std::vector<Pokemon*> parse(const std::string& filename);
 };
 
 #endif

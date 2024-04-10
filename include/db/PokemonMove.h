@@ -24,7 +24,7 @@ class PokemonMove : public Data {
 
         std::string toString() const;
 
-        static std::vector<Data*> parse(const std::string& filename);
+        static std::vector<PokemonMove*> parse(const std::string& filename);
 };
 
 #endif

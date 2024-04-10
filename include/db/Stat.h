@@ -23,7 +23,7 @@ class Stat : public Data {
 
         std::string toString() const;
 
-        static std::vector<Data*> parse(const std::string& filename);
+        static std::vector<Stat*> parse(const std::string& filename);
 };
 
 #endif

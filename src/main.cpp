@@ -2,6 +2,7 @@
 #include "Screen.h"
 #include "AbstractTiles.h"
 #include "PCTile.h"
+#include "Pokemon.h"
 #include <iostream>
 #include <ncurses.h>
 #include <CursesHandler.h>
@@ -9,6 +10,13 @@
 
 int main(int argc, char* argv[])
 {
+    db_parse(0);
+    Pokemon bulbasaur = Pokemon(pokemon[3], 1);
+
+    std::cout << bulbasaur.toString() << std::endl;
+
+    return 1;
+
     if (argc == 3 && std::string(argv[1]) == "--trainers") {
         numNPC = std::atoi(argv[2]);
         if (numNPC <= 0) {

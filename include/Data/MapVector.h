@@ -33,6 +33,13 @@ class MapVector {
             vector.push_back(value);
         }
 
+        void insert(const std::size_t index, const K& key, const V& value) {
+            map[key] = value;
+
+            if (index <= vector.size())
+                vector.insert(vector.begin() + index, value);
+        }
+
         void move(const K& oldKey, const K& newKey) {
             if (map.count(oldKey) == 0)
                 return;

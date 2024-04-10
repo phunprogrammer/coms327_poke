@@ -19,7 +19,7 @@ CursesHandler::~CursesHandler() {
 
 int CursesHandler::PrintScreen() {
     screenWin = newwin(WIDTH, LENGTH, start, 0);
-
+    wclear(stdscr);
     mvwprintw(stdscr, 0, 0, "Seed: %d", seed);  
 
     for(int i = 0; i < LENGTH; i++) {
@@ -48,7 +48,7 @@ int CursesHandler::PrintScreen() {
     }
     wattroff(screenWin, COLOR_PAIR(Entity::NULL_ENTITY));
 
-    mvwprintw(stdscr, TERM_WIDTH - 1, 0, "(%d, %d)", screen.getCoord().x, screen.getCoord().y);
+    mvwprintw(stdscr, TERM_WIDTH - 1, 0, "(%d, %d)", screen.getCoord().x - MIDDLEX, screen.getCoord().y - MIDDLEY);
 
     refresh();
     wrefresh(screenWin);

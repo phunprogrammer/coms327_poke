@@ -44,16 +44,16 @@ int main(int argc, char* argv[])
                 break;
         }
         
-        // int i = 0;
-        // move(TERM_WIDTH, 0);
-        // clrtoeol();
-        // for (const auto& pair : screen.getEntities().getMap())
-        //     mvwprintw(stdscr, TERM_WIDTH, i++, "%c", pair.second->getEntity());
+        int i = 0;
+        move(TERM_WIDTH, 0);
+        clrtoeol();
+        for (const auto& pair : input.getScreen()->getEntities().getMap())
+            mvwprintw(stdscr, TERM_WIDTH, i++, "%c", pair.second->getEntity());
 
-        // move(TERM_WIDTH + 1, 0);
-        // clrtoeol();
-        // for (i = 0; i < (int)screen.getEntities().size(); i++)
-        //      mvwprintw(stdscr, TERM_WIDTH + 1, i, "%c", screen.getEntities()[i]->getEntity());
+        move(TERM_WIDTH + 1, 0);
+        clrtoeol();
+        for (i = 0; i < (int)input.getScreen()->getEntities().size(); i++)
+             mvwprintw(stdscr, TERM_WIDTH + 1, i, "%c", input.getScreen()->getEntities()[i]->getEntity());
 
     } while ((current = getch()) != 'Q');
 

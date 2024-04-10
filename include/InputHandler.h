@@ -19,6 +19,8 @@ class InputHandler {
         int HandleInput(char input);
         int MovePC(char input);
         int MoveScreen(char compass);
+        int MoveScreen(coord_t coord);
+        int Fly();
 
         Screen* getScreen() const { return screen; }
 };

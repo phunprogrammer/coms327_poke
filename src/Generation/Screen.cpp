@@ -35,20 +35,36 @@ Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord
     cursesHandler.PrintScreen();
 }
 
+Screen::Screen(waves_t waves, coord_t coord, PCTile* player, MapVector<coord_t, EntityTile*> entities) :
+    coord(coord), terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
+    structureMap(WIDTH, std::vector<StructureTile>(LENGTH)), priority(0),
+    entities(entities), entityManager(*this), cursesHandler(*this) {
+
+    initialize(waves);
+    
+    player->setScreen(*this);
+    player->setCoordRandom();
+    this->entities.insert(0, player->getCoord(), player);
+
+    for(int i = 1; i < (int)getEntities().size(); i++)
+        ((NPCTile*)getEntities()[i])->queueMove();
+
+    cursesHandler.PrintScreen();
+}
+
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord, MapVector<coord_t, EntityTile*> entities) :
     coord(coord), terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
     structureMap(WIDTH, std::vector<StructureTile>(LENGTH)), priority(0),
-    entities({{player->getCoord(), player}}), entityManager(*this), cursesHandler(*this) {
+    entities(entities), entityManager(*this), cursesHandler(*this) {
 
     initialize(waves);
-    this->entities = entities;
 
     player->setScreen(*this);
     player->setCoord(playerCoord);
+    this->entities.insert(0, player->getCoord(), player);
 
-    for(int i = 1; i < (int)getEntities().size(); i++) {
+    for(int i = 1; i < (int)getEntities().size(); i++)
         ((NPCTile*)getEntities()[i])->queueMove();
-    }
 
     cursesHandler.PrintScreen();
 }

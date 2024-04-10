@@ -40,6 +40,7 @@ class EntityTile {
         virtual coord_t getCoord() = 0;
         virtual coord_t getPrevCoord() = 0;
         virtual void setCoord(coord_t coord) = 0;
+        virtual void setScreen(Screen& screen) = 0;
         virtual int move() = 0;
         virtual ~EntityTile() noexcept = default;
 };
@@ -58,6 +59,7 @@ class NPCTile : public EntityTile {
         bool isDefeated() { return defeated; }
         void defeat() { defeated = true; }
         void setCoord(coord_t coord);
+        void setScreen(Screen& screen) { this->screen = &screen; }
         int move();
         virtual int queueMove() = 0;
 };

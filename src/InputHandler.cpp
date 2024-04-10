@@ -6,7 +6,7 @@
 #include "Tiles.h"
 #include <cstdlib>
 
-InputHandler::InputHandler(Screen *screen) : mapGrid(MAXSIZE, std::vector<MapVector<coord_t, EntityTile*>>(MAXSIZE)), screen(screen) {
+InputHandler::InputHandler(Screen *screen) : mapGrid(MAXSIZE + 1, std::vector<MapVector<coord_t, EntityTile*>>(MAXSIZE + 1)), screen(screen) {
     mapGrid[screen->getCoord().y][screen->getCoord().x] = screen->getEntities();
 }
 
@@ -42,6 +42,8 @@ int InputHandler::HandleInput(char input) {
             return MovePC(input);
         case 't':
             return screen->getCursesHandler().ListTrainers();
+        case 'f':
+            return Fly();
     }
 
     return 0;
@@ -109,6 +111,7 @@ int InputHandler::MovePC(char input) {
 int InputHandler::MoveScreen(char compass) {
     PCTile* pc = (PCTile*)(screen->getEntities()[0]);
     coord_t oldCoords = screen->getCoord();
+    screen->getEntities().remove(pc->getCoord());
     mapGrid[oldCoords.y][oldCoords.x] = screen->getEntities();
     delete screen;
 
@@ -142,5 +145,44 @@ int InputHandler::MoveScreen(char compass) {
         newScreen = new Screen(waves, screenMove, pc, pcMove);
 
     this->screen = newScreen;
+    return 1;
+}
+
+int InputHandler::MoveScreen(coord_t coord) {
+    PCTile* pc = (PCTile*)(screen->getEntities()[0]);
+    coord_t oldCoords = screen->getCoord();
+    screen->getEntities().remove(pc->getCoord());
+    mapGrid[oldCoords.y][oldCoords.x] = screen->getEntities();
+    delete screen;
+
+    Screen* newScreen;
+
+    if(mapGrid[coord.y][coord.x].size() != 0)
+        newScreen = new Screen(waves, coord, pc, mapGrid[coord.y][coord.x]);
+    else
+        newScreen = new Screen(waves, coord, pc);
+
+    this->screen = newScreen;
+    return 1;
+}
+
+int InputHandler::Fly() {
+    echo();
+    curs_set(1);
+    move(TERM_WIDTH, 0);
+
+    int x, y;
+    if(scanw("%d %d", &x, &y) == 2) {
+        int screenX = std::max(std::min(MIDDLEX + x, MAXSIZE), MINSIZE);
+        int screenY = std::max(std::min(MIDDLEY + y, MAXSIZE), MINSIZE);
+        MoveScreen({ screenX, screenY });
+    }
+
+    move(TERM_WIDTH, 0);
+    clrtoeol();
+
+    noecho();
+    curs_set(0);
+
     return 1;
 }

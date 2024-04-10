@@ -65,6 +65,7 @@ class Screen {
     public:
         Screen(waves_t waves, coord_t coord, PCTile* player);
         Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoords);
+        Screen(waves_t waves, coord_t coord, PCTile* player, MapVector<coord_t, EntityTile*> entities);
         Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoords, MapVector<coord_t, EntityTile*> entities);
         ~Screen();
 

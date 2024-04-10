@@ -13,6 +13,7 @@ class PCTile : public EntityTile {
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }
         coord_t getPrevCoord() { return prevCoord; }
+        coord_t getDirection() { return direction; }
         void setCoord(coord_t coord);
         void setDirection(coord_t coord) { this->direction = coord; }
         void setCoordRandom();

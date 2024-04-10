@@ -25,7 +25,7 @@ int HikerTile::queueMove() {
     biomeGrid[this->coord.y][this->coord.x] = this->speed.at((*screen)[this->coord]);
     std::vector<path_t> paths = aStar(biomeGrid, WIDTH, LENGTH, this->coord.x, this->coord.y, screen->getEntities()[0]->getCoord().x, screen->getEntities()[0]->getCoord().y, biomeFactor, neighbors);
     
-    if((int)paths.size() - 1 < 1 || !ValidMove(paths[paths.size() - 1].coord)) {
+    if((int)paths.size() - 1 < 0) {
         this->direction = { 0, 0 };
         screen->pushToQueue(PQItem((EntityTile*)this, screen->getPriority() + this->speed.at((*screen)[this->coord])));
         return 0;

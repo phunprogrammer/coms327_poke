@@ -1,12 +1,20 @@
 #include "PCTile.h"
 #include "Screen.h"
 #include <stdlib.h>
+#include <CursesHandler.h>
 
 PCTile::PCTile(Screen& screen, coord_t coord) : 
     EntityTile(Entity::PC, coord, screen) {}
 
 int PCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
+
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move] != this && !((NPCTile*)screen->getEntities()[move])->isDefeated()) {
+        setCoord(this->coord);
+        int out = screen->getCursesHandler().BattleScreen((NPCTile*)screen->getEntities()[move], this);
+        delete screen->getEntities()[move];
+        return out;
+    }
 
     if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move] != this) {
         setCoord(this->coord);
@@ -24,6 +32,7 @@ int PCTile::move() {
     }
 
     setCoord(move);
+    screen->getCursesHandler().UpdateEntity(this);
     screen->getPriority() += speed.at((*screen)[this->coord]);
 
     return 1;

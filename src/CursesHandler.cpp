@@ -3,16 +3,18 @@
 #include "Config.h"
 #include <Tiles.h>
 
-CursesHandler::CursesHandler(Screen& screen, int seed) : screen(screen), seed(seed) {
+CursesHandler::CursesHandler(Screen& screen) : screen(screen) {
     initscr();
     cbreak();
     noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
     start_color();
-
     InitColors();
-    PrintScreen();
+}
+
+CursesHandler::~CursesHandler() {
+    endwin();
 }
 
 int CursesHandler::PrintScreen() {
@@ -86,4 +88,31 @@ void CursesHandler::InitColors() {
     init_pair(Structure::PMART, COLOR_RED, COLOR_BLACK);
     init_pair(Structure::PCNTR, COLOR_BLUE, COLOR_BLACK);
     init_pair(Entity::NULL_ENTITY, COLOR_WHITE, COLOR_BLACK);
+}
+
+int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
+    int length = std::min(WIDTH * 2, LENGTH);
+    WINDOW* battleWin = newwin(WIDTH, length, start, (LENGTH - length) / 2);
+    box(battleWin, 0, 0);
+
+    int input = 0;
+
+    while(1) {
+        wclear(battleWin);
+
+        if(input == 'Q') {
+            delwin(battleWin);
+            npc->defeat();
+            screen.getEntities().remove(npc->getCoord());
+            PrintScreen();
+            return CONTINUE;
+        }
+
+        box(battleWin, 0, 0);
+
+        mvwprintw(battleWin, 1, 2, "%c wants to battle!", npc->getEntity());
+
+        wrefresh(battleWin);
+        input = getch();
+    }
 }

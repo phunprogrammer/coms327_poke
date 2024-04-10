@@ -63,6 +63,10 @@ int NPCTile::ValidMove(coord_t move) {
 int NPCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
 
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move]->getEntity() == Entity::PC && !this->defeated) {
+        screen->getCursesHandler().BattleScreen(this, (PCTile*)screen->getEntities()[move]);
+    }
+
     if(!ValidMove(move)) {
         setCoord(this->coord);
         queueMove();
@@ -70,6 +74,7 @@ int NPCTile::move() {
     }
 
     setCoord(move);
+    screen->getCursesHandler().UpdateEntity(this);
     queueMove();
 
     return 1;

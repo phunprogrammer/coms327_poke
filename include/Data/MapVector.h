@@ -1,6 +1,6 @@
 #include <vector>
 #include <map>
-#include "ncurses.h"
+#include <algorithm>
 
 #ifndef MAPVECTOR_H
 #define MAPVECTOR_H
@@ -16,6 +16,13 @@ class MapVector {
         MapVector(std::initializer_list<std::pair<K, V>> initVector) {
             for (const auto& pair : initVector)
                 insert(pair.first, pair.second);
+        }
+
+        void remove(const K& key) {
+            auto it = map.find(key);
+            map.erase(it);
+            auto vecIt = std::find(vector.begin(), vector.end(), it->second);
+            vector.erase(vecIt);
         }
 
         void insert(const K& key, const V& value) {

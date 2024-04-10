@@ -21,12 +21,12 @@ int EntityManager::SpawnAllNPC() {
         return 1;
     }
 
-    SpawnNPC(Entity::RIVAL);
-    SpawnNPC(Entity::HIKER);
+    SpawnNPC(Entity::EXPLORER);
+    //SpawnNPC(Entity::HIKER);
 
-    for(int i = 2; i < numNPC; i++) {
-        SpawnNPC(ENTITIES[rand() % ENTITIES.size()]);
-    }
+    // for(int i = 2; i < numNPC; i++) {
+    //     SpawnNPC(ENTITIES[rand() % ENTITIES.size()]);
+    // }
 
     return 1;
 }
@@ -63,6 +63,12 @@ EntityTile* EntityManager::SpawnNPC(Entity entity) {
 
 EntityTile* EntityManager::PopTop() {
     PQItem<EntityTile*> top = screen.getMoveQueue().top();
+
+    if(((NPCTile*)top.getData())->isDefeated()) {
+        screen.getMoveQueue().pop();
+        delete top.getData();
+        return NULL_ENTITY_PTR;
+    }
 
     if(top.getPriority() <= screen.getPriority()) {
         top.getData()->move();

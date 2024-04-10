@@ -2,8 +2,9 @@
 #include "Screen.h"
 #include "CursesHandler.h"
 #include "PCTile.h"
+#include <cstdlib>
 
-InputHandler::InputHandler(Screen& screen, CursesHandler& cursesHandler) : screen(screen), cursesHandler(cursesHandler) {}
+InputHandler::InputHandler(Screen& screen) : screen(screen) {}
 
 int InputHandler::HandleInput(char input) {
     switch(input) {
@@ -75,8 +76,7 @@ int InputHandler::MovePC(char input) {
 
     int out;
     
-    if((out = pc->move()))
-        cursesHandler.UpdateEntity(0);
+    out = pc->move();
 
     return out;
 }

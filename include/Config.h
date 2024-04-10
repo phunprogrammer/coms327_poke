@@ -37,6 +37,13 @@
 //Waves
 #define WAVENUM 2
 
+enum Command : int {
+    CONTINUE,
+    NOTHING,
+    END,
+    BATTLE
+};
+
 typedef struct Coord {
     int x;
     int y;
@@ -90,6 +97,8 @@ extern volatile int initialized;
 
 extern volatile int numNPC;
 
-void Initialize(int& seed);
+extern int seed;
+
+void Initialize();
 
 #endif

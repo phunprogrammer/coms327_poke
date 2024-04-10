@@ -8,7 +8,7 @@ PacerTile::PacerTile(Screen& screen) :
 int PacerTile::queueMove() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
 
-    if(!ValidMove(move)) {
+    if(!ValidMove(move) && (screen->getEntities()[move] == NULL_ENTITY_PTR || screen->getEntities()[move]->getEntity() != Entity::PC)) {
         direction.x *= -1;
         direction.y *= -1;
     }

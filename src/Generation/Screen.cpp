@@ -12,23 +12,27 @@
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player) : 
     coord(coord), terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
     structureMap(WIDTH, std::vector<StructureTile>(LENGTH)), priority(0),
-    entities({{player->getCoord(), player}}), entityManager(*this) {
+    entities({{player->getCoord(), player}}), entityManager(*this), cursesHandler(*this) {
 
     initialize(waves);
     player->setScreen(*this);
     player->setCoordRandom();
     entityManager.SpawnAllNPC();
+
+    cursesHandler.PrintScreen();
 }
 
 Screen::Screen(waves_t waves, coord_t coord, PCTile* player, coord_t playerCoord) : 
     coord(coord), terrainMap(WIDTH, std::vector<TerrainTile>(LENGTH)), 
     structureMap(WIDTH, std::vector<StructureTile>(LENGTH)), priority(0),
-    entities({{player->getCoord(), player}}), entityManager(*this) {
+    entities({{player->getCoord(), player}}), entityManager(*this), cursesHandler(*this) {
         
     initialize(waves);
     player->setScreen(*this);
     player->setCoord(playerCoord);
     entityManager.SpawnAllNPC();
+
+    cursesHandler.PrintScreen();
 }
 
 Screen::~Screen() {

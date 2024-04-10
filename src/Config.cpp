@@ -8,17 +8,18 @@ volatile int initialized = 0;
 
 volatile int numNPC = DEFAULTENTITIES;
 
+int seed;
+
 /**
  * @brief Inialization. CALL BEFORE ANYTHING
  * 
  */
-void Initialize(int& seed) {
+void Initialize() {
     if (initialized == 1)
         return;
 
     initialized = 1;
-    // seed = time(NULL);
-    seed = 1712700259;
+    seed = time(NULL);
 
     srand(seed);    
 

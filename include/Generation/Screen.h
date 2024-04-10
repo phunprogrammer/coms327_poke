@@ -5,6 +5,7 @@
 #include "Tiles.h"
 #include <queue>
 #include <PQItem.h>
+#include <CursesHandler.h>
 
 #ifndef SCREEN_H
 #define SCREEN_H
@@ -52,9 +53,12 @@ class Screen {
         int priority;
         MapVector<coord_t, EntityTile*> entities;
         EntityManager entityManager;
+        CursesHandler cursesHandler;
         std::priority_queue<PQItem<EntityTile*>> moveQueue;
         gates_t gates;
         paths_t paths;
+
+        int seed;
 
         void initialize(waves_t waves);
         int GenerateTerrain(waves_t waves);
@@ -81,7 +85,9 @@ class Screen {
         const std::vector<std::vector<StructureTile>>& getStructureMap() const { return structureMap; }
         std::priority_queue<PQItem<EntityTile*>>& getMoveQueue() { return moveQueue; }
         EntityManager& getEntityManager() { return entityManager; }
+        CursesHandler& getCursesHandler() { return cursesHandler; }
         int& getPriority() { return priority; }
+        int getSeed() const { return seed; }
         gates_t getGates() const { return gates; }
         paths_t getPaths() const { return paths; }
         coord_t getCoord() const { return coord; }

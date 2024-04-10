@@ -54,6 +54,8 @@ class NPCTile : public EntityTile {
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }
         coord_t getPrevCoord() { return prevCoord; }
+        bool isDefeated() { return defeated; }
+        void defeat() { defeated = true; }
         void setCoord(coord_t coord);
         int move();
         virtual int queueMove() = 0;

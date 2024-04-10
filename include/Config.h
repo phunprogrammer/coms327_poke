@@ -4,7 +4,6 @@
  * @date 2/8/24
  */
 #include <vector>
-#include "PQueue.h"
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -14,6 +13,10 @@ const int MAX =  1000000;
 //PPM
 #define SCREENS 11
 #define GENERATEPPM 0
+
+//Terminal
+#define TERM_WIDTH 24
+#define TERM_LENGTH 80
 
 //Screen
 #define WIDTH 21
@@ -35,41 +38,62 @@ const int MAX =  1000000;
 
 //Waves
 #define WAVENUM 2
-extern const float FREQUENCY[];
-extern const float AMPLITUDE[];
 
-//Biomes
-#define BIOMENUM 5
-#define STRUCNUM 3
-#define ENTITYNUM 7
-#define TILENUM BIOMENUM + STRUCNUM + ENTITYNUM
-enum __attribute__ ((__packed__)) Tile {
-    FOREST,
-    MOUNTAIN,
-    CLEARING,
-    GRASSLAND,
-    OCEAN,
-    PATH,
-    POKEM,
-    POKEC,
-    PC,
-    HIKER,
-    RIVAL,
-    PACER,
-    WANDERER,
-    SENTRY,
-    EXPLORER
+enum Command : int {
+    CONTINUE,
+    NOTHING,
+    END,
+    BATTLE
 };
 
-struct Screen;
+typedef struct Coord {
+    int x;
+    int y;
 
-typedef struct NoiseMap {
-    float map[WIDTH][LENGTH];
-} noisemap_t;
+    bool operator==(const Coord& compare) const {
+        return this->x == compare.x && this->y == compare.y;
+    }
 
-typedef struct ExpandedMap {
-    float map[WIDTH * 2][LENGTH * 2];
-} expandedmap_t;
+    bool operator!=(const Coord& compare) const {
+        return this->x != compare.x || this->y != compare.y;
+    }
+
+    bool operator<(const Coord& compare) const {
+        if (this->x == compare.x) {
+            return this->y < compare.y;
+        }
+        return this->x < compare.x;
+    }
+} coord_t;
+
+typedef struct Gates {
+    coord_t north;
+    coord_t south;
+    coord_t east;
+    coord_t west;
+} gates_t;
+
+typedef struct Path {
+    coord_t coord;
+    int gCost;
+} path_t;
+
+typedef struct Paths {
+    std::vector<path_t> horizontalPath;
+    std::vector<path_t> verticalPath;
+} paths_t;
+
+typedef struct EntityMove {
+    int entityIndex;
+    coord_t coord;
+    int priority;
+} entityMove_t;
+
+typedef struct Building {
+    path_t path;
+    int vertical;
+    int inverse;
+} building_t;
 
 typedef struct Wave {
     float seed;
@@ -78,83 +102,18 @@ typedef struct Wave {
 } wave_t;
 
 typedef struct Waves {
-    wave_t Altitude[WAVENUM];
-    wave_t Humidity[WAVENUM];
+    std::vector<wave_t> Height;
+    std::vector<wave_t> Humidity;
 } waves_t;
-
-typedef struct Vector {
-    float x;
-    float y;
-} vector_t;
-
-typedef struct PathGates {
-    int start;
-    int end;
-} pathgates_t;
-
-typedef struct Path {
-    vector_t coord;
-    int gCost;
-    struct Path* previous;
-} path_t;
-
-typedef struct EntityMove {
-    int entityIndex;
-    vector_t coord;
-    int priority;
-} entityMove_t;
-
-typedef struct TileType {
-    enum Tile biomeID;
-    float minHeight;
-    float minHumidity;
-    char type;
-    int weight;
-} tileType_t;
-
-typedef struct EntityType {
-    tileType_t tile;
-    tileType_t originalTile;
-    vector_t coord;
-    int weightFactor[TILENUM];
-    path_t* entityPath;
-    path_t* (*getPath)(struct Screen* screen, struct EntityType* entity);
-    vector_t direction;
-    bool defeated;
-} entityType_t;
-
-typedef struct Screen {
-    tileType_t** biomeMap;
-    vector_t coord;
-    pathgates_t horizontalEndpoints;
-    pathgates_t verticalEndpoints;
-    path_t* horizontalPath;
-    path_t* verticalPath;
-    entityType_t pc;
-    entityType_t* npcs;
-    int npcSize;
-    pqueue_t* moveQueue;
-    int priority;
-} screen_t;
-
-typedef struct Building {
-    path_t* path;
-    int vertical;
-    int inverse;
-} building_t;
 
 extern volatile int initialized;
 
 extern volatile int numNPC;
 
-extern const tileType_t Tiles[TILENUM];
+extern int seed;
 
-extern const entityType_t Entities[TILENUM];
+extern waves_t waves;
 
 void Initialize();
-
-waves_t GetWaves(int* seed);
-
-int Init_Entities();
 
 #endif

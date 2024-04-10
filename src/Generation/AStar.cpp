@@ -1,12 +1,14 @@
-#include "PQueue.h"
+#include "PQItem.h"
 #include "AStar.h"
 #include "Config.h"
+#include "Tiles.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <ncurses.h>
+#include <queue>
+#include <iostream>
 
-const vector_t NEIGHBORARR[] = {
+const coord_t NEIGHBORARR[] = {
     {0, -1},
     {-1, 0}, 
     {1, 0}, 
@@ -60,14 +62,13 @@ int as_isValid(int x, int y, int width, int length) {
  * @param open An open queue that stores opened grids
  * @return path_t* A pointer from the end of the path to the beginning
  */
-path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int startY, int endX, int endY, float biomeFactor, int neighbors) {
+std::vector<path_t> aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int startY, int endX, int endY, float biomeFactor, int neighbors) {
     int startKey = startY * LENGTH + startX;
     int endKey = endY * LENGTH + endX;
 
     grid[endKey / LENGTH][endKey % LENGTH] = -1;
 
-    pqueue_t open;
-    pq_init(&open);
+    std::priority_queue<PQItem<int>> pq;
 
     int closed[WIDTH * LENGTH] = { 0 };
 
@@ -77,23 +78,17 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
     gCost[startKey] = 0;
 
     float fCost[WIDTH * LENGTH] = { 0 };
-    fCost[startKey] = as_calcDistCost(startX, startY, endX, endY) * (float)Tiles[CLEARING].weight * biomeFactor;
+    fCost[startKey] = as_calcDistCost(startX, startY, endX, endY) * (float)WEIGHTS.at(Terrain::CLEARING) * biomeFactor;
 
-    pq_enqueue(&open, &startKey, fCost[startKey]);
+    pq.push(PQItem(startKey, fCost[startKey]));
 
-    while(!pq_isEmpty(&open)) {
-        void *node;
-
-        pq_dequeue(&open, &node);
-        int currentKey = *(int *)node;
-
-        if(currentKey != startKey)
-            free(node);
+    while(!pq.empty()) {
+        int currentKey = pq.top().getData();
+        pq.pop();
 
         closed[currentKey] = 1;
 
         if(currentKey == endKey) {
-            pq_destroy(&open);
             return ConstructPath(cameFrom, gCost, currentKey, startKey, neighbors == 8);
         }
 
@@ -113,12 +108,10 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
             if(costToNeighbor < gCost[neighborNode] || !visited) {
                 cameFrom[neighborNode] = currentKey;
                 gCost[neighborNode] = costToNeighbor;
-                fCost[neighborNode] = costToNeighbor + as_calcDistCost(nextX, nextY, endX, endY) * (float)Tiles[CLEARING].weight * biomeFactor;
+                fCost[neighborNode] = costToNeighbor + as_calcDistCost(nextX, nextY, endX, endY) * (float)WEIGHTS.at(Terrain::CLEARING) * biomeFactor;
 
                 if(!visited) {
-                    int* neighborPtr = (int *)malloc(sizeof(int));
-                    *neighborPtr = neighborNode;
-                    pq_enqueue(&open, neighborPtr, fCost[neighborNode]);
+                    pq.push(PQItem(neighborNode, fCost[neighborNode]));
                     continue;
                 }
             }
@@ -126,8 +119,8 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
     }
 
     //PrintWeightMap(gCost, startX, startY);
-    pq_destroy(&open);
-    return NULL;
+    std::vector<path_t> paths;
+    return paths;
 }   
 
 /**
@@ -138,12 +131,13 @@ path_t* aStar(int grid[WIDTH][LENGTH], int width, int length, int startX, int st
  * @param start Stopping point of the path
  * @return path_t* 
  */
-path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH], int current, int start, int entity) {
-        path_t* path = (path_t *)malloc(sizeof(path_t));
-        path->coord.x = current % LENGTH;
-        path->coord.y = current / LENGTH;
-        path->previous = NULL;
-        path_t* tempPath = path;
+std::vector<path_t> ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH], int current, int start, int entity) {
+        std::vector<path_t> paths;
+        path_t path;
+        path.coord.x = current % LENGTH;
+        path.coord.y = current / LENGTH;
+        path.gCost = (int)gCost[current];
+        paths.push_back(path);
         
         while (current != start) {
             if(entity && cameFrom[current] == start) {
@@ -153,16 +147,14 @@ path_t* ConstructPath(int cameFrom[WIDTH * LENGTH], float gCost[WIDTH * LENGTH],
             
             current = cameFrom[current];
             
-            tempPath->previous = (path_t *)malloc(sizeof(path_t));
-            tempPath->previous->coord.x = current % LENGTH;
-            tempPath->previous->coord.y = current / LENGTH;
-            tempPath->previous->gCost = (int)gCost[current];
-            tempPath->previous->previous = NULL;
-
-            tempPath = tempPath->previous;
+            path_t path;
+            path.coord.x = current % LENGTH;
+            path.coord.y = current / LENGTH;
+            path.gCost = (int)gCost[current];
+            paths.push_back(path);
         }
 
-        return path;
+        return paths;
 }
 
 int PrintWeightMap(float map[WIDTH * LENGTH], int startX, int startY) {

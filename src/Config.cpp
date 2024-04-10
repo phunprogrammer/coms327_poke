@@ -22,7 +22,6 @@ void Initialize() {
 
     initialized = 1;
     seed = time(NULL);
-    seed = 1712781258;
 
     srand(seed);    
 

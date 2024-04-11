@@ -6,4 +6,4 @@ This is assignment 08 of the Pokemon game for COMS 327. In this iteration, I hav
 (MINOR) Speed state displays incorrect number at low levels
 
 ## HOW TO RUN:
-To run use `make` in the terminal then run the `game <filename>` executable generated from it. Use `make clean` to delete generated files.
+To run use `make` in the terminal then run the `game` executable generated from it. Use `make clean` to delete generated files.

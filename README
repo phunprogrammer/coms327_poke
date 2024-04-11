@@ -1,5 +1,9 @@
-# COMS 327 - Assignment 07
-This is assignment 07 of the Pokemon game for COMS 327. In this iteration, you can parse any of the files mentioned in the assignment. `filename` should consist of the name of the `.csv` file without `.csv` on the end. The program will try to look in the two places specified in the assignment.
+# COMS 327 - Assignment 08
+This is assignment 08 of the Pokemon game for COMS 327. In this iteration, I have completely revamped the game with the new additions. Upon entering the game pick between 3 randomly generated pokemon. All trainers will display what pokemon they have. All IVs of pokemon are randomly generated and level grows as the player travels out. Fly is still active and whenever in a menu use `enter` to progress/backout.
+
+## KNOWN BUGS:
+(MINOR) Game rarely crashes on startup
+(MINOR) Speed state displays incorrect number at low levels
 
 ## HOW TO RUN:
 To run use `make` in the terminal then run the `game <filename>` executable generated from it. Use `make clean` to delete generated files.

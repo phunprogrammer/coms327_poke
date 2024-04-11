@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
     if (argc == 3 && std::string(argv[1]) == "--trainers") {
         numNPC = std::atoi(argv[2]);
-        if (numNPC <= 0) {
+        if (numNPC < 0) {
             std::cerr << "Error: Invalid number of trainers" << std::endl;
             return 1;
         }

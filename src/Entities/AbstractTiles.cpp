@@ -34,11 +34,13 @@ coord_t EntityTile::randomDirection() {
 NPCTile::NPCTile(Entity entity, Screen& screen) :
     EntityTile(entity, screen), defeated(0) {
         screen.getEntities().insert(coord, this);
+        GenerateParty();
     }
 
 NPCTile::NPCTile(Entity entity, coord_t coord, Screen& screen) :
     EntityTile(entity, coord, screen), defeated(0) {
         screen.getEntities().insert(coord, this);
+        GenerateParty();
     }
 
 void NPCTile::setCoord(coord_t coord) {
@@ -81,4 +83,11 @@ int NPCTile::move() {
     queueMove();
 
     return 1;
+}
+
+void NPCTile::GenerateParty() {
+    party.push_back(Pokemon(screen->getCoord()));
+
+    while(rand() % 100 < 60 && party.size() < 6)
+        party.push_back(Pokemon(screen->getCoord()));
 }

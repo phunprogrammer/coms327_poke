@@ -4,6 +4,9 @@
 #include <Tiles.h>
 #include "db_parse.h"
 #include <string>
+#include <sstream>
+#include "Pokemon.h"
+#include "PCTile.h"
 
 CursesHandler::CursesHandler(Screen& screen) : screen(screen) {
     initscr();
@@ -35,7 +38,7 @@ int CursesHandler::PrintScreen() {
     move(1, 0);
     clrtoeol();
     for (const auto& pokemon : screen.getEntities()[0]->getParty()) {
-        wprintw(stdscr, "%s ", pokemon.getPokemon().identifier);
+        wprintw(stdscr, "%s ", pokemon.getPokemonSpecies().identifier);
     }
 
     for (int i = 0; i < WIDTH; ++i)
@@ -108,7 +111,7 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
     while(1) {
         wclear(battleWin);
 
-        if(input == 'Q') {
+        if(input == 10) {
             delwin(battleWin);
             npc->defeat();
             screen.getEntities().remove(npc->getCoord());
@@ -119,10 +122,54 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
         box(battleWin, 0, 0);
 
         mvwprintw(battleWin, 1, 2, "%c wants to battle!", npc->getEntity());
+        mvwprintw(battleWin, 2, 2, "Their party consists of:");
+        
+        int line = 3;
+        for(const auto& pokemon : npc->getParty()) {
+            mvwprintw(battleWin, line++, 2, "%s  lvl: %d", pokemon.getPokemonData().identifier, pokemon.getLevel());
+        }
 
         wrefresh(battleWin);
         input = getch();
     }
+}
+
+int CursesHandler::BattleScreen(PCTile* pc) {
+    Pokemon pokemon = Pokemon(screen.getCoord());
+    int length = std::min(WIDTH * 2, LENGTH);
+    WINDOW* battleWin = newwin(WIDTH, length, start, (LENGTH - length) / 2);
+    box(battleWin, 0, 0);
+
+    mvwprintw(battleWin, 1, 2, "%s wants to battle!\n", pokemon_species[pokemon.getPokemonData().species_id].identifier);
+    mvwprintw(battleWin, 2, 2, "Press enter to capture!\n");
+
+    std::istringstream iss(pokemon.toString());
+    std::string line;
+    int lineNum = 4;
+    while (std::getline(iss, line)) {
+        mvwprintw(battleWin, lineNum++, 2, "%s", line.c_str());
+    }
+
+    wrefresh(battleWin);
+    while(getch() != 10) {}
+    wclear(battleWin);
+    box(battleWin, 0, 0);
+
+    if(rand() % 100 < 50) {
+        mvwprintw(battleWin, 1, 2, "It got away! :(, press enter to continue.");
+        wrefresh(battleWin);
+        while(getch() != 10) {}
+        PrintScreen();
+        return 0;
+    }
+
+    mvwprintw(battleWin, 1, 2, "You caught it!, press enter to continue.");
+    pc->addToParty(pokemon);
+    wrefresh(battleWin);
+    while(getch() != 10) {}
+    delwin(battleWin);
+    PrintScreen();
+    return 1;
 }
 
 int CursesHandler::ListTrainers() {
@@ -202,11 +249,13 @@ int CursesHandler::ChooseStarter() {
 
         for (int i = 0; i < 3; ++i) {
             if (i == selected) {
-                 mvwprintw(starterWin, i * 2 + 3, length / 4, "*%s", starterPokemon[i].identifier);
+                 mvwprintw(starterWin, i * 2 + 3, length / 4, "*%s", pokemon_species[starterPokemon[i].species_id].identifier);
                  continue;
             }
             mvwprintw(starterWin, i * 2 + 3, length / 4, " %s", starterPokemon[i].identifier);
         }
         wrefresh(starterWin);
     } while((input = getch()));
+
+    return 0;
 }

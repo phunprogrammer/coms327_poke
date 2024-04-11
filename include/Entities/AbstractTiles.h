@@ -68,6 +68,7 @@ class NPCTile : public EntityTile {
         void setScreen(Screen& screen) { this->screen = &screen; }
         int move();
         virtual int queueMove() = 0;
+        void GenerateParty();
 };
 
 const std::map<char, int> PC_SPEED ({

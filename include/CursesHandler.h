@@ -7,6 +7,7 @@ class Screen;
 class EntityTile;
 class NPCTile;
 class PCTile;
+class Pokemon;
 
 class CursesHandler {
     private:
@@ -21,6 +22,7 @@ class CursesHandler {
         int UpdateEntity(int index);
         int UpdateEntity(EntityTile* entity);
         int BattleScreen(NPCTile* npc, PCTile* pc);
+        int BattleScreen(PCTile* pc);
         int ListTrainers();
         int ChooseStarter();
 };

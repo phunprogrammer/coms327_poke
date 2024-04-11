@@ -22,6 +22,7 @@ class CursesHandler {
         int UpdateEntity(EntityTile* entity);
         int BattleScreen(NPCTile* npc, PCTile* pc);
         int ListTrainers();
+        int ChooseStarter();
 };
 
 #endif

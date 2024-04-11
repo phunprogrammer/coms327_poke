@@ -2,6 +2,7 @@
 #include "Screen.h"
 #include <stdlib.h>
 #include <CursesHandler.h>
+#include <Pokemon.h>
 
 PCTile::PCTile(coord_t coord) : 
     EntityTile(Entity::PC, coord) {}
@@ -49,4 +50,8 @@ void PCTile::setCoordRandom() {
     coord_t random = randomCoord();
     screen->getEntities().move(this->coord, random);
     this->coord = random;
+}
+
+void PCTile::addToParty(Pokemon pokemon) {
+    party.push_back(pokemon);
 }

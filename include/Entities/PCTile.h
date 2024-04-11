@@ -4,6 +4,7 @@
 #define PCTILE_H
 
 class Screen;
+class Pokemon;
 
 class PCTile : public EntityTile {
     public:
@@ -20,6 +21,8 @@ class PCTile : public EntityTile {
         void setCoordRandom();
         void setScreen(Screen& screen) { this->screen = &screen; }
         int move();
+        void addToParty(Pokemon pokemon);
+        std::vector<Pokemon>& getParty() { return party; }
 };
 
 #endif

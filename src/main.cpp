@@ -10,13 +10,6 @@
 
 int main(int argc, char* argv[])
 {
-    db_parse(0);
-    Pokemon bulbasaur = Pokemon(pokemon[3], 1);
-
-    std::cout << bulbasaur.toString() << std::endl;
-
-    return 1;
-
     if (argc == 3 && std::string(argv[1]) == "--trainers") {
         numNPC = std::atoi(argv[2]);
         if (numNPC <= 0) {
@@ -26,11 +19,16 @@ int main(int argc, char* argv[])
     }
 
     Initialize();
+    db_parse(0);
+
     char current;
     waves = Screen::GetWaves();
     coord_t coord = {200, 200};
 
-    InputHandler input = InputHandler(new Screen(waves, coord, new PCTile({0, 0})));
+    PCTile* pc = new PCTile({0, 0});
+    InputHandler input = InputHandler(new Screen(waves, coord, pc));
+    pc->addToParty(Pokemon(pokemon[input.getScreen()->getCursesHandler().ChooseStarter()], 5));
+    input.getScreen()->getCursesHandler().PrintScreen();
 
     do
     {
@@ -49,18 +47,6 @@ int main(int argc, char* argv[])
             if(top == NULL_ENTITY_PTR)
                 break;
         }
-        
-        // int i = 0;
-        // move(TERM_WIDTH, 0);
-        // clrtoeol();
-        // for (const auto& pair : input.getScreen()->getEntities().getMap())
-        //     mvwprintw(stdscr, TERM_WIDTH, i++, "%c", pair.second->getEntity());
-
-        // move(TERM_WIDTH + 1, 0);
-        // clrtoeol();
-        // for (i = 0; i < (int)input.getScreen()->getEntities().size(); i++)
-        //      mvwprintw(stdscr, TERM_WIDTH + 1, i, "%c", input.getScreen()->getEntities()[i]->getEntity());
-
     } while ((current = getch()) != 'Q');
 
     return 0;

@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "Tiles.h"
+#include "Pokemon.h"
 
 #include <map>
 
@@ -35,10 +36,13 @@ class EntityTile {
         coord_t coord;
         coord_t prevCoord;
         coord_t direction;
+
+        std::vector<Pokemon> party;
     public:
         virtual Entity getEntity() = 0;
         virtual coord_t getCoord() = 0;
         virtual coord_t getPrevCoord() = 0;
+        virtual std::vector<Pokemon>& getParty() = 0;
         virtual void setCoord(coord_t coord) = 0;
         virtual void setScreen(Screen& screen) = 0;
         virtual int move() = 0;
@@ -56,6 +60,8 @@ class NPCTile : public EntityTile {
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }
         coord_t getPrevCoord() { return prevCoord; }
+        std::vector<Pokemon>& getParty() { return party; }
+
         bool isDefeated() { return defeated; }
         void defeat() { defeated = true; }
         void setCoord(coord_t coord);

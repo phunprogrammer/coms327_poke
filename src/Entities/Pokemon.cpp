@@ -38,7 +38,29 @@ Pokemon::Pokemon(pokemon_db pokemon, int level) : level(level), pokemon(pokemon)
         if(pokemon_moves[i].pokemon_move_method_id == 1 && !std::count(learnableMoves.begin(), learnableMoves.end(), pokemon_moves[i]))
             learnableMoves.push_back(pokemon_moves[i]);
     }
+    int minMoveLevel = learnableMoves[0].level;
+
+    for(int i = 1; i < (int)learnableMoves.size(); i++) {
+        int current = learnableMoves[i].level;
+        if(learnableMoves[i].level < minMoveLevel)
+            minMoveLevel = learnableMoves[i].level;
+    }
+
+    level = std::max(minMoveLevel, this->level);
+
+    std::vector<int> validMoves;
+    for(int i = 0; i < (int)learnableMoves.size(); i++)
+        if(learnableMoves[i].level <= this->level)
+            validMoves.push_back(i);
+
+    while(validMoves.size() > 0 && learnedMoves.size() < 4) {
+        int index = rand() % validMoves.size();
+        learnedMoves.push_back(learnableMoves[validMoves[index]]);
+        validMoves.erase(validMoves.begin() + index);
+    }
 };
+
+Pokemon::~Pokemon() {}
 
 std::string Pokemon::toString() const {
     std::ostringstream oss;
@@ -46,11 +68,6 @@ std::string Pokemon::toString() const {
     oss << "Species: " << pokemonSpecies.identifier << std::endl;
     oss << "Level: " << level << std::endl;
     //oss << "Experience: " << experience << std::endl;
-
-    oss << "Learnable Moves:" << std::endl;
-    for (const auto& move : learnableMoves) {
-        oss << " - " << std::string(moves[move.move_id].identifier) << std::endl;
-    }
 
     oss << "Stats:" << std::endl;
     for (const auto& stat : pokemonStats) {
@@ -60,6 +77,16 @@ std::string Pokemon::toString() const {
     oss << "Types:" << std::endl;
     for (const auto& type : pokemonTypes) {
         oss << " - " << std::string(types[type.type_id]) << std::endl;
+    }
+
+    oss << "Learnable Moves:" << std::endl;
+    for (const auto& move : learnableMoves) {
+        oss << " - " << std::string(moves[move.move_id].identifier) << std::endl;
+    }
+
+    oss << "Learned Moves:" << std::endl;
+    for (const auto& move : learnedMoves) {
+        oss << " - " << std::string(moves[move.move_id].identifier) << std::endl;
     }
 
     return oss.str();

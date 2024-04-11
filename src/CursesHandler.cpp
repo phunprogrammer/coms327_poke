@@ -2,6 +2,8 @@
 #include "Screen.h"
 #include "Config.h"
 #include <Tiles.h>
+#include "db_parse.h"
+#include <string>
 
 CursesHandler::CursesHandler(Screen& screen) : screen(screen) {
     initscr();
@@ -22,12 +24,18 @@ int CursesHandler::PrintScreen() {
     wclear(stdscr);
     mvwprintw(stdscr, 0, 0, "Seed: %d", seed);  
 
-    for(int i = 0; i < LENGTH; i++) {
-        mvwprintw(stdscr, 1, i, "%d", i % 10);  
-    }
+    // for(int i = 0; i < LENGTH; i++) {
+    //     mvwprintw(stdscr, 1, i, "%d", i % 10);  
+    // }
 
-    for(int i = 0; i < WIDTH; i++) {
-        mvwprintw(stdscr, i + 2, LENGTH, "%d", i % 10);  
+    // for(int i = 0; i < WIDTH; i++) {
+    //     mvwprintw(stdscr, i + 2, LENGTH, "%d", i % 10);  
+    // }
+
+    move(1, 0);
+    clrtoeol();
+    for (const auto& pokemon : screen.getEntities()[0]->getParty()) {
+        wprintw(stdscr, "%s ", pokemon.getPokemon().identifier);
     }
 
     for (int i = 0; i < WIDTH; ++i)
@@ -157,4 +165,48 @@ int CursesHandler::ListTrainers() {
     PrintScreen();
 
     return 1;
+}
+
+int CursesHandler::ChooseStarter() {
+    const int width = WIDTH / 2;
+    const int length = LENGTH / 2;
+    WINDOW* starterWin = newwin(width, length, start + (WIDTH - width) / 2, (LENGTH - length) / 2);
+
+    std::vector<pokemon_db> starterPokemon;
+
+    for(int i = 0; i < 3; i++)
+        starterPokemon.push_back(pokemon[(rand() % pokemon_db_size - 1) + 1]);
+
+
+    int selected = 0;
+    int input = 0;
+
+    do {
+        wclear(starterWin);
+        box(starterWin, 0, 0);
+        mvwprintw(starterWin, 1, 4, "Use arrow keys, enter to select");
+
+        switch (input) {
+            case KEY_UP:
+                selected = (selected - 1 + 3) % 3;
+                break;
+            case KEY_DOWN:
+                selected = (selected + 1) % 3;
+                break;
+            case 10:
+                delwin(starterWin);
+                PrintScreen();
+                return starterPokemon[selected].id;
+                break;
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            if (i == selected) {
+                 mvwprintw(starterWin, i * 2 + 3, length / 4, "*%s", starterPokemon[i].identifier);
+                 continue;
+            }
+            mvwprintw(starterWin, i * 2 + 3, length / 4, " %s", starterPokemon[i].identifier);
+        }
+        wrefresh(starterWin);
+    } while((input = getch()));
 }

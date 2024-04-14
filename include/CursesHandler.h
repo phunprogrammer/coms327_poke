@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <vector>
 
 #ifndef CURSESHANDLER_H
 #define CURSESHANDLER_H
@@ -27,6 +28,7 @@ class CursesHandler {
         int ChooseStarter();
         int BattleMenu(WINDOW* menu);
         int FightMenu(WINDOW* menu, Pokemon pokemon);
+        int PKMNMenu(WINDOW* menu, std::vector<Pokemon> party);
 };
 
 #endif

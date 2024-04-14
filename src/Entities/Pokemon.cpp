@@ -42,13 +42,15 @@ void Pokemon::LoadData() {
         pokemonBaseStats.push_back(pokemon_stats[i]);
     }
 
-    pokemonIVs.push_back(rand() % 16);
-    int value = std::floor(((pokemonBaseStats[0].base_stat + pokemonIVs[0]) * 2 * level) / 100) + level + 10;
+    int randInt = rand() % 16;
+    pokemonIVs.push_back(randInt);
+    int value = std::floor(((pokemonBaseStats[0].base_stat + pokemonIVs[0]) * 2 * level) / 100.0) + level + 10;
     pokemonStats.push_back(value);
 
     for(int j = 1; j < (int)pokemonBaseStats.size(); j++) {
-        pokemonIVs.push_back(rand() % 16);
-        value = std::floor(((pokemonBaseStats[j].base_stat + pokemonIVs[j]) * 2 * level) / 100) + 5;
+        int randInt = rand() % 16;
+        pokemonIVs.push_back(randInt);
+        value = std::floor(((pokemonBaseStats[j].base_stat + pokemonIVs[j]) * 2 * level) / 100.0) + 5;
         pokemonStats.push_back(value);
     }
         
@@ -115,7 +117,7 @@ std::string Pokemon::toString() const {
 
     oss << "Stats:" << std::endl;
     for (const auto& stat : pokemonBaseStats) {
-        oss << " - " << std::string(stats[stat.stat_id].identifier) << ": " << pokemonStats[stat.stat_id] << std::endl;
+        oss << " - " << std::string(stats[stat.stat_id].identifier) << ": " << pokemonStats[stat.stat_id - 1] << std::endl;
     }
 
     oss << "Types:" << std::endl;

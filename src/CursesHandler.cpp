@@ -170,6 +170,7 @@ int CursesHandler::BattleScreen(PCTile* pc) {
     delwin(battleWin);
     PrintScreen();
     return 1;
+    
 }
 
 int CursesHandler::ListTrainers() {
@@ -252,7 +253,7 @@ int CursesHandler::ChooseStarter() {
                  mvwprintw(starterWin, i * 2 + 3, length / 4, "*%s", pokemon_species[starterPokemon[i].species_id].identifier);
                  continue;
             }
-            mvwprintw(starterWin, i * 2 + 3, length / 4, " %s", starterPokemon[i].identifier);
+            mvwprintw(starterWin, i * 2 + 3, length / 4, " %s", pokemon_species[starterPokemon[i].species_id].identifier);
         }
         wrefresh(starterWin);
     } while((input = getch()));

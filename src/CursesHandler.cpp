@@ -7,6 +7,7 @@
 #include <sstream>
 #include "Pokemon.h"
 #include "PCTile.h"
+#include <cmath>
 
 CursesHandler::CursesHandler(Screen& screen) : screen(screen) {
     initscr();
@@ -104,6 +105,7 @@ void CursesHandler::InitColors() {
 int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
     int length = std::min(WIDTH * 2, LENGTH);
     WINDOW* battleWin = newwin(WIDTH, length, start, (LENGTH - length) / 2);
+    WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
     box(battleWin, 0, 0);
 
     int input = 0;
@@ -111,26 +113,18 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
     while(1) {
         wclear(battleWin);
 
-        if(input == 10) {
-            delwin(battleWin);
-            npc->defeat();
-            screen.getEntities().remove(npc->getCoord());
-            PrintScreen();
-            return CONTINUE;
-        }
-
         box(battleWin, 0, 0);
 
-        mvwprintw(battleWin, 1, 2, "%c wants to battle!", npc->getEntity());
-        mvwprintw(battleWin, 2, 2, "Their party consists of:");
-        
-        int line = 3;
-        for(const auto& pokemon : npc->getParty()) {
-            mvwprintw(battleWin, line++, 2, "%s  lvl: %d", pokemon.getPokemonData().identifier, pokemon.getLevel());
-        }
-
         wrefresh(battleWin);
-        input = getch();
+        switch(BattleMenu(menuWin)) {
+            case 0:
+                FightMenu(menuWin, pc->getParty()[0]);
+            case 1:
+            case 2:
+            case 3:
+                break;
+        }
+        getch();
     }
 }
 
@@ -170,7 +164,91 @@ int CursesHandler::BattleScreen(PCTile* pc) {
     delwin(battleWin);
     PrintScreen();
     return 1;
-    
+}
+
+int CursesHandler::BattleMenu(WINDOW* menu) {
+    std::vector<std::vector<std::string>> options{
+        {"FIGHT", "PKMN"},
+        {"BAG", "RUN"}
+    };
+
+    coord_t selection = { 0, 0 };
+
+    int length = std::min(WIDTH * 2, LENGTH);
+    int input = 0;
+
+    do {
+        wclear(menu);
+        box(menu, 0, 0);
+
+        switch(input) {
+            case KEY_RIGHT:
+                selection.x = std::min((int)options[0].size() - 1, selection.x + 1);
+                break;
+            case KEY_LEFT:
+                selection.x = std::max(0, selection.x - 1);
+                break;
+            case KEY_DOWN:
+                selection.y = std::min((int)options.size() - 1, selection.y + 1);
+                break;
+            case KEY_UP:
+                selection.y = std::max(0, selection.y - 1);
+                break;
+        }
+
+        for(int i = 0; i < (int)options.size(); i++)
+            for(int j = 0; j < (int)options[0].size(); j++) {
+                if(selection.x == j && selection.y == i)
+                    mvwprintw(menu, 2 * (i + 1), length * 0.55 + j * 10 - 1, ">%s<", options[i][j].c_str());
+                else
+                    mvwprintw(menu, 2 * (i + 1), length * 0.55 + j * 10, "%s", options[i][j].c_str());
+            }
+
+        wrefresh(menu);
+    } while((input = getch()) != 10);
+
+    if(options[selection.y][selection.x] == "FIGHT")
+        return 0;
+
+    if(options[selection.y][selection.x] == "PKMN")
+        return 1;
+
+    if(options[selection.y][selection.x] == "BAG")
+        return 2;
+
+    if(options[selection.y][selection.x] == "RUN")
+        return 3;
+}
+
+int CursesHandler::FightMenu(WINDOW* menu, Pokemon pokemon) {
+    int selection = 0;
+
+    int length = std::min(WIDTH * 2, LENGTH);
+    int input = 0;
+
+    do {
+        wclear(menu);
+        box(menu, 0, 0);
+
+        switch(input) {
+            case KEY_DOWN:
+                selection = std::min((int)pokemon.getLearnedMoves().size() - 1, selection + 1);
+                break;
+            case KEY_UP:
+                selection = std::max(0, selection - 1);
+                break;
+        }
+
+        for(int i = 0; i < (int)pokemon.getLearnedMoves().size(); i++)
+            if(selection == i)
+                mvwprintw(menu, (i + 1), length * 0.55 - 1, ">%s<", moves[pokemon.getLearnedMoves()[i].move_id].identifier);
+            else
+                mvwprintw(menu, (i + 1), length * 0.55, "%s", moves[pokemon.getLearnedMoves()[i].move_id].identifier);
+
+        wrefresh(menu);
+    } while((input = getch()) != 10);
+
+    return selection;
 }
 
 int CursesHandler::ListTrainers() {

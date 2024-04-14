@@ -25,6 +25,8 @@ class CursesHandler {
         int BattleScreen(PCTile* pc);
         int ListTrainers();
         int ChooseStarter();
+        int BattleMenu(WINDOW* menu);
+        int FightMenu(WINDOW* menu, Pokemon pokemon);
 };
 
 #endif

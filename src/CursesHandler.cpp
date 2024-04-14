@@ -130,7 +130,7 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
                 break;
             case 1: {
                     int pkmnTemp = 0;
-                    if((pkmnTemp = PKMNMenu(menuWin, pc->getParty())) == pc->getParty().size() || pkmnTemp == pokemonIndex)
+                    if((pkmnTemp = PKMNMenu(menuWin, pc->getParty())) == (int)pc->getParty().size() || pkmnTemp == pokemonIndex)
                         continue;
                     else
                         pokemonIndex = pkmnTemp;
@@ -351,11 +351,10 @@ int CursesHandler::ChooseStarter() {
     const int length = LENGTH / 2;
     WINDOW* starterWin = newwin(width, length, start + (WIDTH - width) / 2, (LENGTH - length) / 2);
 
-    std::vector<pokemon_db> starterPokemon;
+    std::vector<pokemon_species_db> starterPokemon;
 
     for(int i = 0; i < 3; i++)
-        starterPokemon.push_back(pokemon[(rand() % pokemon_db_size - 1) + 1]);
-
+        starterPokemon.push_back(pokemon_species[(rand() % pokemon_species_size - 1) + 1]);
 
     int selected = 0;
     int input = 0;
@@ -381,10 +380,10 @@ int CursesHandler::ChooseStarter() {
 
         for (int i = 0; i < 3; ++i) {
             if (i == selected) {
-                 mvwprintw(starterWin, i * 2 + 3, length / 4, "*%s", pokemon_species[starterPokemon[i].species_id].identifier);
+                 mvwprintw(starterWin, i * 2 + 3, length / 4, "*%s", starterPokemon[i].identifier);
                  continue;
             }
-            mvwprintw(starterWin, i * 2 + 3, length / 4, " %s", pokemon_species[starterPokemon[i].species_id].identifier);
+            mvwprintw(starterWin, i * 2 + 3, length / 4, " %s", starterPokemon[i].identifier);
         }
         wrefresh(starterWin);
     } while((input = getch()));

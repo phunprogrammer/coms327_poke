@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 
     PCTile* pc = new PCTile({0, 0});
     InputHandler input = InputHandler(new Screen(waves, coord, pc));
-    pc->addToParty(Pokemon(pokemon[input.getScreen()->getCursesHandler().ChooseStarter()], 5));
+    pc->addToParty(Pokemon(pokemon_species[input.getScreen()->getCursesHandler().ChooseStarter()], 5));
     input.getScreen()->getCursesHandler().PrintScreen();
 
     do

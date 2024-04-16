@@ -4,6 +4,7 @@
 #include <algorithm> 
 #include <Config.h>
 #include <cmath>
+#include <climits>
 
 Pokemon::Pokemon(pokemon_species_db pokemon, int level) : level(level), pokemonSpecies(pokemon) {
     LoadData();
@@ -148,12 +149,12 @@ std::string Pokemon::toString() const {
     return oss.str();
 }
 
-int Pokemon::incrementHP(int amount) {
-    if(hp == 0 || hp == pokemonStats[0] || amount == 0) return 0;
+int Pokemon::UpdateHP(int amount) {
+    if(amount == 0 || (amount < 0 && hp == 0) || (amount > 0 && hp == pokemonStats[0])) return 0;
     hp = std::max(std::min(pokemonStats[0], hp + amount), 0);
     return 1;
 }
-int Pokemon::incrementExp(int amount) {
+int Pokemon::IncrementExp(int amount) {
     if(level == 100 || amount <= 0) return 0;
 
     int used = amount;
@@ -184,6 +185,38 @@ int Pokemon::CalcStats() {
         value = std::floor(((pokemonBaseStats[j].base_stat + pokemonIVs[j]) * 2 * level) / 100.0) + 5;
         pokemonStats.push_back(value);
     }
+
+    return 1;
+}
+
+float Pokemon::CalcBaseDmg(move_db move, Pokemon enemy) {
+    float baseDmg = ((2 * this->level) / 5.0 + 2) * (float)move.power * ((float)pokemonStats[Stat::ATTACK] / (float)enemy.getPokemonStats()[Stat::DEFENSE]);
+    return (baseDmg / 50.0) + 2;
+}
+
+float Pokemon::Effectiveness(move_db move, Pokemon enemy) {
+    int start = ((move.type_id - 1) * 18) + 1;
+    float efficacy = type_efficacy[start + enemy.getPokemonTypes()[0].type_id - 1].damage_factor / 100.0;
+
+    if((int)enemy.getPokemonTypes().size() > 1)
+        efficacy *= type_efficacy[start + enemy.getPokemonTypes()[1].type_id - 1].damage_factor / 100.0;
+
+    return efficacy;
+}
+
+int Pokemon::Attack(move_db move, Pokemon& enemy) {
+    if(move.power == INT_MAX || rand() % 100 + 1 > move.accuracy)
+        return 0;
+
+    float baseDmg = CalcBaseDmg(move, enemy);
+    float randMultiplier = (rand() % 16 + 85) / 100.0;
+    float stabMultiplier = move.type_id == pokemonTypes[0].type_id || ((int)pokemonTypes.size() > 1 && move.type_id == pokemonTypes[1].type_id) ? 1.5 : 1;
+    float typeMultiplier = Effectiveness(move, enemy);
+    float critMultiplier = ((rand() % 256) < pokemonBaseStats[Stat::SPEED].base_stat / 2.0) ? 1.5 : 1;
+
+    int totalDmg = baseDmg * critMultiplier * randMultiplier  * stabMultiplier * typeMultiplier;
+
+    enemy.UpdateHP(totalDmg * -1);
 
     return 1;
 }

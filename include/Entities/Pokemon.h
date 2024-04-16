@@ -6,6 +6,15 @@
 #ifndef POKEMON_H
 #define POKEMON_H
 
+enum Stat {
+    HP,
+    ATTACK,
+    DEFENSE,
+    SATTACK,
+    SDEFENSE,
+    SPEED
+};
+
 class Pokemon {
     private:
         int level;
@@ -18,6 +27,7 @@ class Pokemon {
         std::vector<int> pokemonStats;
         std::vector<int> pokemonIVs;
 
+        std::vector<int> movePP;
         std::vector<pokemon_move_db> learnedMoves;
         std::vector<pokemon_move_db> learnableMoves;
 
@@ -27,6 +37,8 @@ class Pokemon {
         std::vector<pokemon_types_db> pokemonTypes;
 
         int CalcStats();
+        float CalcBaseDmg(move_db move, Pokemon enemy);
+        float Effectiveness(move_db move, Pokemon enemy);
     public:
         Pokemon(pokemon_species_db pokemon, int level);
         Pokemon(coord_t screenCoord);
@@ -40,12 +52,16 @@ class Pokemon {
         const std::vector<pokemon_move_db>& getLearnableMoves() const { return learnableMoves; }
         const pokemon_db& getPokemonData() const { return pokemonData; }
         const pokemon_species_db& getPokemonSpecies() const { return pokemonSpecies; }
-        const std::vector<pokemon_stats_db>& getPokemonStats() const { return pokemonBaseStats; }
+        const std::vector<pokemon_stats_db>& getPokemonBaseStats() const { return pokemonBaseStats; }
+         const std::vector<int>& getPokemonStats() const { return pokemonStats; }
         const std::vector<pokemon_types_db>& getPokemonTypes() const { return pokemonTypes; }
+        
+        bool isFainted() { return hp <= 0; }
 
         void LoadData();
-        int incrementHP(int amount);
-        int incrementExp(int amount);
+        int UpdateHP(int amount);
+        int IncrementExp(int amount);
+        int Attack(move_db move, Pokemon& enemy);
 };
 
 #endif

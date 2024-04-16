@@ -79,6 +79,9 @@ stats_db stats[stats_size];
 const int pokemon_types_size = 1676;
 pokemon_types_db pokemon_types[pokemon_types_size];
 
+const int type_efficacy_size = 325;
+type_efficacy_db type_efficacy[type_efficacy_size];
+
 void db_parse(bool print)
 {
   FILE *f;
@@ -523,6 +526,39 @@ void db_parse(bool print)
               i2s(pokemon_types[i].pokemon_id),
               i2s(pokemon_types[i].type_id),
               i2s(pokemon_types[i].slot));
+    }
+    fclose(f);
+  }
+
+  prefix = (char *) realloc(prefix,
+                            prefix_len + strlen("type_efficacy.csv") + 1);
+  strcpy(prefix + prefix_len, "type_efficacy.csv");
+  
+  f = fopen(prefix, "r");
+
+  //No null byte copied here, so prefix is not technically a string anymore.
+  prefix = (char *) realloc(prefix, prefix_len + 1);
+
+  fgets(line, 800, f);
+  
+  for (i = 1; i < type_efficacy_size; i++) {
+    fgets(line, 800, f);
+    type_efficacy[i].damage_type_id = atoi((tmp = next_token(line, ',')));
+    tmp = next_token(NULL, ',');
+    type_efficacy[i].target_type_id = *tmp ? atoi(tmp) : INT_MAX;
+    tmp = next_token(NULL, ',');
+    type_efficacy[i].damage_factor = (*tmp != '\n') ? atoi(tmp) : INT_MAX;
+  }
+
+  fclose(f);
+  
+  if (print) {
+    f = fopen("type_efficacy.csv", "w");
+    for (i = 1; i < type_efficacy_size; i++) {
+      fprintf(f, "%s,%s,%s\n",
+              i2s(type_efficacy[i].damage_type_id),
+              i2s(type_efficacy[i].target_type_id),
+              i2s(type_efficacy[i].damage_factor));
     }
     fclose(f);
   }

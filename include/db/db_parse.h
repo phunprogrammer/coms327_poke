@@ -98,6 +98,12 @@ struct pokemon_types_db {
   int slot;
 };
 
+struct type_efficacy_db {
+  int damage_type_id;
+  int target_type_id;
+  int damage_factor;
+};
+
 extern const int pokemon_db_size;
 extern pokemon_db pokemon[];
 
@@ -124,6 +130,9 @@ extern stats_db stats[];
 
 extern const int pokemon_types_size;
 extern pokemon_types_db pokemon_types[];
+
+extern const int type_efficacy_size;
+extern type_efficacy_db type_efficacy[];
 
 void db_parse(bool print);
 

@@ -10,7 +10,7 @@ PCTile::PCTile(coord_t coord) :
 int PCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
 
-    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move] != this && !((NPCTile*)screen->getEntities()[move])->isDefeated()) {
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move] != this && !((NPCTile*)screen->getEntities()[move])->isDefeated() && !this->isDefeated()) {
         setCoord(this->coord);
         int out = screen->getCursesHandler().BattleScreen((NPCTile*)screen->getEntities()[move], this);
         delete screen->getEntities()[move];
@@ -58,4 +58,21 @@ void PCTile::setCoordRandom() {
 void PCTile::addToParty(Pokemon pokemon) {
     if(party.size() < 6)
         party.push_back(pokemon);
+}
+
+int PCTile::healParty() {
+    for (auto& pokemon : party)
+        pokemon.Heal();
+}
+
+int PCTile::isDefeated() {
+    bool pcDefeated = true;
+    for (auto& pokemon : party) {
+        if (!pokemon.isFainted()) {
+            pcDefeated = false;
+            break;
+        }
+    }
+
+    return pcDefeated;
 }

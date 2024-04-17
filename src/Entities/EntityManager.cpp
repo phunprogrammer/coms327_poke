@@ -61,21 +61,22 @@ EntityTile* EntityManager::SpawnNPC(Entity entity) {
     return npc;
 }
 
-EntityTile* EntityManager::PopTop() {
+int EntityManager::PopTop() {
     PQItem<EntityTile*> top = screen.getMoveQueue().top();
+    int out;
 
     if(((NPCTile*)top.getData())->isDefeated()) {
         screen.getMoveQueue().pop();
         delete top.getData();
-        return NULL_ENTITY_PTR;
+        return END;
     }
 
     if(top.getPriority() <= screen.getPriority()) {
-        top.getData()->move();
+        out = top.getData()->move();
         screen.getMoveQueue().pop();
     }
     else
-        return NULL_ENTITY_PTR;
+        return END;
 
-    return top.getData();
+    return out;
 }

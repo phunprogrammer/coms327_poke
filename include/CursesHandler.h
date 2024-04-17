@@ -16,6 +16,7 @@ class CursesHandler {
         WINDOW* screenWin;
         Screen& screen;
         void InitColors();
+        void BattleGraphics(WINDOW* menu);
     public:
         CursesHandler(Screen& screen);
         ~CursesHandler();
@@ -26,6 +27,7 @@ class CursesHandler {
         int BattleScreen(PCTile* pc);
         int ListTrainers();
         int ChooseStarter();
+        int BattleInfo(WINDOW* menu, Pokemon pc, Pokemon enemy);
         int BattleMenu(WINDOW* menu);
         int FightMenu(WINDOW* menu, Pokemon pokemon);
         int PKMNMenu(WINDOW* menu, std::vector<Pokemon> party);

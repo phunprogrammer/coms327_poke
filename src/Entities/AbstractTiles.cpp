@@ -2,6 +2,7 @@
 #include "AbstractTiles.h"
 #include "Screen.h"
 #include <stdlib.h>
+#include "PCTile.h"
 
 EntityTile::EntityTile(Entity entity, coord_t coord, Screen& screen) : 
     entity(entity), screen(&screen), speed(ENTITY_SPEED.at(entity)), coord(coord), direction(randomDirection()) {}
@@ -68,7 +69,7 @@ int NPCTile::ValidMove(coord_t move) {
 int NPCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
 
-    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move]->getEntity() == Entity::PC && !this->defeated) {
+    if(screen->getEntities()[move] != NULL_ENTITY_PTR && screen->getEntities()[move]->getEntity() == Entity::PC && !this->defeated && !((PCTile*)screen->getEntities()[move])->isDefeated()) {
         screen->getCursesHandler().BattleScreen(this, (PCTile*)screen->getEntities()[move]);
     }
 

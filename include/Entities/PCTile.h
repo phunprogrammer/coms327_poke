@@ -23,6 +23,8 @@ class PCTile : public EntityTile {
         int move();
         void addToParty(Pokemon pokemon);
         std::vector<Pokemon>& getParty() { return party; }
+        int healParty();
+        int isDefeated();
 };
 
 #endif

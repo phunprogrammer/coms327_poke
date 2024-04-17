@@ -10,6 +10,19 @@
 
 int main(int argc, char* argv[])
 {
+    // db_parse(0);
+    // Initialize();
+    // Pokemon mon1 = Pokemon(pokemon_species[6], 40);
+    // Pokemon mon2 = Pokemon(pokemon_species[3], 40);
+    // std::cout << mon1.toString() <<std::endl;
+    // std::cout << mon2.toString() <<std::endl;
+    // mon1.Attack(moves[mon1.getLearnedMoves()[0].move_id], mon2);
+    // mon2.Attack(moves[mon2.getLearnedMoves()[3].move_id], mon1);
+    // std::cout << mon1.toString() <<std::endl;
+    // std::cout << mon2.toString() <<std::endl;
+
+    // return 0;
+
     if (argc == 3 && std::string(argv[1]) == "--trainers") {
         numNPC = std::atoi(argv[2]);
         if (numNPC < 0) {
@@ -42,9 +55,9 @@ int main(int argc, char* argv[])
             continue;
 
         while(!input.getScreen()->getMoveQueue().empty()) {
-            EntityTile* top = input.getScreen()->getEntityManager().PopTop();
+            command = (Command)input.getScreen()->getEntityManager().PopTop();
 
-            if(top == NULL_ENTITY_PTR)
+            if(command == END)
                 break;
         }
     } while ((current = getch()) != 'Q');

@@ -10,6 +10,7 @@
 #include <cmath>
 
 CursesHandler::CursesHandler(Screen& screen) : screen(screen) {
+    setlocale(LC_ALL, "");
     initscr();
     cbreak();
     noecho();
@@ -108,32 +109,34 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
     WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
     box(battleWin, 0, 0);
 
-    int input = 0;
-    int move = 0;
-    int pokemonIndex = 0;
+    int pcPokemon = 0;
+    int npcPokemon = 0;
+    move_db pcMove;
+    move_db npcMove;
+    int battleWinner = 0; //0 = PC, 1 = NPC
 
     while(1) {
         wclear(battleWin);
 
-        box(battleWin, 0, 0);
-
-        wrefresh(battleWin);
+        BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
 
         switch(BattleMenu(menuWin)) {
             case 0:
-                switch((move = FightMenu(menuWin, pc->getParty()[pokemonIndex]))) {
+                int moveTemp;
+                switch((moveTemp = FightMenu(menuWin, pc->getParty()[pcPokemon]))) {
                     case 4:
                         continue;
                     default:
+                        pcMove = moves[pc->getParty()[pcPokemon].getLearnedMoves()[moveTemp].move_id];
                         break;
                 }
                 break;
             case 1: {
                     int pkmnTemp = 0;
-                    if((pkmnTemp = PKMNMenu(menuWin, pc->getParty())) == (int)pc->getParty().size() || pkmnTemp == pokemonIndex)
+                    if((pkmnTemp = PKMNMenu(menuWin, pc->getParty())) == (int)pc->getParty().size() || pkmnTemp == pcPokemon)
                         continue;
                     else
-                        pokemonIndex = pkmnTemp;
+                        pcPokemon = pkmnTemp;
                     break;
                 }
                 break;
@@ -141,7 +144,53 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
             case 3:
                 continue;
         }
+
+        npcMove = moves[npc->getParty()[npcPokemon].getLearnedMoves()[rand() % npc->getParty()[npcPokemon].getLearnedMoves().size()].move_id];
+
+        int pcPriority = pcMove.priority * 1000 + pc->getParty()[pcPokemon].getPokemonStats()[Stat::SPEED];
+        int npcPriority = npcMove.priority * 1000 + npc->getParty()[npcPokemon].getPokemonStats()[Stat::SPEED];
+
+        if (pcPriority >= npcPriority) {
+            pc->getParty()[pcPokemon].Attack(pcMove, npc->getParty()[npcPokemon]);
+
+            if (!npc->getParty()[npcPokemon].isFainted())
+                npc->getParty()[npcPokemon].Attack(npcMove, pc->getParty()[pcPokemon]);
+        } else {
+            npc->getParty()[npcPokemon].Attack(npcMove, pc->getParty()[pcPokemon]);
+
+            if (!pc->getParty()[pcPokemon].isFainted())
+                pc->getParty()[pcPokemon].Attack(pcMove, npc->getParty()[npcPokemon]);
+        }
+
+        if (npc->getParty()[npcPokemon].isFainted()) {
+            int experience = (npc->getParty()[npcPokemon].getPokemonData().base_experience * npc->getParty()[npcPokemon].getLevel()) / 7;
+            pc->getParty()[pcPokemon].IncrementExp(experience * 1.5);
+
+            if(npcPokemon == (int)npc->getParty().size() - 1)
+                break;
+            npcPokemon++;
+        }
+
+        if (pc->getParty()[pcPokemon].isFainted()) {
+            if(pc->isDefeated()) {
+                battleWinner = 1;
+                break;
+            }
+            else
+                while((pcPokemon = PKMNMenu(menuWin, pc->getParty())) < (int)pc->getParty().size());
+        }
     }
+
+    int out = NOTHING;
+
+    if(battleWinner == 0) {
+        npc->defeat();
+        screen.getEntities().remove(npc->getCoord());
+    }
+
+    delwin(battleWin);
+    PrintScreen();
+    return out;
 }
 
 int CursesHandler::BattleScreen(PCTile* pc) {
@@ -234,6 +283,8 @@ int CursesHandler::BattleMenu(WINDOW* menu) {
 
     if(options[selection.y][selection.x] == "RUN")
         return 3;
+
+    return 0;
 }
 
 int CursesHandler::FightMenu(WINDOW* menu, Pokemon pokemon) {
@@ -353,8 +404,9 @@ int CursesHandler::ChooseStarter() {
 
     std::vector<pokemon_species_db> starterPokemon;
 
-    for(int i = 0; i < 3; i++)
-        starterPokemon.push_back(pokemon_species[(rand() % pokemon_species_size - 1) + 1]);
+    for(int i = 0; i < 3; i++) {
+        starterPokemon.push_back(pokemon_species[rand() % (pokemon_species_size - 1) + 1]);
+    }
 
     int selected = 0;
     int input = 0;
@@ -389,4 +441,63 @@ int CursesHandler::ChooseStarter() {
     } while((input = getch()));
 
     return 0;
+}
+
+int CursesHandler::BattleInfo(WINDOW* menu, Pokemon pc, Pokemon enemy) {
+    BattleGraphics(menu);
+
+    //PC
+    mvwaddstr(menu, 9, 18, pc.getPokemonSpecies().identifier);
+    char info[48];
+    snprintf(info, 48, "lvl:%-4d hp:%d/%d", pc.getLevel(), pc.getHp(), pc.getPokemonStats()[Stat::HP]);
+    mvwaddstr(menu, 10, 18, info);
+
+    int hpBar;
+    int currentHp = 20.0 * ((float)pc.getHp() / pc.getPokemonStats()[Stat::HP]);
+
+    for(hpBar = 0; hpBar < currentHp; hpBar++)
+        mvwaddstr(menu, 11, 18 + hpBar, "▮");
+
+    for(; hpBar < 20; hpBar++)
+        mvwaddstr(menu, 11, 18 + hpBar, "▯");
+
+    //ENEMY
+    mvwaddstr(menu, 2, 3, enemy.getPokemonSpecies().identifier);
+    snprintf(info, 48, "lvl:%-4d hp:%d/%d", enemy.getLevel(), enemy.getHp(), enemy.getPokemonStats()[Stat::HP]);
+    mvwaddstr(menu, 3, 3, info);
+
+    currentHp = 20.0 * ((float)enemy.getHp() / enemy.getPokemonStats()[Stat::HP]);
+
+    for(hpBar = 0; hpBar < currentHp; hpBar++)
+        mvwaddstr(menu, 4, 3 + hpBar, "▮");
+
+    for(; hpBar < 20; hpBar++)
+        mvwaddstr(menu, 4, 3 + hpBar, "▯");
+
+    wrefresh(menu);
+    return 1;
+}
+
+void CursesHandler::BattleGraphics(WINDOW* menu) {
+    box(menu, 0, 0);
+
+    mvwaddstr(menu, 9, 5, "(\\__/)");
+    mvwaddstr(menu, 10, 3, "_ (o'.') __");
+    mvwaddstr(menu, 11, 2, "( z(_(\")(\") )");
+    mvwaddstr(menu, 12, 2, "╰───────────╯");
+
+    mvwaddstr(menu, 9, 39, "│");
+    mvwaddstr(menu, 10, 39, "│");
+    mvwaddstr(menu, 11, 39, "│");
+    mvwaddstr(menu, 12, 18, "↼────────────────────╯");
+
+    mvwaddstr(menu, 2, 31, "(\\__/)");
+    mvwaddstr(menu, 3, 28, "__ (`д´o) _");
+    mvwaddstr(menu, 4, 27, "( (\")(\")_)z )");
+    mvwaddstr(menu, 5, 27, "╰───────────╯");
+
+    mvwaddstr(menu, 2, 2, "│");
+    mvwaddstr(menu, 3, 2, "│");
+    mvwaddstr(menu, 4, 2, "│");
+    mvwaddstr(menu, 5, 2, "╰────────────────────⇀");
 }

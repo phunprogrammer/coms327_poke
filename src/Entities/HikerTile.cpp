@@ -36,7 +36,7 @@ int HikerTile::queueMove() {
     this->direction.x = path.coord.x - this->coord.x;
     this->direction.y = path.coord.y - this->coord.y;
 
-    screen->pushToQueue(PQItem((EntityTile*)this, screen->getPriority() + path.gCost));
+    screen->pushToQueue(PQItem((EntityTile*)this, screen->getPriority() + this->speed.at((*screen)[this->coord])));
 
     return 1;
 }

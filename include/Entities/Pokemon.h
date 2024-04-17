@@ -48,18 +48,20 @@ class Pokemon {
         const int& getLevel() const { return level; }
         const int& getExp() const { return exp; }
         const int& getMaxExp() const { return experience[maxExpIndex].experience; }
+        const int& getHp() const { return hp; }
         const std::vector<pokemon_move_db>& getLearnedMoves() const { return learnedMoves; }
         const std::vector<pokemon_move_db>& getLearnableMoves() const { return learnableMoves; }
         const pokemon_db& getPokemonData() const { return pokemonData; }
         const pokemon_species_db& getPokemonSpecies() const { return pokemonSpecies; }
         const std::vector<pokemon_stats_db>& getPokemonBaseStats() const { return pokemonBaseStats; }
-         const std::vector<int>& getPokemonStats() const { return pokemonStats; }
+        const std::vector<int>& getPokemonStats() const { return pokemonStats; }
         const std::vector<pokemon_types_db>& getPokemonTypes() const { return pokemonTypes; }
         
         bool isFainted() { return hp <= 0; }
 
         void LoadData();
         int UpdateHP(int amount);
+        int Heal();
         int IncrementExp(int amount);
         int Attack(move_db move, Pokemon& enemy);
 };

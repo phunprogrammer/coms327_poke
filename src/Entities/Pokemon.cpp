@@ -220,3 +220,8 @@ int Pokemon::Attack(move_db move, Pokemon& enemy) {
 
     return 1;
 }
+
+int Pokemon::Heal() {
+    UpdateHP(pokemonStats[0]);
+    return 1;
+}

@@ -41,7 +41,7 @@ enum Command : int {
     CONTINUE,
     NOTHING,
     END,
-    BATTLE
+    DEFEATED
 };
 
 typedef struct Coord {

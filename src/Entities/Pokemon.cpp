@@ -218,6 +218,12 @@ int Pokemon::Attack(move_db move, Pokemon& enemy) {
 
     enemy.UpdateHP(totalDmg * -1);
 
+    if(typeMultiplier > 1)
+        return 2;
+
+    if(typeMultiplier == 0)
+        return 3;
+    
     return 1;
 }
 

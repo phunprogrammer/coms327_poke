@@ -63,6 +63,8 @@ void PCTile::addToParty(Pokemon pokemon) {
 int PCTile::healParty() {
     for (auto& pokemon : party)
         pokemon.Heal();
+
+    return 1;
 }
 
 int PCTile::isDefeated() {

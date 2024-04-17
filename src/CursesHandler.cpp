@@ -116,6 +116,8 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
     int battleWinner = 0; //0 = PC, 1 = NPC
 
     while(1) {
+        int pcTurn = 1;
+        int npcTurn = 1;
         wclear(battleWin);
 
         BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
@@ -135,8 +137,15 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
                     int pkmnTemp = 0;
                     if((pkmnTemp = PKMNMenu(menuWin, pc->getParty())) == (int)pc->getParty().size() || pkmnTemp == pcPokemon)
                         continue;
-                    else
+                    else {
                         pcPokemon = pkmnTemp;
+                        pcTurn = 0;
+                        
+                        std::stringstream string;
+                        string << "You switched to " << pc->getParty()[pcPokemon].getPokemonSpecies().identifier;
+                        PrintText(menuWin, string.str());
+                        BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+                    }
                     break;
                 }
                 break;
@@ -150,34 +159,55 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
         int pcPriority = pcMove.priority * 1000 + pc->getParty()[pcPokemon].getPokemonStats()[Stat::SPEED];
         int npcPriority = npcMove.priority * 1000 + npc->getParty()[npcPokemon].getPokemonStats()[Stat::SPEED];
 
-        if (pcPriority >= npcPriority) {
-            pc->getParty()[pcPokemon].Attack(pcMove, npc->getParty()[npcPokemon]);
+        int defeat;
 
-            if (!npc->getParty()[npcPokemon].isFainted())
-                npc->getParty()[npcPokemon].Attack(npcMove, pc->getParty()[pcPokemon]);
-        } else {
-            npc->getParty()[npcPokemon].Attack(npcMove, pc->getParty()[pcPokemon]);
+        if (pcPriority >= npcPriority && pcTurn) {
+            defeat = AttackCycle(menuWin, pc->getParty()[pcPokemon], pcMove, npc->getParty()[npcPokemon], npcMove, npcTurn);
+            BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
 
-            if (!pc->getParty()[pcPokemon].isFainted())
-                pc->getParty()[pcPokemon].Attack(pcMove, npc->getParty()[npcPokemon]);
+            if(defeat == 1) {
+                std::stringstream string;
+                string << npc->getParty()[npcPokemon].getPokemonSpecies().identifier << " fainted!";
+                PrintText(menuWin, string.str());
+            }
+        } else if(npcTurn) {
+            defeat = AttackCycle(menuWin, npc->getParty()[npcPokemon], npcMove, pc->getParty()[pcPokemon], pcMove, pcTurn);
+            BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+
+            if(defeat == 1) {
+                std::stringstream string;
+                string << pc->getParty()[pcPokemon].getPokemonSpecies().identifier << " fainted!";
+                PrintText(menuWin, string.str());
+            }
         }
 
         if (npc->getParty()[npcPokemon].isFainted()) {
             int experience = (npc->getParty()[npcPokemon].getPokemonData().base_experience * npc->getParty()[npcPokemon].getLevel()) / 7;
             pc->getParty()[pcPokemon].IncrementExp(experience * 1.5);
 
+            std::stringstream string;
+            string << pc->getParty()[pcPokemon].getPokemonSpecies().identifier << " gained " << experience << "exp!";
+            PrintText(menuWin, string.str());
+
             if(npcPokemon == (int)npc->getParty().size() - 1)
                 break;
+
             npcPokemon++;
+
+            string.str(std::string());
+            string << npc->getEntity() << " switched to " << npc->getParty()[npcPokemon].getPokemonSpecies().identifier;
+            PrintText(menuWin, string.str());
+            BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
         }
 
         if (pc->getParty()[pcPokemon].isFainted()) {
             if(pc->isDefeated()) {
+                PrintText(menuWin, "All of your pokemon have fainted!");
                 battleWinner = 1;
                 break;
             }
             else
-                while((pcPokemon = PKMNMenu(menuWin, pc->getParty())) < (int)pc->getParty().size());
+                while((pcPokemon = PKMNMenu(menuWin, pc->getParty())) >= (int)pc->getParty().size());
         }
     }
 
@@ -186,6 +216,10 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
     if(battleWinner == 0) {
         npc->defeat();
         screen.getEntities().remove(npc->getCoord());
+
+        std::stringstream string;
+        string << "You defeated " << npc->getEntity();
+        PrintText(menuWin, string.str());
     }
 
     delwin(battleWin);
@@ -343,14 +377,21 @@ int CursesHandler::PKMNMenu(WINDOW* menu, std::vector<Pokemon> party) {
                 return selection;
         }
 
-        for(int i = 0; i < (int)party.size(); i++)
-            if(selection == i)
+        for(int i = 0; i < (int)party.size(); i++) {
+            if (party[i].isFainted())
+                wattron(menu, COLOR_PAIR(Structure::PMART));
+                
+            if(selection == i) {
                 mvwprintw(menu, (i + 1), length * 0.55 - 1, ">%s<", party[i].getPokemonSpecies().identifier);
-            else
+            }
+            else 
                 mvwprintw(menu, (i + 1), length * 0.55, "%s", party[i].getPokemonSpecies().identifier);
 
+            wattroff(menu, COLOR_PAIR(Structure::PMART));
+        }
+
         wrefresh(menu);
-    } while((input = getch()) != 10);
+    } while((input = getch()) != 10 || party[selection].isFainted());
 
     return selection;
 }
@@ -500,4 +541,81 @@ void CursesHandler::BattleGraphics(WINDOW* menu) {
     mvwaddstr(menu, 3, 2, "│");
     mvwaddstr(menu, 4, 2, "│");
     mvwaddstr(menu, 5, 2, "╰────────────────────⇀");
+}
+
+int CursesHandler::PrintText(WINDOW* window, std::string text) {
+    int height, width;
+    coord_t current = { 1, 1 };
+
+    wclear(window);
+    box(window, 0, 0);
+
+    getmaxyx(window, height, width);
+
+    for (char c : text) {
+        if(current.x >= width - 1)
+            current = { 1, current.y + 1 };
+
+        if(current.y >= height - 1)
+            break;
+
+        mvwaddch(window, current.y, current.x++, c);
+    }
+
+    wrefresh(window);
+
+    while(getch() != 10);
+
+    return 1;
+}
+
+int CursesHandler::AttackCycle(WINDOW* window, Pokemon& attacker, move_db attackerMove, Pokemon& defender, move_db defenderMove, int turn) {
+    int out = 0;
+    std::stringstream string;
+    string << attacker.getPokemonSpecies().identifier << " used " << attackerMove.identifier;
+    PrintText(window, string.str());
+
+    int attack = attacker.Attack(attackerMove, defender);
+
+    switch (attack) {
+        case 3:
+            PrintText(window, "It has NO EFFECT!");
+            break;
+        case 2:
+            PrintText(window, "It was SUPER EFFECTIVE!");
+            break;
+        case 1:
+            PrintText(window, "It hit!");
+            break;
+        case 0:
+            PrintText(window, "It missed!");
+            break;
+    }
+
+    if (!defender.isFainted() && turn) {
+        string.str(std::string());
+        string << defender.getPokemonSpecies().identifier << " used " << defenderMove.identifier;
+        PrintText(window, string.str());
+        attack = defender.Attack(defenderMove, attacker);
+
+        switch (attack) {
+            case 3:
+                PrintText(window, "It has NO EFFECT!");
+                break;
+            case 2:
+                PrintText(window, "It was SUPER EFFECTIVE!");
+                break;
+            case 1:
+                PrintText(window, "It hit!");
+                break;
+            case 0:
+                PrintText(window, "It missed!");
+                break;
+        }
+    }
+    else if (defender.isFainted()){
+        out = 1;
+    }
+
+    return out;
 }

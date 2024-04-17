@@ -125,13 +125,10 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
         switch(BattleMenu(menuWin)) {
             case 0:
                 int moveTemp;
-                switch((moveTemp = FightMenu(menuWin, pc->getParty()[pcPokemon]))) {
-                    case 4:
-                        continue;
-                    default:
-                        pcMove = moves[pc->getParty()[pcPokemon].getLearnedMoves()[moveTemp].move_id];
-                        break;
-                }
+                if((moveTemp = FightMenu(menuWin, pc->getParty()[pcPokemon])) == (int)pc->getParty()[pcPokemon].getLearnedMoves().size()) 
+                    continue;
+                else
+                    pcMove = moves[pc->getParty()[pcPokemon].getLearnedMoves()[moveTemp].move_id];
                 break;
             case 1: {
                     int pkmnTemp = 0;
@@ -150,7 +147,9 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
                 }
                 break;
             case 2:
+                continue;
             case 3:
+                PrintText(menuWin, "You cannot run away");
                 continue;
         }
 
@@ -206,8 +205,14 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
                 battleWinner = 1;
                 break;
             }
-            else
+            else {
                 while((pcPokemon = PKMNMenu(menuWin, pc->getParty())) >= (int)pc->getParty().size());
+
+                std::stringstream string;
+                string << "You switched to " << pc->getParty()[pcPokemon].getPokemonSpecies().identifier;
+                PrintText(menuWin, string.str());
+                BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+            }
         }
     }
 

@@ -32,12 +32,12 @@ int PCTile::move() {
         return 0;
     }
 
-    if((*screen)[move] == Terrain::GRASSLAND && rand() % 100 <= 10 && this->party.size() > 0)
-        screen->getCursesHandler().BattleScreen(this);
-
     setCoord(move);
     screen->getCursesHandler().UpdateEntity(this);
     screen->getPriority() += speed.at((*screen)[this->coord]);
+
+    if((*screen)[move] == Terrain::GRASSLAND && rand() % 100 <= 10 && this->party.size() > 0 && !this->isDefeated())
+        screen->getCursesHandler().BattleScreen(this);
 
     return 1;
 }

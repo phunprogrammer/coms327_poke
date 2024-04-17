@@ -370,14 +370,14 @@ int Screen::GenerateBuildings() {
 
     building_t pokemart = buildingQueue.top().getData();
     buildingQueue.pop();
-    ConstructBuilding(pokemart, Structure::PMART); 
+    ConstructBuilding(pokemart, Structure::PCNTR); 
 
     int constructed = 1;
 
     while(constructed == 1 && !buildingQueue.empty()){
         building_t pokecenter = buildingQueue.top().getData();
         buildingQueue.pop();
-        constructed = ConstructBuilding(pokecenter, Structure::PCNTR);
+        constructed = ConstructBuilding(pokecenter, Structure::PMART);
     }
 
     return 1;

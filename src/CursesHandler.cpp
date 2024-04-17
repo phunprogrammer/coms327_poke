@@ -98,29 +98,85 @@ void CursesHandler::InitColors() {
     init_pair(Terrain::GRASSLAND, COLOR_GREEN, COLOR_BLACK);
     init_pair(Terrain::OCEAN, COLOR_BLACK, COLOR_CYAN);
     init_pair(Structure::PATH, COLOR_WHITE, COLOR_BLACK);
-    init_pair(Structure::PMART, COLOR_RED, COLOR_BLACK);
-    init_pair(Structure::PCNTR, COLOR_BLUE, COLOR_BLACK);
+    init_pair(Structure::PCNTR, COLOR_RED, COLOR_BLACK);
+    init_pair(Structure::PMART, COLOR_BLUE, COLOR_BLACK);
     init_pair(Entity::NULL_ENTITY, COLOR_WHITE, COLOR_BLACK);
 }
 
 int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
+    PrintScreen();
     int length = std::min(WIDTH * 2, LENGTH);
     WINDOW* battleWin = newwin(WIDTH, length, start, (LENGTH - length) / 2);
     WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
     box(battleWin, 0, 0);
 
-    int pcPokemon = 0;
-    int npcPokemon = 0;
+    std::stringstream string;
+    string << npc->getEntity() << " wants to battle! ";
+    PrintText(menuWin, string.str());
+
+    int battleWinner = Battle(battleWin, menuWin, pc, npc->getParty(), false);
+
+    if(battleWinner == 0) {
+        npc->defeat();
+        screen.getEntities().remove(npc->getCoord());
+
+        std::stringstream string;
+        string << "You defeated " << npc->getEntity();
+        PrintText(menuWin, string.str());
+    }
+
+    delwin(battleWin);
+    PrintScreen();
+    return 1;
+}
+
+int CursesHandler::BattleScreen(PCTile* pc) {
+    PrintScreen();
+    Pokemon pokemon = Pokemon(screen.getCoord());
+    std::vector<Pokemon> wild({pokemon});
+
+    int length = std::min(WIDTH * 2, LENGTH);
+    WINDOW* battleWin = newwin(WIDTH, length, start, (LENGTH - length) / 2);
+    WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
+    box(battleWin, 0, 0);
+
+    std::stringstream string;
+    string << "You encountered a wild " << pokemon.getPokemonSpecies().identifier << "!";
+    PrintText(menuWin, string.str());
+
+    int battleOutcome = Battle(battleWin, menuWin, pc, wild, true);
+
+    if(battleOutcome == 0) {
+        std::stringstream string;
+        string << "You defeated " << pokemon.getPokemonSpecies().identifier;
+        PrintText(menuWin, string.str());
+    }
+
+    delwin(battleWin);
+    PrintScreen();
+
+    return 1;
+}
+
+int CursesHandler::Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::vector<Pokemon>& enemyParty, bool wild) {
+    int pcPokemon;
+
+    for(pcPokemon = 0; pcPokemon < (int)pc->getParty().size(); pcPokemon++)
+        if(!pc->getParty()[pcPokemon].isFainted())
+            break;
+
+    int enemyPokemon = 0;
     move_db pcMove;
     move_db npcMove;
-    int battleWinner = 0; //0 = PC, 1 = NPC
+    int battleOutcome = 0;
+    int escapeAttempts = 0;
 
-    while(1) {
+    while(battleOutcome == 0) {
         int pcTurn = 1;
         int npcTurn = 1;
         wclear(battleWin);
 
-        BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+        BattleInfo(battleWin, pc->getParty()[pcPokemon], enemyParty[enemyPokemon]);
 
         switch(BattleMenu(menuWin)) {
             case 0:
@@ -141,7 +197,7 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
                         std::stringstream string;
                         string << "You switched to " << pc->getParty()[pcPokemon].getPokemonSpecies().identifier;
                         PrintText(menuWin, string.str());
-                        BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+                        BattleInfo(battleWin, pc->getParty()[pcPokemon], enemyParty[enemyPokemon]);
                     }
                     break;
                 }
@@ -149,29 +205,43 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
             case 2:
                 continue;
             case 3:
-                PrintText(menuWin, "You cannot run away");
-                continue;
+                if(wild) {
+                    if(rand() % 256 < CalcEscape(escapeAttempts, pc->getParty()[pcPokemon], enemyParty[enemyPokemon])) {
+                        PrintText(menuWin, "You escaped!");
+                        battleOutcome = 2;
+                        continue;
+                    }
+                    else {
+                        PrintText(menuWin, "You failed to escape.");
+                        pcTurn = 0;
+                    }
+                }
+                else {
+                    PrintText(menuWin, "You cannot run away");
+                    continue;
+                }
+                break;
         }
 
-        npcMove = moves[npc->getParty()[npcPokemon].getLearnedMoves()[rand() % npc->getParty()[npcPokemon].getLearnedMoves().size()].move_id];
+        npcMove = moves[enemyParty[enemyPokemon].getLearnedMoves()[rand() % enemyParty[enemyPokemon].getLearnedMoves().size()].move_id];
 
         int pcPriority = pcMove.priority * 1000 + pc->getParty()[pcPokemon].getPokemonStats()[Stat::SPEED];
-        int npcPriority = npcMove.priority * 1000 + npc->getParty()[npcPokemon].getPokemonStats()[Stat::SPEED];
+        int npcPriority = npcMove.priority * 1000 + enemyParty[enemyPokemon].getPokemonStats()[Stat::SPEED];
 
         int defeat;
 
         if (pcPriority >= npcPriority && pcTurn) {
-            defeat = AttackCycle(menuWin, pc->getParty()[pcPokemon], pcMove, npc->getParty()[npcPokemon], npcMove, npcTurn);
-            BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+            defeat = AttackCycle(menuWin, pc->getParty()[pcPokemon], pcMove, enemyParty[enemyPokemon], npcMove, npcTurn);
+            BattleInfo(battleWin, pc->getParty()[pcPokemon], enemyParty[enemyPokemon]);
 
             if(defeat == 1) {
                 std::stringstream string;
-                string << npc->getParty()[npcPokemon].getPokemonSpecies().identifier << " fainted!";
+                string << enemyParty[enemyPokemon].getPokemonSpecies().identifier << " fainted!";
                 PrintText(menuWin, string.str());
             }
         } else if(npcTurn) {
-            defeat = AttackCycle(menuWin, npc->getParty()[npcPokemon], npcMove, pc->getParty()[pcPokemon], pcMove, pcTurn);
-            BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+            defeat = AttackCycle(menuWin, enemyParty[enemyPokemon], npcMove, pc->getParty()[pcPokemon], pcMove, pcTurn);
+            BattleInfo(battleWin, pc->getParty()[pcPokemon], enemyParty[enemyPokemon]);
 
             if(defeat == 1) {
                 std::stringstream string;
@@ -180,30 +250,30 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
             }
         }
 
-        if (npc->getParty()[npcPokemon].isFainted()) {
-            int experience = (npc->getParty()[npcPokemon].getPokemonData().base_experience * npc->getParty()[npcPokemon].getLevel()) / 7;
-            pc->getParty()[pcPokemon].IncrementExp(experience * 1.5);
+        if (enemyParty[enemyPokemon].isFainted()) {
+            int experience = (enemyParty[enemyPokemon].getPokemonData().base_experience * enemyParty[enemyPokemon].getLevel()) / 7;
+            pc->getParty()[pcPokemon].IncrementExp(experience * (wild ? 1 : 1.5));
 
             std::stringstream string;
             string << pc->getParty()[pcPokemon].getPokemonSpecies().identifier << " gained " << experience << "exp!";
             PrintText(menuWin, string.str());
 
-            if(npcPokemon == (int)npc->getParty().size() - 1)
+            if(enemyPokemon == (int)enemyParty.size() - 1)
                 break;
 
-            npcPokemon++;
+            enemyPokemon++;
 
             string.str(std::string());
-            string << npc->getEntity() << " switched to " << npc->getParty()[npcPokemon].getPokemonSpecies().identifier;
+            string << "Enemy switched to " << enemyParty[enemyPokemon].getPokemonSpecies().identifier;
             PrintText(menuWin, string.str());
-            BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+            BattleInfo(battleWin, pc->getParty()[pcPokemon], enemyParty[enemyPokemon]);
         }
 
         if (pc->getParty()[pcPokemon].isFainted()) {
             if(pc->isDefeated()) {
                 PrintText(menuWin, "All of your pokemon have fainted!");
-                battleWinner = 1;
-                break;
+                battleOutcome = 1;
+                continue;
             }
             else {
                 while((pcPokemon = PKMNMenu(menuWin, pc->getParty())) >= (int)pc->getParty().size());
@@ -211,63 +281,12 @@ int CursesHandler::BattleScreen(NPCTile* npc, PCTile* pc) {
                 std::stringstream string;
                 string << "You switched to " << pc->getParty()[pcPokemon].getPokemonSpecies().identifier;
                 PrintText(menuWin, string.str());
-                BattleInfo(battleWin, pc->getParty()[pcPokemon], npc->getParty()[npcPokemon]);
+                BattleInfo(battleWin, pc->getParty()[pcPokemon], enemyParty[enemyPokemon]);
             }
         }
     }
 
-    int out = NOTHING;
-
-    if(battleWinner == 0) {
-        npc->defeat();
-        screen.getEntities().remove(npc->getCoord());
-
-        std::stringstream string;
-        string << "You defeated " << npc->getEntity();
-        PrintText(menuWin, string.str());
-    }
-
-    delwin(battleWin);
-    PrintScreen();
-    return out;
-}
-
-int CursesHandler::BattleScreen(PCTile* pc) {
-    Pokemon pokemon = Pokemon(screen.getCoord());
-    int length = std::min(WIDTH * 2, LENGTH);
-    WINDOW* battleWin = newwin(WIDTH, length, start, (LENGTH - length) / 2);
-    box(battleWin, 0, 0);
-
-    mvwprintw(battleWin, 1, 2, "%s wants to battle!\n", pokemon_species[pokemon.getPokemonData().species_id].identifier);
-    mvwprintw(battleWin, 2, 2, "Press enter to capture!\n");
-
-    std::istringstream iss(pokemon.toString());
-    std::string line;
-    int lineNum = 4;
-    while (std::getline(iss, line)) {
-        mvwprintw(battleWin, lineNum++, 2, "%s", line.c_str());
-    }
-
-    wrefresh(battleWin);
-    while(getch() != 10) {}
-    wclear(battleWin);
-    box(battleWin, 0, 0);
-
-    if(rand() % 100 < 50) {
-        mvwprintw(battleWin, 1, 2, "It got away! :(, press enter to continue.");
-        wrefresh(battleWin);
-        while(getch() != 10) {}
-        PrintScreen();
-        return 0;
-    }
-
-    mvwprintw(battleWin, 1, 2, "You caught it!, press enter to continue.");
-    pc->addToParty(pokemon);
-    wrefresh(battleWin);
-    while(getch() != 10) {}
-    delwin(battleWin);
-    PrintScreen();
-    return 1;
+    return battleOutcome;
 }
 
 int CursesHandler::BattleMenu(WINDOW* menu) {
@@ -490,6 +509,7 @@ int CursesHandler::ChooseStarter() {
 }
 
 int CursesHandler::BattleInfo(WINDOW* menu, Pokemon pc, Pokemon enemy) {
+    wclear(menu);
     BattleGraphics(menu);
 
     //PC
@@ -499,7 +519,7 @@ int CursesHandler::BattleInfo(WINDOW* menu, Pokemon pc, Pokemon enemy) {
     mvwaddstr(menu, 10, 18, info);
 
     int hpBar;
-    int currentHp = 20.0 * ((float)pc.getHp() / pc.getPokemonStats()[Stat::HP]);
+    int currentHp = std::ceil(20.0 * ((float)pc.getHp() / pc.getPokemonStats()[Stat::HP]));
 
     for(hpBar = 0; hpBar < currentHp; hpBar++)
         mvwaddstr(menu, 11, 18 + hpBar, "▮");
@@ -512,7 +532,7 @@ int CursesHandler::BattleInfo(WINDOW* menu, Pokemon pc, Pokemon enemy) {
     snprintf(info, 48, "lvl:%-4d hp:%d/%d", enemy.getLevel(), enemy.getHp(), enemy.getPokemonStats()[Stat::HP]);
     mvwaddstr(menu, 3, 3, info);
 
-    currentHp = 20.0 * ((float)enemy.getHp() / enemy.getPokemonStats()[Stat::HP]);
+    currentHp = std::ceil(20.0 * ((float)enemy.getHp() / enemy.getPokemonStats()[Stat::HP]));
 
     for(hpBar = 0; hpBar < currentHp; hpBar++)
         mvwaddstr(menu, 4, 3 + hpBar, "▮");
@@ -623,4 +643,17 @@ int CursesHandler::AttackCycle(WINDOW* window, Pokemon& attacker, move_db attack
     }
 
     return out;
+}
+
+int CursesHandler::CalcEscape(int attempts, Pokemon ally, Pokemon enemy) {
+    int baseChance = (ally.getPokemonStats()[Stat::SPEED] * 32) / (float)((enemy.getPokemonStats()[Stat::SPEED] / 4) % 256);
+    return baseChance + 30 * attempts;
+}
+
+int CursesHandler::HealPoke() {
+    int length = std::min(WIDTH * 2, LENGTH);
+    WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
+    PrintText(menuWin, "Your party was healed");
+    PrintScreen();
+    return 1;
 }

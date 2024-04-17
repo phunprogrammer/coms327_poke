@@ -44,6 +44,8 @@ int InputHandler::HandleInput(char input) {
             return screen->getCursesHandler().ListTrainers();
         case 'f':
             return Fly();
+        case 10:
+            return EnterPokeCenter();
     }
 
     return 0;
@@ -184,5 +186,13 @@ int InputHandler::Fly() {
     noecho();
     curs_set(0);
 
+    return 1;
+}
+
+int InputHandler::EnterPokeCenter() {
+    PCTile* pc = (PCTile*)(screen->getEntities()[0]);
+    if((*screen)[pc->getCoord()] != Structure::PCNTR) return 0;
+    pc->healParty();
+    screen->getCursesHandler().HealPoke();
     return 1;
 }

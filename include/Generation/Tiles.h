@@ -24,8 +24,8 @@ const std::vector<Terrain> TERRAINS {
 enum Structure : char {
     NULL_STRUCT = ' ',
     PATH = '#',
-    PMART = 'M',
-    PCNTR = 'C'
+    PCNTR = 'C',
+    PMART = 'M'
 };
 
 const std::map<char, int> WEIGHTS ({
@@ -37,8 +37,8 @@ const std::map<char, int> WEIGHTS ({
     { Terrain::OCEAN, 100 },
     { Structure::NULL_STRUCT, 0 },
     { Structure::PATH, -5 },
-    { Structure::PMART, 100 },
-    { Structure::PCNTR, 100 }
+    { Structure::PCNTR, 100 },
+    { Structure::PMART, 100 }
 });
 
 class TerrainTile {

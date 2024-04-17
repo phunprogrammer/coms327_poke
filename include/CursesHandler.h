@@ -19,6 +19,7 @@ class CursesHandler {
         Screen& screen;
         void InitColors();
         void BattleGraphics(WINDOW* menu);
+        int CalcEscape(int attempts, Pokemon ally, Pokemon enemy);
     public:
         CursesHandler(Screen& screen);
         ~CursesHandler();
@@ -35,6 +36,8 @@ class CursesHandler {
         int PKMNMenu(WINDOW* menu, std::vector<Pokemon> party);
         int PrintText(WINDOW* window, std::string text);
         int AttackCycle(WINDOW* window, Pokemon& attacker, move_db attackerMove, Pokemon& defender, move_db defenderMove, int turn);
+        int Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::vector<Pokemon>& enemyParty, bool wild);
+        int HealPoke();
 };
 
 #endif

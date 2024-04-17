@@ -38,6 +38,7 @@ class CursesHandler {
         int AttackCycle(WINDOW* window, Pokemon& attacker, move_db attackerMove, Pokemon& defender, move_db defenderMove, int turn);
         int Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::vector<Pokemon>& enemyParty, bool wild);
         int HealPoke();
+        int EnterMart();
 };
 
 #endif

@@ -22,6 +22,7 @@ class InputHandler {
         int MoveScreen(coord_t coord);
         int Fly();
         int EnterPokeCenter();
+        int EnterPokeMart();
 
         Screen* getScreen() const { return screen; }
 };

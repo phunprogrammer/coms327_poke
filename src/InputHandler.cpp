@@ -45,7 +45,9 @@ int InputHandler::HandleInput(char input) {
         case 'f':
             return Fly();
         case 10:
-            return EnterPokeCenter();
+            EnterPokeMart();
+            EnterPokeCenter();
+            return 1;
     }
 
     return 0;
@@ -192,6 +194,14 @@ int InputHandler::Fly() {
 int InputHandler::EnterPokeCenter() {
     PCTile* pc = (PCTile*)(screen->getEntities()[0]);
     if((*screen)[pc->getCoord()] != Structure::PCNTR) return 0;
+    pc->healParty();
+    screen->getCursesHandler().HealPoke();
+    return 1;
+}
+
+int InputHandler::EnterPokeMart() {
+    PCTile* pc = (PCTile*)(screen->getEntities()[0]);
+    if((*screen)[pc->getCoord()] != Structure::PMART) return 0;
     pc->healParty();
     screen->getCursesHandler().HealPoke();
     return 1;

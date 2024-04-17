@@ -380,7 +380,17 @@ int CursesHandler::FightMenu(WINDOW* menu, Pokemon pokemon) {
 }
 
 int CursesHandler::PKMNMenu(WINDOW* menu, std::vector<Pokemon> party) {
-    int selection = 0;
+    std::vector<std::vector<Pokemon>> party2d;
+
+    for (size_t i = 0; i < party.size(); i += 2) {
+        std::vector<Pokemon> row;
+        row.push_back(party[i]);
+        if (i + 1 < party.size())
+            row.push_back(party[i + 1]);
+        party2d.push_back(row);
+    }
+
+    coord_t selection = { 0, 0 };
 
     int length = std::min(WIDTH * 2, LENGTH);
     int input = 0;
@@ -390,34 +400,42 @@ int CursesHandler::PKMNMenu(WINDOW* menu, std::vector<Pokemon> party) {
         box(menu, 0, 0);
 
         switch(input) {
+            case KEY_RIGHT:
+                selection.x + 1 < (int)party2d[selection.y].size() ? selection.x++ : selection.x;
+                break;
+            case KEY_LEFT:
+                selection.x - 1 >= 0 ? selection.x-- : selection.x;
+                break;
             case KEY_DOWN:
-                selection = std::min((int)party.size() - 1, selection + 1);
+                selection.y + 1 < (int)party2d.size() && selection.x < (int)party2d[selection.y + 1].size() ? selection.y++ : selection.y;
                 break;
             case KEY_UP:
-                selection = std::max(0, selection - 1);
+                selection.y - 1 >= 0 ? selection.y-- : selection.y;
                 break;
             case KEY_BACKSPACE:
-                selection = (int)party.size();
-                return selection;
+                selection = { (int)(std::ceil(party.size() / 2.0) - party.size() / 2), (int)party.size() / 2};
+                return selection.y * 2 + selection.x;
         }
 
-        for(int i = 0; i < (int)party.size(); i++) {
-            if (party[i].isFainted())
-                wattron(menu, COLOR_PAIR(Structure::PMART));
-                
-            if(selection == i) {
-                mvwprintw(menu, (i + 1), length * 0.55 - 1, ">%s<", party[i].getPokemonSpecies().identifier);
-            }
-            else 
-                mvwprintw(menu, (i + 1), length * 0.55, "%s", party[i].getPokemonSpecies().identifier);
+        for(int i = 0; i < (int)party2d.size(); i++) {
+            for(int j = 0; j < (int)party2d[i].size(); j++) {
+                if (party2d[i][j].isFainted())
+                    wattron(menu, COLOR_PAIR(Structure::PCNTR));
+                    
+                if(selection.y == i && selection.x == j) {
+                    mvwprintw(menu, (i + 1), length * 0.3 + j * 15 - 1, ">%s<", party2d[i][j].getPokemonSpecies().identifier);
+                }
+                else 
+                    mvwprintw(menu, (i + 1), length * 0.3 + j * 15, "%s", party2d[i][j].getPokemonSpecies().identifier);
 
-            wattroff(menu, COLOR_PAIR(Structure::PMART));
+                wattroff(menu, COLOR_PAIR(Structure::PCNTR));
+            }
         }
 
         wrefresh(menu);
-    } while((input = getch()) != 10 || party[selection].isFainted());
+    } while((input = getch()) != 10 || party2d[selection.y][selection.x].isFainted());
 
-    return selection;
+    return selection.y * 2 + selection.x;
 }
 
 int CursesHandler::ListTrainers() {
@@ -651,6 +669,14 @@ int CursesHandler::CalcEscape(int attempts, Pokemon ally, Pokemon enemy) {
 }
 
 int CursesHandler::HealPoke() {
+    int length = std::min(WIDTH * 2, LENGTH);
+    WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
+    PrintText(menuWin, "Your party was healed");
+    PrintScreen();
+    return 1;
+}
+
+int CursesHandler::EnterMart() {
     int length = std::min(WIDTH * 2, LENGTH);
     WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
     PrintText(menuWin, "Your party was healed");

@@ -1,4 +1,5 @@
 #include "AbstractTiles.h"
+#include "Items.h"
 
 #ifndef PCTILE_H
 #define PCTILE_H
@@ -7,6 +8,8 @@ class Screen;
 class Pokemon;
 
 class PCTile : public EntityTile {
+    private:
+        std::vector<Item> bag;
     public:
         PCTile(coord_t coord);
         ~PCTile() noexcept override = default;

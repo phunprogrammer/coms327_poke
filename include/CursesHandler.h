@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include <vector>
 #include <string>
+#include "Items.h"
 
 #ifndef CURSESHANDLER_H
 #define CURSESHANDLER_H
@@ -34,6 +35,8 @@ class CursesHandler {
         int BattleMenu(WINDOW* menu);
         int FightMenu(WINDOW* menu, Pokemon pokemon);
         int PKMNMenu(WINDOW* menu, std::vector<Pokemon> party);
+        int BagMenu(Pokemon& enemy, bool wild);
+        int UseItem(WINDOW* menu, ItemEnum item, Pokemon& enemy, bool wild);
         int PrintText(WINDOW* window, std::string text);
         int AttackCycle(WINDOW* window, Pokemon& attacker, move_db attackerMove, Pokemon& defender, move_db defenderMove, int turn);
         int Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::vector<Pokemon>& enemyParty, bool wild);

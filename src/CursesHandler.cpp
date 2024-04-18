@@ -8,6 +8,7 @@
 #include "Pokemon.h"
 #include "PCTile.h"
 #include <cmath>
+#include "Items.h"
 
 CursesHandler::CursesHandler(Screen& screen) : screen(screen) {
     setlocale(LC_ALL, "");
@@ -165,7 +166,12 @@ int CursesHandler::Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::v
         if(!pc->getParty()[pcPokemon].isFainted())
             break;
 
-    int enemyPokemon = 0;
+    int enemyPokemon;
+
+    for(enemyPokemon = 0; enemyPokemon < (int)enemyParty.size(); enemyPokemon++)
+        if(!enemyParty[enemyPokemon].isFainted())
+            break;
+    
     move_db pcMove;
     move_db npcMove;
     int battleOutcome = 0;
@@ -188,7 +194,11 @@ int CursesHandler::Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::v
                 break;
             case 1: {
                     int pkmnTemp = 0;
-                    if((pkmnTemp = PKMNMenu(menuWin, pc->getParty())) == (int)pc->getParty().size() || pkmnTemp == pcPokemon)
+                    do {
+                        pkmnTemp = PKMNMenu(menuWin, pc->getParty());
+                    } while(pkmnTemp != (int)pc->getParty().size() && (pc->getParty()[pkmnTemp].isFainted() || pkmnTemp == pcPokemon));
+
+                    if(pkmnTemp == (int)pc->getParty().size())
                         continue;
                     else {
                         pcPokemon = pkmnTemp;
@@ -203,7 +213,19 @@ int CursesHandler::Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::v
                 }
                 break;
             case 2:
-                continue;
+                int out;
+                if((out = BagMenu(enemyParty[enemyPokemon], wild)) == (int)ITEMS.size())
+                    continue;
+                else if (out == 2) {
+                    battleOutcome = out;
+                    npcTurn = 0;
+                    pcTurn = 0;
+                }
+                else {
+                    pcTurn = 0;
+                    BattleInfo(battleWin, pc->getParty()[pcPokemon], enemyParty[enemyPokemon]);
+                }
+                break;
             case 3:
                 if(wild) {
                     if(rand() % 256 < CalcEscape(escapeAttempts, pc->getParty()[pcPokemon], enemyParty[enemyPokemon])) {
@@ -250,7 +272,7 @@ int CursesHandler::Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::v
             }
         }
 
-        if (enemyParty[enemyPokemon].isFainted()) {
+        if (enemyParty[enemyPokemon].isFainted() || battleOutcome == 2) {
             int experience = (enemyParty[enemyPokemon].getPokemonData().base_experience * enemyParty[enemyPokemon].getLevel()) / 7;
             pc->getParty()[pcPokemon].IncrementExp(experience * (wild ? 1 : 1.5));
 
@@ -276,7 +298,7 @@ int CursesHandler::Battle(WINDOW* battleWin, WINDOW* menuWin, PCTile* pc, std::v
                 continue;
             }
             else {
-                while((pcPokemon = PKMNMenu(menuWin, pc->getParty())) >= (int)pc->getParty().size());
+                while((pcPokemon = PKMNMenu(menuWin, pc->getParty())) >= (int)pc->getParty().size() || pc->getParty()[pcPokemon].isFainted());
 
                 std::stringstream string;
                 string << "You switched to " << pc->getParty()[pcPokemon].getPokemonSpecies().identifier;
@@ -433,7 +455,7 @@ int CursesHandler::PKMNMenu(WINDOW* menu, std::vector<Pokemon> party) {
         }
 
         wrefresh(menu);
-    } while((input = getch()) != 10 || party2d[selection.y][selection.x].isFainted());
+    } while((input = getch()) != 10);
 
     return selection.y * 2 + selection.x;
 }
@@ -678,8 +700,143 @@ int CursesHandler::HealPoke() {
 
 int CursesHandler::EnterMart() {
     int length = std::min(WIDTH * 2, LENGTH);
-    WINDOW* menuWin = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
-    PrintText(menuWin, "Your party was healed");
+    WINDOW* menu = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
+    int selection = 0;
+    int input = 0;
+
+    do {
+        wclear(menu);
+        box(menu, 0, 0);
+
+        switch(input) {
+            case KEY_DOWN:
+                selection = std::min((int)ITEMS.size() - 1, selection + 1);
+                break;
+            case KEY_UP:
+                selection = std::max(0, selection - 1);
+                break;
+            case KEY_BACKSPACE:
+                PrintScreen();
+                return (int)ITEMS.size();
+        }
+
+        for(int i = 0; i < (int)ITEMS.size(); i++)
+            if(selection == i)
+                mvwprintw(menu, (i + 1), length * 0.4 - 1, ">%s<", ITEM_STRINGS.at(ITEMS[i]).c_str());
+            else
+                mvwprintw(menu, (i + 1), length * 0.4, "%s", ITEM_STRINGS.at(ITEMS[i]).c_str());
+
+        wrefresh(menu);
+    } while((input = getch()) != 10);
+
+    std::stringstream string;
+    string << ITEM_STRINGS.at(ITEMS[selection]) << " was added to your bag!";
+    PrintText(menu, string.str());
+
     PrintScreen();
-    return 1;
+    return selection;
+}
+
+int CursesHandler::UseItem(WINDOW* menu, ItemEnum item, Pokemon& enemy, bool wild) {
+    int out = 1;
+    int pkmnTemp;
+    std::stringstream string;
+    PCTile* pc = (PCTile*)(screen.getEntities()[0]);
+
+    switch(item) {
+        case ItemEnum::POTION:
+            pkmnTemp = 0;
+            do {
+                pkmnTemp = PKMNMenu(menu, pc->getParty());
+            } while(pkmnTemp != (int)pc->getParty().size() && (pc->getParty()[pkmnTemp].isFainted()));
+
+            if(pkmnTemp == (int)pc->getParty().size())
+                return 0;
+
+            out = UsePotion(pc->getParty()[pkmnTemp]);
+            
+            if(out)
+                string << ITEM_STRINGS.at(item) << " was used on " << pc->getParty()[pkmnTemp].getPokemonSpecies().identifier;
+            else
+                string << pc->getParty()[pkmnTemp].getPokemonSpecies().identifier << " is full health!";
+
+            break;
+        case ItemEnum::REVIVE:
+            pkmnTemp = PKMNMenu(menu, pc->getParty());
+
+            if(pkmnTemp == (int)pc->getParty().size())
+                return 0;
+
+            out = UseRevive(pc->getParty()[pkmnTemp]);
+
+            if(out)
+                string << ITEM_STRINGS.at(item) << " was used on " << pc->getParty()[pkmnTemp].getPokemonSpecies().identifier;
+            else
+                string << pc->getParty()[pkmnTemp].getPokemonSpecies().identifier << " is not fainted!";
+            
+            break;
+        case ItemEnum::POKEBALL:
+            if(!wild) {
+                string << "Cannot catch trainer pokemon!";
+                out = 0;
+            }
+            else if(UsePokeball(pc, enemy)) {
+                string << "You caught " << enemy.getPokemonSpecies().identifier;
+                out = 2;
+            }
+            else
+                string << enemy.getPokemonSpecies().identifier << " broke free!";
+            
+            break;
+    }
+
+    if(out)
+        pc->removeFromBag(item);
+
+    PrintText(menu, string.str());
+    return out;
+}
+
+int CursesHandler::BagMenu(Pokemon& enemy, bool wild) {
+    int length = std::min(WIDTH * 2, LENGTH);
+    WINDOW* menu = newwin(WIDTH * 0.35, length, start + std::ceil(WIDTH * 0.65), (LENGTH - length) / 2);
+    int selection = 0;
+    int input = 0;
+    int out = 0;
+
+    std::vector<std::pair<ItemEnum, int>> bag;
+
+    for(auto& [key, value] : ((PCTile*)screen.getEntities()[0])->getBag())
+        bag.push_back(std::make_pair(key, value));
+
+    if(bag.size() == 0) {
+        PrintText(menu, "Bag is empty :(");
+        return (int)ITEMS.size();
+    }
+
+    do {
+        wclear(menu);
+        box(menu, 0, 0);
+
+        switch(input) {
+            case KEY_DOWN:
+                selection = std::min((int)bag.size() - 1, selection + 1);
+                break;
+            case KEY_UP:
+                selection = std::max(0, selection - 1);
+                break;
+            case KEY_BACKSPACE:
+                return (int)ITEMS.size();
+        }
+
+        for(int i = 0; i < (int)bag.size(); i++)
+            if(selection == i)
+                mvwprintw(menu, (i + 1), length * 0.4 - 1, ">%s< x%d", ITEM_STRINGS.at(bag[i].first).c_str(), bag[i].second);
+            else
+                mvwprintw(menu, (i + 1), length * 0.4, "%s  x%d", ITEM_STRINGS.at(bag[i].first).c_str(), bag[i].second);
+
+        wrefresh(menu);
+    } while((input = getch()) != 10 || !(out = UseItem(menu, bag[selection].first, enemy, wild)));
+
+    return out;
 }

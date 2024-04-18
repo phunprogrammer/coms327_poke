@@ -9,22 +9,25 @@ class Pokemon;
 
 class PCTile : public EntityTile {
     private:
-        std::vector<Item> bag;
+        std::map<ItemEnum, int> bag;
     public:
         PCTile(coord_t coord);
-        ~PCTile() noexcept override = default;
+        ~PCTile();
         
         Entity getEntity() { return entity; }
         coord_t getCoord() { return coord; }
         coord_t getPrevCoord() { return prevCoord; }
         coord_t getDirection() { return direction; }
+        std::map<ItemEnum, int>& getBag() { return bag; }
         void setScreen(Screen* screen) { this->screen = screen; }
         void setCoord(coord_t coord);
         void setDirection(coord_t coord) { this->direction = coord; }
         void setCoordRandom();
         void setScreen(Screen& screen) { this->screen = &screen; }
         int move();
-        void addToParty(Pokemon pokemon);
+        int addToParty(Pokemon pokemon);
+        int addToBag(ItemEnum item);
+        int removeFromBag(ItemEnum item);
         std::vector<Pokemon>& getParty() { return party; }
         int healParty();
         int isDefeated();

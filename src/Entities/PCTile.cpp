@@ -3,9 +3,16 @@
 #include <stdlib.h>
 #include <CursesHandler.h>
 #include <Pokemon.h>
+#include "Items.h"
 
 PCTile::PCTile(coord_t coord) : 
-    EntityTile(Entity::PC, coord) {}
+    EntityTile(Entity::PC, coord) {
+    addToBag(ItemEnum::POTION);
+    addToBag(ItemEnum::REVIVE);
+    addToBag(ItemEnum::POKEBALL);
+}
+
+PCTile::~PCTile() {}
 
 int PCTile::move() {
     coord_t move = { this->coord.x + this->direction.x, this->coord.y + this->direction.y };
@@ -55,9 +62,11 @@ void PCTile::setCoordRandom() {
     this->coord = random;
 }
 
-void PCTile::addToParty(Pokemon pokemon) {
-    if(party.size() < 6)
-        party.push_back(pokemon);
+int PCTile::addToParty(Pokemon pokemon) {
+    if(party.size() >= 6) return 0;
+        
+    party.push_back(pokemon);
+    return 1;
 }
 
 int PCTile::healParty() {
@@ -77,4 +86,33 @@ int PCTile::isDefeated() {
     }
 
     return pcDefeated;
+}
+
+int PCTile::addToBag(ItemEnum item) {
+    for(auto& [key, value] : bag) {
+        if(key == item) { 
+            value++;
+            return 1;
+        }
+    }
+
+    bag[item] = 1;
+    return 1;
+}
+
+int PCTile::removeFromBag(ItemEnum item) {
+    if(bag.count(item) == 0) return 0;
+
+    for(auto& [key, value] : bag) {
+        if(key == item) { 
+            if(value > 1)
+                value--;
+            else
+                bag.erase(key);
+            
+            break;
+        }
+    }    
+
+    return 1;
 }

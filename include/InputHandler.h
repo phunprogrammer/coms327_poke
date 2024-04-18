@@ -23,6 +23,7 @@ class InputHandler {
         int Fly();
         int EnterPokeCenter();
         int EnterPokeMart();
+        int OpenBag();
 
         Screen* getScreen() const { return screen; }
 };

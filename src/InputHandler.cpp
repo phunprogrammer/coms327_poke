@@ -48,6 +48,8 @@ int InputHandler::HandleInput(char input) {
             EnterPokeMart();
             EnterPokeCenter();
             return 1;
+        case 'b':
+            return OpenBag();
     }
 
     return 0;
@@ -202,7 +204,15 @@ int InputHandler::EnterPokeCenter() {
 int InputHandler::EnterPokeMart() {
     PCTile* pc = (PCTile*)(screen->getEntities()[0]);
     if((*screen)[pc->getCoord()] != Structure::PMART) return 0;
-    pc->healParty();
-    screen->getCursesHandler().HealPoke();
+    int selection;
+    while((selection = screen->getCursesHandler().EnterMart()) != (int)ITEMS.size())
+        pc->addToBag(ITEMS[selection]);
+    return 1;
+}
+
+int InputHandler::OpenBag() {
+    PCTile* pc = (PCTile*)(screen->getEntities()[0]);
+    screen->getCursesHandler().BagMenu(pc->getParty()[0], false);
+    screen->getCursesHandler().PrintScreen();
     return 1;
 }
